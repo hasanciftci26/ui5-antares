@@ -1,0 +1,14 @@
+specVersion: "3.2"
+metadata:
+  name: ui5.antares
+type: library
+framework:
+  name: SAPUI5
+  version: "1.123.1"
+  libraries:
+    - name: sap.m
+    - name: sap.ui.core 
+resources:
+  configuration:
+    paths:
+      src: dist/resources
