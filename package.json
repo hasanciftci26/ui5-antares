@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "description": "UI5 Antares is a set of some useful classes and methods to speed up the development time for OData operations in SAPUI5 applications.",
   "scripts": {
-    "build": "ui5 build preload --clean-dest --config ui5-npm.yaml --exclude-task=minify && npm run move-declaration",
-    "move-declaration": "shx cp dist/index.d.ts dist/resources/ui5/antares && shx rm dist/index.d.ts"
+    "build": "ui5 build preload --clean-dest --config ui5-npm.yaml --exclude-task=minify && node correct-types.js"
   },
   "repository": {
     "url": "https://github.com/hasanciftci26/ui5-antares"
@@ -18,7 +17,7 @@
     "dist",
     "ui5.yaml"
   ],
-  "types": "dist/resources/ui5/antares/index.d.ts",
+  "types": "dist/index.d.ts",
   "author": "Hasan Çiftçi (hasanciftcii26@gmail.com)",
   "license": "UNLICENSED",
   "devDependencies": {
@@ -27,7 +26,6 @@
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
     "@ui5/cli": "^3.9.2",
-    "shx": "^0.3.4",
     "typescript": "^5.4.5",
     "ui5-task-no-debug-files": "^0.0.5",
     "ui5-tooling-transpile": "^3.4.0"
