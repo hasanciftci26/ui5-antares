@@ -6,6 +6,9 @@
     "build": "ui5 build preload --clean-dest --config ui5-npm.yaml --exclude-task=minify && npm run move-declaration",
     "move-declaration": "shx cp dist/index.d.ts dist/resources/ui5/antares && shx rm dist/index.d.ts"
   },
+  "repository": {
+    "url": "https://github.com/hasanciftci26/ui5-antares"
+  },
   "keywords": [
     "SAPUI5",
     "UI5",
