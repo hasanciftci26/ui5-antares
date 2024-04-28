@@ -26,6 +26,7 @@
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
     "@ui5/cli": "^3.9.2",
+    "replace-in-file": "^7.1.0",
     "typescript": "^5.4.5",
     "ui5-task-no-debug-files": "^0.0.5",
     "ui5-tooling-transpile": "^3.4.0"

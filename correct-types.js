@@ -1,36 +1,25 @@
-const fs = require("fs");
-const path = require("path");
+const replace = require("replace-in-file");
 
-fs.readFile(path.join("dist", "index.d.ts"), "utf8", function (err, data) {
-    if (err) {
-        return console.log(err);
-    }
+const references = {
+    files: "dist/index.d.ts",
+    from: /path="\.\/(resources\/ui5\/antares\/)?/g,
+    to: 'path="./resources/ui5/antares/'
+};
 
-    const result = data.replaceAll('path="./', 'path="./resources/ui5/antares/');
-
-    fs.writeFile(path.join("dist", "index.d.ts"), result, "utf8", function (err) {
-        if (err) return console.log(err);
-    });
+replace(references).then((results) => {
+    console.log("Reference replacement results:", results);
+}).catch((error) => {
+    console.error("Error occurred in reference replacement:", error);
 });
 
-const generatedFilePath = path.join(__dirname, "dist", "resources", "ui5", "antares");
+const typeMappings = {
+    files: "dist/resources/ui5/antares/**/*.d.ts",
+    from: new RegExp('//# sourceMappingURL=[A-Za-z]*.d.ts.map', "g"),
+    to: ""
+};
 
-fs.promises.readdir(generatedFilePath, { recursive: true }).then((files) => {
-    files.forEach((file) => {
-        if (file.endsWith(".d.ts")) {
-            const filePath = path.join(generatedFilePath, file);
-
-            fs.readFile(filePath, "utf8", function (err, data) {
-                if (err) {
-                    return console.log(err);
-                }
-
-                const result = data.replace(/\/\/# sourceMappingURL\=[A-Za-z]*\.d\.ts\.map/, "");
-
-                fs.writeFile(filePath, result, "utf8", function (err) {
-                    if (err) return console.log(err);
-                });
-            });
-        }
-    });
+replace(typeMappings).then((results) => {
+    console.log("Type mappings replacement results:", results);
+}).catch((error) => {
+    console.error("Error occurred in type mappings replacement:", error);
 });
