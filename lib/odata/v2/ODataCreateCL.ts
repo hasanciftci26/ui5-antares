@@ -8,7 +8,7 @@ import { ODataMethods } from "ui5/antares/types/odata/enums";
  * @namespace ui5.antares.odata.v2
  */
 export default class ODataCreateCL<EntityT extends object = object, ErrorT = IError> extends ODataCL {
-    private payload: EntityT;
+    private payload?: EntityT;
     private entityPath: string;
     private urlParameters?: Record<string, string>;
     private refreshAfterChange: boolean = true;
@@ -39,7 +39,6 @@ export default class ODataCreateCL<EntityT extends object = object, ErrorT = IEr
     }
 
     public createEntry(): Context {
-        this.checkData(this.payload);
         const oDataModel = this.getODataModel();
 
         const entry = oDataModel.createEntry(this.entityPath, {
@@ -54,7 +53,7 @@ export default class ODataCreateCL<EntityT extends object = object, ErrorT = IEr
         const oDataModel = this.getODataModel();
 
         return new Promise((resolve, reject) => {
-            oDataModel.create(this.entityPath, this.payload, {
+            oDataModel.create(this.entityPath, this.payload!, {
                 urlParameters: this.urlParameters,
                 refreshAfterChange: this.refreshAfterChange,
                 success: (responseData: EntityT) => {

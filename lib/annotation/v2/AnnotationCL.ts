@@ -1,15 +1,18 @@
 import BaseObject from "sap/ui/base/Object";
 import ODataMetaModel, { EntitySet, EntityType, Property } from "sap/ui/model/odata/ODataMetaModel";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
+import EntityCL from "ui5/antares/entity/v2/EntityCL";
 import { IEntityTypeLabel } from "ui5/antares/types/annotation/label";
 import { IODataMetadata } from "ui5/antares/types/annotation/metadata";
 import { NamingStrategies } from "ui5/antares/types/entry/enums";
 
+/**
+ * @namespace ui5.antares.annotation.v2
+ */
 export default class AnnotationCL extends BaseObject {
     private namingStrategy: NamingStrategies;
     private oDataModel: ODataModel;
     private entityName: string;
-    private metaModel: ODataMetaModel;
     private metadataUrl: string;
     private entityTypeLabels: IEntityTypeLabel[] = [];
 
@@ -18,25 +21,19 @@ export default class AnnotationCL extends BaseObject {
         this.namingStrategy = namingStrategy;
         this.oDataModel = oDataModel;
         this.entityName = entityName;
-        this.metaModel = oDataModel.getMetaModel();
         this.metadataUrl = metadataUrl;
     }
 
     public async generateFormAnnotations(): Promise<string> {
-        const entitySet: EntitySet | undefined = this.metaModel.getODataEntitySet(this.entityName) as EntitySet;
+        const entity = new EntityCL(this.oDataModel, this.entityName);
 
-        if (!entitySet) {
-            throw new Error(`${this.entityName} EntitySet was not found in the OData metadata!`);
+        try {
+            const entityType = entity.getEntityType();
+            this.populateFieldLabels(entityType.property);
+            return this.generateFormXMLAnnotations(entityType.name);
+        } catch (error) {
+            throw error;
         }
-
-        const entityType: EntityType | undefined = this.metaModel.getODataEntityType(entitySet.entityType) as EntityType;
-
-        if (!entityType) {
-            throw new Error(`${entityType} EntityType was not found in the OData metadata!`);
-        }
-
-        this.populateFieldLabels(entityType.property);
-        return this.generateFormXMLAnnotations(entityType.name);
     }
 
     private populateFieldLabels(properties?: Property[]): void {
@@ -133,7 +130,7 @@ export default class AnnotationCL extends BaseObject {
         const schemaElement = xmlDoc.createElementNS("http://docs.oasis-open.org/odata/ns/edm", "Schema");
 
         this.entityTypeLabels.forEach((label) => {
-            const annotationsElement = xmlDoc.createElement("Annotations");
+            const annotationsElement = xmlDoc.createElementNS(null, "Annotations");
             annotationsElement.setAttribute("Target", `ModelEntityTypes.${entityTypeName}/${label.originalProperty}`);
 
             const annotationElement = xmlDoc.createElement("Annotation");
@@ -153,7 +150,7 @@ export default class AnnotationCL extends BaseObject {
 
     private getServiceNamespace(): Promise<string> {
         return new Promise((resolve) => {
-            this.oDataModel.metadataLoaded().then((result) => {
+            this.oDataModel.metadataLoaded().then(() => {
                 const metadata = this.oDataModel.getServiceMetadata() as IODataMetadata;
 
                 if (metadata.dataServices.schema.length) {
