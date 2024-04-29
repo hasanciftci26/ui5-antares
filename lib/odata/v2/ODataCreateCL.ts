@@ -18,6 +18,10 @@ export default class ODataCreateCL<EntityT extends object = object, ErrorT = IEr
         this.entityPath = entityName.startsWith("/") ? entityName : `/${entityName}`;
     }
 
+    protected getEntityName(): string {
+        return this.entityPath.slice(1);
+    }
+
     public setODataModelName(modelName: string) {
         this.setModelName(modelName);
     }
@@ -32,7 +36,7 @@ export default class ODataCreateCL<EntityT extends object = object, ErrorT = IEr
 
     public setRefreshAfterChange(refreshAfterChange: boolean) {
         this.refreshAfterChange = refreshAfterChange;
-    }    
+    }
 
     public createEntry(): Context {
         this.checkData(this.payload);
