@@ -119,10 +119,12 @@ export default class EntryCreateCL<EntityT extends object> extends ODataCreateCL
             escapeHandler: this.onCancelESC.bind(this),
             beginButton: new Button({
                 text: this.createButtonText,
+                type: "Success",
                 press: this.onCreate.bind(this)
             }),
             endButton: new Button({
                 text: this.cancelButtonText,
+                type: "Negative",
                 press: this.onCancel.bind(this)
             })
         });
