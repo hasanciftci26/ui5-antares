@@ -1,44 +1,37 @@
-import BaseObject from "sap/ui/base/Object";
-import ODataMetaModel, { EntitySet, EntityType, Property } from "sap/ui/model/odata/ODataMetaModel";
-import ODataModel from "sap/ui/model/odata/v2/ODataModel";
+import UIComponent from "sap/ui/core/UIComponent";
+import Controller from "sap/ui/core/mvc/Controller";
+import { Property } from "sap/ui/model/odata/ODataMetaModel";
 import EntityCL from "ui5/antares/entity/v2/EntityCL";
 import { IEntityTypeLabel } from "ui5/antares/types/annotation/label";
 import { IODataMetadata } from "ui5/antares/types/annotation/metadata";
 import { NamingStrategies } from "ui5/antares/types/entry/enums";
+import Util from "ui5/antares/util/Util";
 
 /**
  * @namespace ui5.antares.annotation.v2
  */
-export default class AnnotationCL extends BaseObject {
+export default class AnnotationCL extends EntityCL {
     private namingStrategy: NamingStrategies;
-    private oDataModel: ODataModel;
-    private entityName: string;
-    private metadataUrl: string;
     private entityTypeLabels: IEntityTypeLabel[] = [];
 
-    constructor(namingStrategy: NamingStrategies, oDataModel: ODataModel, entityName: string, metadataUrl: string) {
-        super();
+    constructor(controller: Controller | UIComponent, entityName: string, namingStrategy: NamingStrategies, modelName?: string) {
+        super(controller, entityName, modelName);
         this.namingStrategy = namingStrategy;
-        this.oDataModel = oDataModel;
-        this.entityName = entityName;
-        this.metadataUrl = metadataUrl;
     }
 
-    public async generateFormAnnotations(): Promise<string> {
-        const entity = new EntityCL(this.oDataModel, this.entityName);
+    public async appendFormAnnotations(): Promise<void> {
+        const entityType = this.getEntityType();
+        this.populateFieldLabels(entityType.property);
+        const xmlAnnotations = await this.getFormXMLAnnotations(entityType.name);
 
-        try {
-            const entityType = entity.getEntityType();
-            this.populateFieldLabels(entityType.property);
-            return this.generateFormXMLAnnotations(entityType.name);
-        } catch (error) {
-            throw error;
-        }
+        this.getODataModel().metadataLoaded().then(() => {
+            this.getODataModel().addAnnotationXML(xmlAnnotations);
+        });
     }
 
     private populateFieldLabels(properties?: Property[]): void {
         if (!properties) {
-            throw new Error(`EntitySet ${this.entityName} does not contain any property!`);
+            throw new Error(`EntitySet ${this.getEntityName()} does not contain any property!`);
         }
 
         properties.forEach((property) => {
@@ -46,19 +39,19 @@ export default class AnnotationCL extends BaseObject {
 
             switch (this.namingStrategy) {
                 case NamingStrategies.CAMEL_CASE:
-                    label = this.getCamelCaseLabel(property.name);
+                    label = Util.getCamelCaseLabel(property.name);
                     break;
                 case NamingStrategies.PASCAL_CASE:
-                    label = this.getPascalCaseLabel(property.name);
+                    label = Util.getPascalCaseLabel(property.name);
                     break;
                 case NamingStrategies.SNAKE_CASE:
-                    label = this.getSnakeCaseLabel(property.name);
+                    label = Util.getSnakeCaseLabel(property.name);
                     break;
                 case NamingStrategies.CONSTANT_CASE:
-                    label = this.getConstantCaseLabel(property.name);
+                    label = Util.getConstantCaseLabel(property.name);
                     break;
                 case NamingStrategies.KEBAB_CASE:
-                    label = this.getKebabCaseLabel(property.name);
+                    label = Util.getKebabCaseLabel(property.name);
                     break;
             }
 
@@ -69,40 +62,12 @@ export default class AnnotationCL extends BaseObject {
         });
     }
 
-    private getCamelCaseLabel(name: string): string {
-        return name.replace(/([A-Z])/g, " $1").replace(/^./, function (str) {
-            return str.toUpperCase();
-        });
-    }
-
-    private getPascalCaseLabel(name: string): string {
-        return name.replace(/([A-Z])/g, " $1").trim();
-    }
-
-    private getSnakeCaseLabel(name: string): string {
-        return name.replace(/_/g, " ").replace(/\b\w/g, function (str) {
-            return str.toUpperCase();
-        });
-    }
-
-    private getConstantCaseLabel(name: string): string {
-        return name.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, function (str) {
-            return str.toUpperCase();
-        });
-    }
-
-    private getKebabCaseLabel(name: string): string {
-        return name.split("-")
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ");
-    }
-
-    private async generateFormXMLAnnotations(entityTypeName: string): Promise<string> {
+    private async getFormXMLAnnotations(entityTypeName: string): Promise<string> {
         const edmxNamespace = "http://docs.oasis-open.org/odata/ns/edmx";
         const xmlDoc = document.implementation.createDocument(edmxNamespace, "edmx:Edmx");
         const edmxElement = xmlDoc.documentElement;
         const uris = [
-            this.metadataUrl,
+            this.getMetadataUrl(),
             "https://sap.github.io/odata-vocabularies/vocabularies/Common.xml"
         ];
 
@@ -150,8 +115,8 @@ export default class AnnotationCL extends BaseObject {
 
     private getServiceNamespace(): Promise<string> {
         return new Promise((resolve) => {
-            this.oDataModel.metadataLoaded().then(() => {
-                const metadata = this.oDataModel.getServiceMetadata() as IODataMetadata;
+            this.getODataModel().metadataLoaded().then(() => {
+                const metadata = this.getODataModel().getServiceMetadata() as IODataMetadata;
 
                 if (metadata.dataServices.schema.length) {
                     resolve(metadata.dataServices.schema[0].namespace || "");

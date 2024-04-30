@@ -1,18 +1,27 @@
-import BaseObject from "sap/ui/base/Object";
+import UIComponent from "sap/ui/core/UIComponent";
+import Controller from "sap/ui/core/mvc/Controller";
 import ODataMetaModel, { EntitySet, EntityType } from "sap/ui/model/odata/ODataMetaModel";
-import ODataModel from "sap/ui/model/odata/v2/ODataModel";
+import ModelCL from "ui5/antares/base/v2/ModelCL";
 
 /**
  * @namespace ui5.antares.entity.v2
  */
-export default class EntityCL extends BaseObject {
+export default class EntityCL extends ModelCL {
     private entityName: string;
     private metaModel: ODataMetaModel;
 
-    constructor(oDataModel: ODataModel, entityName: string) {
-        super();
-        this.metaModel = oDataModel.getMetaModel();
+    constructor(controller: Controller | UIComponent, entityName: string, modelName?: string) {
+        super(controller, modelName);
         this.entityName = entityName;
+        this.metaModel = this.getODataModel().getMetaModel();
+    }
+
+    protected getEntityName(): string {
+        return this.entityName;
+    }
+
+    public getMetaModel(): ODataMetaModel {
+        return this.metaModel;
     }
 
     public getEntityType(): EntityType {
@@ -38,5 +47,20 @@ export default class EntityCL extends BaseObject {
         }
 
         return entitySet;
+    }
+
+    public getEntityTypeKeys(): string[] {
+        const entityType = this.getEntityType();
+        return entityType.key.propertyRef.map(key => key.name);
+    }
+
+    public getEntityTypeProperties(): string[] {
+        const entityType = this.getEntityType();
+
+        if (!entityType.property) {
+            throw new Error(`${entityType.name} EntityType has no property in the OData metadata!`);
+        }
+
+        return entityType.property.map(prop => prop.name);
     }
 }
