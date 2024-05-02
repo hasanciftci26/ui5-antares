@@ -1,0 +1,13 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    controllerName="unit.ui5.antares.controller.Homepage"
+    displayBlock="true">
+    <Page id="Homepage"
+        showHeader="true"
+        title="UI5 Antares Unit Tests">
+        <content>
+            <Button text="Get Data" press="onGetData" />
+        </content>
+    </Page>
+</mvc:View>
