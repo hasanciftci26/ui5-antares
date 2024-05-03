@@ -1,9 +1,9 @@
-import EntityCL from "../entity/v2/EntityCL";
+import EntityCL from "ui5/antares/entity/v2/EntityCL";
 import SmartForm from "sap/ui/comp/smartform/SmartForm";
 import Group from "sap/ui/comp/smartform/Group";
 import SmartField from "sap/ui/comp/smartfield/SmartField";
 import GroupElement from "sap/ui/comp/smartform/GroupElement";
-import { IContentConfigurations } from "../types/ui/content";
+import { IContentConfigurations } from "ui5/antares/types/ui/content";
 import SimpleForm from "sap/ui/layout/form/SimpleForm";
 import UI5Element from "sap/ui/core/Element";
 import Label from "sap/m/Label";
