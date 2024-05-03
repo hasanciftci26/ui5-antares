@@ -2,6 +2,9 @@ import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";
 import ODataMetaModel, { EntitySet, EntityType } from "sap/ui/model/odata/ODataMetaModel";
 import ModelCL from "ui5/antares/base/v2/ModelCL";
+import { IEntityType } from "ui5/antares/types/entity/type";
+import { NamingStrategies } from "ui5/antares/types/entry/enums";
+import Util from "ui5/antares/util/Util";
 
 /**
  * @namespace ui5.antares.entity.v2
@@ -9,10 +12,14 @@ import ModelCL from "ui5/antares/base/v2/ModelCL";
 export default class EntityCL extends ModelCL {
     private entityName: string;
     private metaModel: ODataMetaModel;
+    private resourceBundlePrefix: string;
+    private namingStrategy: NamingStrategies;
 
-    constructor(controller: Controller | UIComponent, entityName: string, modelName?: string) {
+    constructor(controller: Controller | UIComponent, entityName: string, resourceBundlePrefix: string, namingStrategy: NamingStrategies, modelName?: string) {
         super(controller, modelName);
         this.entityName = entityName;
+        this.resourceBundlePrefix = resourceBundlePrefix;
+        this.namingStrategy = namingStrategy;
         this.metaModel = this.getODataModel().getMetaModel();
     }
 
@@ -24,9 +31,9 @@ export default class EntityCL extends ModelCL {
         return this.metaModel;
     }
 
-    public getEntityType(): EntityType {
+    public async getEntityType(): Promise<EntityType> {
         try {
-            const entitySet = this.getEntitySet();
+            const entitySet = await this.getEntitySet();
             const entityType: EntityType | undefined = this.metaModel.getODataEntityType(entitySet.entityType) as EntityType;
 
             if (!entityType) {
@@ -39,28 +46,60 @@ export default class EntityCL extends ModelCL {
         }
     }
 
-    public getEntitySet(): EntitySet {
-        const entitySet: EntitySet | undefined = this.metaModel.getODataEntitySet(this.entityName) as EntitySet;
+    public getEntitySet(): Promise<EntitySet> {
+        return new Promise((resolve, reject) => {
+            this.metaModel.loaded().then(() => {
+                const entitySet: EntitySet | undefined = this.metaModel.getODataEntitySet(this.entityName) as EntitySet;
 
-        if (!entitySet) {
-            throw new Error(`${this.entityName} EntitySet was not found in the OData metadata!`);
-        }
+                if (!entitySet) {
+                    reject(`${this.entityName} EntitySet was not found in the OData metadata!`);
+                }
 
-        return entitySet;
+                resolve(entitySet);
+            });
+        });
     }
 
-    public getEntityTypeKeys(): string[] {
-        const entityType = this.getEntityType();
-        return entityType.key.propertyRef.map(key => key.name);
+    public async getEntityTypeKeys(): Promise<IEntityType[]> {
+        const entityType = await this.getEntityType();
+        const entityTypeProps = await this.getEntityTypeProperties();
+
+        return entityType.key.propertyRef.map((key) => {
+            return {
+                originalProperty: key.name,
+                propertyType: entityTypeProps.find(prop => prop.originalProperty === key.name)!.propertyType,
+                generatedLabel: this.getEntityTypePropLabel(key.name)
+            }
+        });
     }
 
-    public getEntityTypeProperties(): string[] {
-        const entityType = this.getEntityType();
+    public async getEntityTypeProperties(): Promise<IEntityType[]> {
+        const entityType = await this.getEntityType();
 
         if (!entityType.property) {
             throw new Error(`${entityType.name} EntityType has no property in the OData metadata!`);
         }
 
-        return entityType.property.map(prop => prop.name);
+        return entityType.property.map((prop) => {
+            return {
+                originalProperty: prop.name,
+                propertyType: prop.type,
+                generatedLabel: this.getEntityTypePropLabel(prop.name)
+            }
+        });
+    }
+
+    public getEntityTypePropLabel(property: string): string {
+        const resourceBundle = this.getResourceBundle();
+
+        if (resourceBundle) {
+            if (resourceBundle.hasText(`${this.resourceBundlePrefix}${this.entityName}${property}`)) {
+                return resourceBundle.getText(`${this.resourceBundlePrefix}${this.entityName}${property}`) as string;
+            } else {
+                return Util.getGeneratedLabel(property, this.namingStrategy);
+            }
+        } else {
+            return Util.getGeneratedLabel(property, this.namingStrategy);
+        }
     }
 }

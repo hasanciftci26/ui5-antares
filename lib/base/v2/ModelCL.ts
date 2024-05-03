@@ -1,8 +1,10 @@
+import ResourceBundle from "sap/base/i18n/ResourceBundle";
 import BaseObject from "sap/ui/base/Object";
 import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";
 import View from "sap/ui/core/mvc/View";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
+import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import { IManifestDataSources, IManifestModels } from "ui5/antares/types/common";
 
 /**
@@ -15,6 +17,7 @@ export default abstract class ModelCL extends BaseObject {
     private oDataModel: ODataModel;
     private metadataUrl: string;
     private modelName?: string;
+    private resourceBundle?: ResourceBundle;
 
     constructor(controller: Controller | UIComponent, modelName?: string) {
         super();
@@ -24,12 +27,17 @@ export default abstract class ModelCL extends BaseObject {
         if (controller instanceof Controller) {
             this.sourceView = controller.getView() as View;
             this.ownerComponent = controller.getOwnerComponent() as UIComponent;
-            this.oDataModel = this.ownerComponent.getModel(this.modelName) as ODataModel;
         } else {
             this.ownerComponent = controller;
-            this.oDataModel = this.ownerComponent.getModel(this.modelName) as ODataModel;
         }
 
+        const resourceModel = this.ownerComponent.getModel("i18n");
+
+        if (resourceModel instanceof ResourceModel) {
+            this.resourceBundle = resourceModel.getResourceBundle() as ResourceBundle;
+        }
+
+        this.oDataModel = this.ownerComponent.getModel(this.modelName) as ODataModel;
         this.setMetadataUrl();
     }
 
@@ -55,6 +63,14 @@ export default abstract class ModelCL extends BaseObject {
 
     protected getModelName(): string | undefined {
         return this.modelName;
+    }
+
+    protected getServiceUrl(): string {
+        return this.metadataUrl.split("$metadata")[0];
+    }
+
+    protected getResourceBundle(): ResourceBundle | undefined {
+        return this.resourceBundle;
     }
 
     protected setModelName(modelName?: string): void {

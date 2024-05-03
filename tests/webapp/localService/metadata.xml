@@ -22,7 +22,8 @@
           Type="Edm.String" />
         <Property Name="CategoryID"
           Type="Edm.Int32" />
-        <!-- Foreign Key to Category -->
+        <Property Name="SupplierID"
+          Type="Edm.Int32" />
         <NavigationProperty Name="toCategory"
           Relationship="UI5Antares.Product_Category_Association"
           FromRole="Product"

@@ -1,7 +1,7 @@
 {
     "_version": "1.59.0",
     "sap.app": {
-        "id": "unit.ui5.antares",
+        "id": "test.ui5.antares",
         "type": "application",
         "i18n": "i18n/i18n.properties",
         "applicationVersion": {
@@ -65,7 +65,7 @@
             "i18n": {
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": {
-                    "bundleName": "unit.ui5.antares.i18n.i18n"
+                    "bundleName": "test.ui5.antares.i18n.i18n"
                 }
             },
             "": {
@@ -85,7 +85,7 @@
                 "routerClass": "sap.m.routing.Router",
                 "viewType": "XML",
                 "async": true,
-                "viewPath": "unit.ui5.antares.view",
+                "viewPath": "test.ui5.antares.view",
                 "controlAggregation": "pages",
                 "controlId": "app",
                 "clearControlAggregation": false
@@ -110,7 +110,7 @@
             }
         },
         "rootView": {
-            "viewName": "unit.ui5.antares.view.App",
+            "viewName": "test.ui5.antares.view.App",
             "type": "XML",
             "async": true,
             "id": "App"

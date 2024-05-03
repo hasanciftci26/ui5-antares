@@ -9,7 +9,7 @@
         "moduleResolution": "node",
         "sourceMap": true,
         "paths": {
-            "unit/ui5/antares/*": [
+            "test/ui5/antares/*": [
                 "./webapp/*"
             ],
             "ui5/antares/*": [

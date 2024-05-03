@@ -1,13 +1,51 @@
 <mvc:View xmlns:mvc="sap.ui.core.mvc"
     xmlns:core="sap.ui.core"
     xmlns="sap.m"
-    controllerName="unit.ui5.antares.controller.Homepage"
+    controllerName="test.ui5.antares.controller.Homepage"
     displayBlock="true">
     <Page id="Homepage"
         showHeader="true"
-        title="UI5 Antares Unit Tests">
+        title="UI5 Antares Test App">
         <content>
-            <Button text="Get Data" press="onGetData" />
+            <Table items="{/Products}">
+                <headerToolbar>
+                    <OverflowToolbar >
+                        <ToolbarSpacer />
+                        <Button text="Create a Product"
+                            press="onCreateProduct"/>
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column >
+                        <Label text="ID"/>
+                    </Column>
+                    <Column >
+                        <Label text="Name"/>
+                    </Column>
+                    <Column >
+                        <Label text="Price"/>
+                    </Column>
+                    <Column >
+                        <Label text="Currency"/>
+                    </Column>
+                    <Column >
+                        <Label text="Category ID"/>
+                    </Column>
+                    <Column >
+                        <Label text="Supplier ID"/>
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem >
+                        <Text text="{ID}"/>
+                        <Text text="{Name}"/>
+                        <Text text="{Price}"/>
+                        <Text text="{Currency}"/>
+                        <Text text="{CategoryID}"/>
+                        <Text text="{SupplierID}"/>
+                    </ColumnListItem>
+                </items>
+            </Table>
         </content>
     </Page>
 </mvc:View>

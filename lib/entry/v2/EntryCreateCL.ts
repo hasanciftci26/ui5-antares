@@ -1,16 +1,11 @@
 import { Button$PressEvent } from "sap/m/Button";
 import Dialog from "sap/m/Dialog";
-import SmartField from "sap/ui/comp/smartfield/SmartField";
-import Group from "sap/ui/comp/smartform/Group";
-import GroupElement from "sap/ui/comp/smartform/GroupElement";
-import SmartForm from "sap/ui/comp/smartform/SmartForm";
 import Controller from "sap/ui/core/mvc/Controller";
 import View from "sap/ui/core/mvc/View";
 import Context from "sap/ui/model/Context";
-import AnnotationCL from "ui5/antares/annotation/v2/AnnotationCL";
-import EntityCL from "ui5/antares/entity/v2/EntityCL";
 import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL";
 import { FormTypes, NamingStrategies } from "ui5/antares/types/entry/enums";
+import ContentCL from "ui5/antares/ui/ContentCL";
 import DialogCL from "ui5/antares/ui/DialogCL";
 
 /**
@@ -25,6 +20,9 @@ export default class EntryCreateCL<EntityT extends object> extends ODataCreateCL
     private formPropertyOrder?: string[];
     private excludeOtherProps: boolean = false;
     private excludedProperties: string[] = [];
+    private mandatoryProperties: string[] = [];
+    private resourceBundlePrefix: string = "antares";
+    private useMetadataLabels: boolean = false;
     private createButtonText: string = "Create";
     private cancelButtonText: string = "Cancel";
     public entryDialog: Dialog;
@@ -71,6 +69,21 @@ export default class EntryCreateCL<EntityT extends object> extends ODataCreateCL
         this.excludedProperties = properties;
     }
 
+    public setMandatoryProperties(properties: string[]) {
+        this.mandatoryProperties = properties;
+    }
+
+    public setResourceBundlePrefix(prefix: string) {
+        this.resourceBundlePrefix = prefix;
+    }
+
+    public setUseMetadataLabels(useMetadataLabels: boolean) {
+        if (this.formType !== FormTypes.SMART && useMetadataLabels) {
+            throw new Error("Metadata Labels can only be used with SmartForm!");
+        }
+        this.useMetadataLabels = useMetadataLabels;
+    }
+
     public createNewEntry() {
         if (!this.getSourceView()) {
             throw new Error("createNewEntry() method cannot be used on the UIComponent!");
@@ -95,118 +108,36 @@ export default class EntryCreateCL<EntityT extends object> extends ODataCreateCL
         dialog.attachEscapeHandler(this.onCancelESC, this);
         this.entryDialog = dialog.createEntryDialog();
 
+        const content = new ContentCL({
+            controller: this.getSourceController(),
+            entityName: this.getEntityName(),
+            excludedProperties: this.excludedProperties,
+            excludeOtherProps: this.excludeOtherProps,
+            mandatoryProperties: this.mandatoryProperties,
+            namingStrategy: this.namingStrategy,
+            resourceBundlePrefix: this.resourceBundlePrefix,
+            formPropertyOrder: this.formPropertyOrder,
+            modelName: this.getModelName(),
+            useMetadataLabels: this.useMetadataLabels,
+            formType: this.formType
+        });
+
+        this.entryContext = this.createEntry();
+
         if (this.formType === FormTypes.SMART) {
-            const annotation = new AnnotationCL(this.getSourceController(), this.getEntityName(), this.namingStrategy, this.getModelName());
-            await annotation.appendFormAnnotations();
-
-            const smartForm = this.getSmartFormContent();
-            this.entryContext = this.createEntry();
+            const smartForm = await content.getSmartForm(this.formTitle);
             smartForm.setModel(this.getODataModel());
-            smartForm.bindElement(this.entryContext.getPath());
-
+            smartForm.setBindingContext(this.entryContext);
             this.entryDialog.addContent(smartForm);
+        } else {
+            const simpleForm = await content.getSimpleForm(this.formTitle);
+            simpleForm.setModel(this.getODataModel());
+            simpleForm.setBindingContext(this.entryContext);
+            this.entryDialog.addContent(simpleForm);
         }
 
         (this.getSourceView() as View).addDependent(this.entryDialog);
         this.entryDialog.open();
-    }
-
-    private getSmartFormContent(): SmartForm {
-        const smartFormGroup = this.getSmartFormGroup();
-        this.formId = `sfCreateNew${this.getEntityName()}`;
-
-        const smartForm = new SmartForm({
-            id: this.formId,
-            editTogglable: false,
-            editable: true,
-            title: this.formTitle || `Create New ${this.getEntityName()}`,
-            groups: [smartFormGroup]
-        });
-
-        return smartForm;
-    }
-
-    private getSmartFormGroup(): Group {
-        const entity = new EntityCL(this.getSourceController(), this.getEntityName(), this.getModelName());
-        const smartGroup = new Group();
-
-        this.addSmartKeyProperties(smartGroup, entity);
-
-        if (this.formPropertyOrder) {
-            this.addOrderedSmartProperties(smartGroup, entity);
-        } else {
-            this.addSmartProperties(smartGroup, entity);
-        }
-
-        return smartGroup;
-    }
-
-    private addSmartKeyProperties(smartGroup: Group, entity: EntityCL) {
-        const entityTypeKeys = entity.getEntityTypeKeys();
-
-        entityTypeKeys.forEach((key) => {
-            const smartField = new SmartField({
-                value: `{${key}}`
-            });
-
-            smartGroup.addGroupElement(new GroupElement({
-                elements: [smartField]
-            }));
-        });
-    }
-
-    private addOrderedSmartProperties(smartGroup: Group, entity: EntityCL) {
-        const entityTypeKeys = entity.getEntityTypeKeys();
-        const entityTypeProperties = entity.getEntityTypeProperties();
-
-        for (const order of this.formPropertyOrder!) {
-            if (entityTypeKeys.includes(order) || !entityTypeProperties.includes(order)) {
-                continue;
-            }
-
-            const smartField = new SmartField({
-                value: `{${order}}`
-            });
-
-            smartGroup.addGroupElement(new GroupElement({
-                elements: [smartField]
-            }));
-        }
-
-        if (!this.excludeOtherProps) {
-            for (const property of entityTypeProperties) {
-                if (entityTypeKeys.includes(property) || this.formPropertyOrder!.includes(property) || this.excludedProperties.includes(property)) {
-                    continue;
-                }
-
-                const smartField = new SmartField({
-                    value: `{${property}}`
-                });
-
-                smartGroup.addGroupElement(new GroupElement({
-                    elements: [smartField]
-                }));
-            }
-        }
-    }
-
-    private addSmartProperties(smartGroup: Group, entity: EntityCL) {
-        const entityTypeKeys = entity.getEntityTypeKeys();
-        const entityTypeProperties = entity.getEntityTypeProperties();
-
-        for (const property of entityTypeProperties) {
-            if (entityTypeKeys.includes(property) || this.excludedProperties.includes(property)) {
-                continue;
-            }
-
-            const smartField = new SmartField({
-                value: `{${property}}`
-            });
-
-            smartGroup.addGroupElement(new GroupElement({
-                elements: [smartField]
-            }));
-        }
     }
 
     private onCreateCompleted(event: Button$PressEvent) {

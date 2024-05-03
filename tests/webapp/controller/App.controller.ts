@@ -1,7 +1,7 @@
 import Controller from "sap/ui/core/mvc/Controller";
 
 /**
- * @namespace unit.ui5.antares.controller
+ * @namespace test.ui5.antares.controller
  */
 export default class App extends Controller {
 
