@@ -1,0 +1,82 @@
+[
+    {
+        "ID": 1,
+        "Name": "Laptop",
+        "Price": 1200,
+        "Currency": "USD",
+        "CategoryID": 1,
+        "SupplierID": 1
+    },
+    {
+        "ID": 2,
+        "Name": "Smartphone",
+        "Price": 800,
+        "Currency": "USD",
+        "CategoryID": 1,
+        "SupplierID": 2
+    },
+    {
+        "ID": 3,
+        "Name": "Tablet",
+        "Price": 500,
+        "Currency": "USD",
+        "CategoryID": 1,
+        "SupplierID": 3
+    },
+    {
+        "ID": 4,
+        "Name": "Headphones",
+        "Price": 150,
+        "Currency": "USD",
+        "CategoryID": 1,
+        "SupplierID": 1
+    },
+    {
+        "ID": 5,
+        "Name": "Smart Watch",
+        "Price": 300,
+        "Currency": "USD",
+        "CategoryID": 1,
+        "SupplierID": 2
+    },
+    {
+        "ID": 6,
+        "Name": "LED TV",
+        "Price": 1500,
+        "Currency": "USD",
+        "CategoryID": 1,
+        "SupplierID": 3
+    },
+    {
+        "ID": 7,
+        "Name": "T-shirt",
+        "Price": 25,
+        "Currency": "USD",
+        "CategoryID": 2,
+        "SupplierID": 4
+    },
+    {
+        "ID": 8,
+        "Name": "Jeans",
+        "Price": 60,
+        "Currency": "USD",
+        "CategoryID": 2,
+        "SupplierID": 4
+    },
+    {
+        "ID": 9,
+        "Name": "Novel Book",
+        "Price": 20,
+        "Currency": "USD",
+        "CategoryID": 3,
+        "SupplierID": 5
+    },
+    {
+        "ID": 10,
+        "Name": "Cookbook",
+        "Price": 30,
+        "Currency": "USD",
+        "CategoryID": 3,
+        "SupplierID": 5
+    }
+]

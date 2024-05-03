@@ -10,18 +10,12 @@ import { IODataReadResult } from "ui5/antares/types/odata/read";
  * @namespace ui5.antares.odata.v2
  */
 export default class ODataReadCL<EntityT extends object = object, EntityKeyT extends object = object> extends ODataCL {
-    private entityPath: string;
     private filters: Filter[] = [];
     private sorters: Sorter[] = [];
     private urlParameters?: Record<string, string>;
 
-    constructor(controller: Controller, entityName: string) {
-        super(controller, ODataMethods.READ);
-        this.entityPath = entityName.startsWith("/") ? entityName : `/${entityName}`;
-    }
-
-    public setODataModelName(modelName: string) {
-        this.setModelName(modelName);
+    constructor(controller: Controller, entityPath: string, modelName?: string) {
+        super(controller, entityPath, ODataMethods.READ, modelName);
     }
 
     public setFilters(filters: Filter[]) {
@@ -48,7 +42,7 @@ export default class ODataReadCL<EntityT extends object = object, EntityKeyT ext
         const oDataModel = this.getODataModel();
 
         return new Promise((resolve, reject) => {
-            oDataModel.read(this.entityPath, {
+            oDataModel.read(this.getEntityPath(), {
                 filters: this.filters,
                 sorters: this.sorters,
                 urlParameters: this.urlParameters,
@@ -64,7 +58,7 @@ export default class ODataReadCL<EntityT extends object = object, EntityKeyT ext
 
     public readByKey(keys: EntityKeyT): Promise<EntityT> {
         const oDataModel = this.getODataModel();
-        const path = oDataModel.createKey(this.entityPath, keys);
+        const path = oDataModel.createKey(this.getEntityPath(), keys);
 
         return new Promise((resolve, reject) => {
             oDataModel.read(path, {

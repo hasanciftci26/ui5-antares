@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx"
+  xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
+  Version="1.0">
+  <edmx:DataServices>
+    <!-- Products Entity -->
+    <Schema Namespace="UI5Antares"
+      xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+      <!-- Product Entity Definition -->
+      <EntityType Name="Product">
+        <Key>
+          <PropertyRef Name="ID" />
+        </Key>
+        <Property Name="ID"
+          Type="Edm.Int32"
+          Nullable="false" />
+        <Property Name="Name"
+          Type="Edm.String" />
+        <Property Name="Price"
+          Type="Edm.Decimal" />
+        <Property Name="Currency"
+          Type="Edm.String" />
+        <Property Name="CategoryID"
+          Type="Edm.Int32" />
+        <Property Name="SupplierID"
+          Type="Edm.Int32" />
+        <NavigationProperty Name="toCategory"
+          Relationship="UI5Antares.Product_Category_Association"
+          FromRole="Product"
+          ToRole="Category" />
+        <NavigationProperty Name="toSupplier"
+          Relationship="UI5Antares.Product_Supplier_Association"
+          FromRole="Product"
+          ToRole="Supplier" />
+      </EntityType>
+
+      <!-- Category Entity Definition -->
+      <EntityType Name="Category">
+        <Key>
+          <PropertyRef Name="ID" />
+        </Key>
+        <Property Name="ID"
+          Type="Edm.Int32"
+          Nullable="false" />
+        <Property Name="Name"
+          Type="Edm.String" />
+        <NavigationProperty Name="toProducts"
+          Relationship="UI5Antares.Product_Category_Association"
+          FromRole="Category"
+          ToRole="Product" />
+      </EntityType>
+
+      <!-- Supplier Entity -->
+      <EntityType Name="Supplier">
+        <Key>
+          <PropertyRef Name="ID" />
+        </Key>
+        <Property Name="ID"
+          Type="Edm.Int32"
+          Nullable="false" />
+        <Property Name="CompanyName"
+          Type="Edm.String" />
+        <Property Name="ContactName"
+          Type="Edm.String" />
+        <Property Name="Country"
+          Type="Edm.String" />
+
+        <!-- Navigation Property: Supplier to Products (1-N) -->
+        <NavigationProperty Name="toProducts"
+          Relationship="UI5Antares.Product_Supplier_Association"
+          FromRole="Supplier"
+          ToRole="Product" />
+      </EntityType>
+
+      <!-- Order Entity -->
+      <EntityType Name="Order">
+        <Key>
+          <PropertyRef Name="ID" />
+        </Key>
+        <Property Name="ID"
+          Type="Edm.Int32"
+          Nullable="false" />
+        <Property Name="OrderDate"
+          Type="Edm.DateTime" />
+        <Property Name="CustomerID"
+          Type="Edm.String" />
+        <Property Name="TotalAmount"
+          Type="Edm.Decimal" />
+      </EntityType>
+
+      <!-- Association Definition (Category to Product) -->
+      <Association Name="Product_Category_Association">
+        <End Type="UI5Antares.Category"
+          Role="Category"
+          Multiplicity="1" />
+        <End Type="UI5Antares.Product"
+          Role="Product"
+          Multiplicity="*" />
+      </Association>
+
+      <!-- Association: Product to Supplier (1-1) -->
+      <Association Name="Product_Supplier_Association">
+        <End Type="UI5Antares.Supplier"
+          Role="Supplier"
+          Multiplicity="1" />
+        <End Type="UI5Antares.Product"
+          Role="Product"
+          Multiplicity="*" />
+      </Association>
+
+      <!-- EntityContainer -->
+      <EntityContainer Name="UI5AntaresEntities"
+        m:IsDefaultEntityContainer="true">
+        <EntitySet Name="Products"
+          EntityType="UI5Antares.Product" />
+        <EntitySet Name="Categories"
+          EntityType="UI5Antares.Category" />
+        <EntitySet Name="Suppliers"
+          EntityType="UI5Antares.Supplier" />
+        <EntitySet Name="Orders"
+          EntityType="UI5Antares.Order" />
+
+        <AssociationSet Name="Product_Category_AssociationSet"
+          Association="UI5Antares.Product_Category_Association">
+          <End Role="Product"
+            EntitySet="Products" />
+          <End Role="Category"
+            EntitySet="Categories" />
+        </AssociationSet>
+
+        <AssociationSet Name="Product_Supplier_AssociationSet"
+          Association="UI5Antares.Product_Supplier_Association">
+          <End Role="Product"
+            EntitySet="Products" />
+          <End Role="Supplier"
+            EntitySet="Suppliers" />
+        </AssociationSet>
+      </EntityContainer>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>

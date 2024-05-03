@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>UI5 Antares Test App</title>
+    <style>
+        html, body, body > div, #container, #container-uiarea {
+            height: 100%;
+        }
+    </style>
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.20.1.css">
+    <script src="https://code.jquery.com/qunit/qunit-2.20.1.js"></script>
+    <script
+        id="sap-ui-bootstrap"
+        src="https://sapui5.hana.ondemand.com/1.123.1/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-resourceroots='{
+            "test.ui5.antares": "./",
+            "ui5.antares": "./antares"
+        }'
+        data-sap-ui-oninit="module:test/ui5/antares/server/init-mock-server"
+        data-sap-ui-compatVersion="edge"
+        data-sap-ui-async="true"
+        data-sap-ui-frameOptions="trusted"
+    ></script>
+</head>
+<body class="sapUiBody sapUiSizeCompact" id="content">
+    <div
+        data-sap-ui-component
+        data-name="test.ui5.antares"
+        data-id="container"
+        data-settings='{"id" : "test.ui5.antares"}'
+        data-handle-validation="true"
+    ></div>
+</body>
+</html>

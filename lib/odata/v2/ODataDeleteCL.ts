@@ -7,17 +7,11 @@ import { ODataMethods } from "ui5/antares/types/odata/enums";
  * @namespace ui5.antares.odata.v2
  */
 export default class ODataDeleteCL<EntityKeyT extends object = object> extends ODataCL {
-    private entityPath: string;
     private urlParameters?: Record<string, string>;
     private refreshAfterChange: boolean = true;
 
-    constructor(controller: Controller, entityName: string) {
-        super(controller, ODataMethods.DELETE);
-        this.entityPath = entityName.startsWith("/") ? entityName : `/${entityName}`;
-    }
-
-    public setODataModelName(modelName: string) {
-        this.setModelName(modelName);
+    constructor(controller: Controller, entityPath: string, modelName?: string) {
+        super(controller, entityPath, ODataMethods.DELETE, modelName);
     }
 
     public setUrlParameters(urlParameters: Record<string, string>): void {
@@ -30,7 +24,7 @@ export default class ODataDeleteCL<EntityKeyT extends object = object> extends O
 
     public delete(keys: EntityKeyT): Promise<EntityKeyT> {
         const oDataModel = this.getODataModel();
-        const path = oDataModel.createKey(this.entityPath, keys);
+        const path = oDataModel.createKey(this.getEntityPath(), keys);
 
         return new Promise((resolve, reject) => {
             oDataModel.remove(path, {

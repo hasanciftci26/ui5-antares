@@ -1,0 +1,29 @@
+{
+    "name": "test-ui5-antares",
+    "version": "0.0.1",
+    "private": "true",
+    "description": "UI5 Antares Tests",
+    "keywords": [
+        "SAPUI5",
+        "UI5",
+        "OData"
+    ],
+    "main": "webapp/index.test.html",
+    "scripts": {
+        "start": "ui5 serve --port 8080 -o index.test.html",
+        "prestart": "shx rm -r ./webapp/antares/ && shx cp -r ../lib/ ./webapp/antares/"
+    },
+    "devDependencies": {
+        "@sap-ux/eslint-plugin-fiori-tools": "^0.4.1",
+        "@sap/ux-ui5-tooling": "^1.13.2",
+        "@sapui5/types": "1.123.1",
+        "@types/sinon": "^17.0.3",
+        "@typescript-eslint/eslint-plugin": "^7.7.0",
+        "@typescript-eslint/parser": "^7.7.0",
+        "@ui5/cli": "^3.9.2",
+        "shx": "^0.3.4",
+        "typescript": "^5.4.5",
+        "ui5-middleware-livereload": "^0.8.4",
+        "ui5-tooling-transpile": "^3.3.7"
+    }
+}

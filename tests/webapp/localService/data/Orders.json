@@ -1,0 +1,38 @@
+[
+    {
+        "ID": 1,
+        "OrderDate": "2024-05-01",
+        "CustomerID": "ALFKI",
+        "TotalAmount": 2500
+    },
+    {
+        "ID": 2,
+        "OrderDate": "2024-05-02",
+        "CustomerID": "BERGS",
+        "TotalAmount": 1200
+    },
+    {
+        "ID": 3,
+        "OrderDate": "2024-05-03",
+        "CustomerID": "FRANS",
+        "TotalAmount": 800
+    },
+    {
+        "ID": 4,
+        "OrderDate": "2024-05-04",
+        "CustomerID": "WANDK",
+        "TotalAmount": 300
+    },
+    {
+        "ID": 5,
+        "OrderDate": "2024-05-05",
+        "CustomerID": "RATTC",
+        "TotalAmount": 1800
+    },
+    {
+        "ID": 6,
+        "OrderDate": "2024-05-06",
+        "CustomerID": "LONEP",
+        "TotalAmount": 500
+    }
+]

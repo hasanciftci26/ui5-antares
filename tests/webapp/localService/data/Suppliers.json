@@ -1,0 +1,32 @@
+[
+    {
+        "ID": 1,
+        "CompanyName": "Tech Store Inc.",
+        "ContactName": "John Doe",
+        "Country": "USA"
+    },
+    {
+        "ID": 2,
+        "CompanyName": "Mobile Solutions Ltd.",
+        "ContactName": "Alice Smith",
+        "Country": "UK"
+    },
+    {
+        "ID": 3,
+        "CompanyName": "Gadget World GmbH",
+        "ContactName": "Max Müller",
+        "Country": "Germany"
+    },
+    {
+        "ID": 4,
+        "CompanyName": "Fashion Trends Ltd.",
+        "ContactName": "Emily Brown",
+        "Country": "USA"
+    },
+    {
+        "ID": 5,
+        "CompanyName": "Bookworm Publishers",
+        "ContactName": "David Johnson",
+        "Country": "Canada"
+    }
+]

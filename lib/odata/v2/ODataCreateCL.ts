@@ -8,18 +8,12 @@ import { ODataMethods } from "ui5/antares/types/odata/enums";
  * @namespace ui5.antares.odata.v2
  */
 export default class ODataCreateCL<EntityT extends object = object, ErrorT = IError> extends ODataCL {
-    private payload: EntityT;
-    private entityPath: string;
+    private payload?: EntityT;
     private urlParameters?: Record<string, string>;
     private refreshAfterChange: boolean = true;
 
-    constructor(controller: Controller, entityName: string) {
-        super(controller, ODataMethods.CREATE);
-        this.entityPath = entityName.startsWith("/") ? entityName : `/${entityName}`;
-    }
-
-    public setODataModelName(modelName: string) {
-        this.setModelName(modelName);
+    constructor(controller: Controller, entityPath: string,  modelName?: string) {
+        super(controller, entityPath, ODataMethods.CREATE, modelName);
     }
 
     public setData(data: EntityT) {
@@ -32,13 +26,12 @@ export default class ODataCreateCL<EntityT extends object = object, ErrorT = IEr
 
     public setRefreshAfterChange(refreshAfterChange: boolean) {
         this.refreshAfterChange = refreshAfterChange;
-    }    
+    }
 
     public createEntry(): Context {
-        this.checkData(this.payload);
         const oDataModel = this.getODataModel();
 
-        const entry = oDataModel.createEntry(this.entityPath, {
+        const entry = oDataModel.createEntry(this.getEntityPath(), {
             properties: this.payload
         }) as Context;
 
@@ -50,7 +43,7 @@ export default class ODataCreateCL<EntityT extends object = object, ErrorT = IEr
         const oDataModel = this.getODataModel();
 
         return new Promise((resolve, reject) => {
-            oDataModel.create(this.entityPath, this.payload, {
+            oDataModel.create(this.getEntityPath(), this.payload!, {
                 urlParameters: this.urlParameters,
                 refreshAfterChange: this.refreshAfterChange,
                 success: (responseData: EntityT) => {

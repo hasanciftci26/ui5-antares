@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "target": "es2022",
+        "module": "es2022",
+        "skipLibCheck": false,
+        "allowJs": false,
+        "strict": true,
+        "strictPropertyInitialization": false,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "paths": {
+            "test/ui5/antares/*": [
+                "./webapp/*"
+            ],
+            "ui5/antares/*": [
+                "../lib/*"
+            ]
+        },
+        "typeRoots": [
+            "./node_modules/@types",
+            "./node_modules/@sapui5/types"
+        ]
+    },
+    "include": [
+        "./webapp/**/*"
+    ]
+}

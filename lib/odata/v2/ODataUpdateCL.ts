@@ -8,17 +8,11 @@ import { ODataMethods } from "ui5/antares/types/odata/enums";
  */
 export default class ODataUpdateCL<EntityT extends object = object, EntityKeyT extends object = object> extends ODataCL {
     private payload: EntityT;
-    private entityPath: string;
     private urlParameters?: Record<string, string>;
     private refreshAfterChange: boolean = true;
 
-    constructor(controller: Controller, entityName: string) {
-        super(controller, ODataMethods.UPDATE);
-        this.entityPath = entityName.startsWith("/") ? entityName : `/${entityName}`;
-    }
-
-    public setODataModelName(modelName: string) {
-        this.setModelName(modelName);
+    constructor(controller: Controller, entityPath: string, modelName?: string) {
+        super(controller, entityPath, ODataMethods.UPDATE, modelName);
     }
 
     public setData(data: EntityT) {
@@ -36,7 +30,7 @@ export default class ODataUpdateCL<EntityT extends object = object, EntityKeyT e
     public update(keys: EntityKeyT): Promise<EntityT> {
         this.checkData(this.payload);
         const oDataModel = this.getODataModel();
-        const path = oDataModel.createKey(this.entityPath, keys);
+        const path = oDataModel.createKey(this.getEntityPath(), keys);
 
         return new Promise((resolve, reject) => {
             oDataModel.update(path, this.payload, {
