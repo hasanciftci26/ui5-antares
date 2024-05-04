@@ -3,6 +3,7 @@ import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL";
 import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL";
 import { IProducts } from "../types/create";
 import { FormTypes, NamingStrategies } from "ui5/antares/types/entry/enums";
+import { ButtonType } from "sap/m/library";
 
 /**
  * @namespace test.ui5.antares.controller
@@ -24,13 +25,13 @@ export default class Homepage extends BaseController {
 
     public async onCreateProduct(): Promise<void> {
         const entry = new EntryCreateCL<IProducts>(this, "Products");
-        entry.setNamingStrategy(NamingStrategies.PASCAL_CASE);
-        entry.setResourceBundlePrefix("");
-        entry.setMandatoryProperties(["Name", "Price"]);
-        entry.setData({
-            CategoryID: 5
-        });
-        entry.setFormType(FormTypes.SIMPLE);
+        entry.setBeginButtonText("Kaydet");
+        entry.setBeginButtonType(ButtonType.Critical);
+        entry.setEndButtonText("Çıkış");
+        entry.setFormTitle("Yeni Ürün");
+        entry.setMandatoryProperties(["CategoryID"]);
+        entry.setExcludedProperties(["SupplierID"]);
+        entry.setPropertyOrder(["Price", "Currency"], false);
         entry.createNewEntry();
     }
 

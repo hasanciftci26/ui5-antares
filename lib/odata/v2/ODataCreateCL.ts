@@ -3,6 +3,7 @@ import ODataCL from "ui5/antares/odata/v2/ODataCL";
 import { IError } from "ui5/antares/types/common";
 import Context from "sap/ui/model/Context";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
+import UIComponent from "sap/ui/core/UIComponent";
 
 /**
  * @namespace ui5.antares.odata.v2
@@ -12,7 +13,7 @@ export default class ODataCreateCL<EntityT extends object = object, ErrorT = IEr
     private urlParameters?: Record<string, string>;
     private refreshAfterChange: boolean = true;
 
-    constructor(controller: Controller, entityPath: string,  modelName?: string) {
+    constructor(controller: Controller | UIComponent, entityPath: string,  modelName?: string) {
         super(controller, entityPath, ODataMethods.CREATE, modelName);
     }
 

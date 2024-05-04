@@ -45,7 +45,7 @@ export default abstract class ModelCL extends BaseObject {
         return this.controller;
     }
 
-    protected getSourceView(): View | void {
+    protected getSourceView(): View | undefined {
         return this.sourceView;
     }
 
@@ -73,7 +73,7 @@ export default abstract class ModelCL extends BaseObject {
         return this.resourceBundle;
     }
 
-    protected setModelName(modelName?: string): void {
+    public setModelName(modelName?: string): void {
         this.modelName = modelName;
         this.oDataModel = this.ownerComponent.getModel(this.modelName) as ODataModel;
         this.setMetadataUrl();

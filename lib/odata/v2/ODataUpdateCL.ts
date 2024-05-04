@@ -1,3 +1,4 @@
+import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";
 import ODataCL from "ui5/antares/odata/v2/ODataCL";
 import { IError } from "ui5/antares/types/common";
@@ -11,7 +12,7 @@ export default class ODataUpdateCL<EntityT extends object = object, EntityKeyT e
     private urlParameters?: Record<string, string>;
     private refreshAfterChange: boolean = true;
 
-    constructor(controller: Controller, entityPath: string, modelName?: string) {
+    constructor(controller: Controller | UIComponent, entityPath: string, modelName?: string) {
         super(controller, entityPath, ODataMethods.UPDATE, modelName);
     }
 
