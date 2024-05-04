@@ -1,9 +1,11 @@
 import { ButtonType } from "sap/m/library";
+import Control from "sap/ui/core/Control";
 import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";
 import ModelCL from "ui5/antares/base/v2/ModelCL";
 import { FormTypes, NamingStrategies } from "ui5/antares/types/entry/enums";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
+import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 
 /**
  * @namespace ui5.antares.entry.v2
@@ -26,8 +28,9 @@ export default abstract class EntryCL extends ModelCL {
     private mandatoryProperties: string[] = [];
     private resourceBundlePrefix: string = "antares";
     private useMetadataLabels: boolean = false;
-    // public entryDialog: Dialog;
-    // public entryContext: Context;
+    private errorMessage: string = "Please fill in all required fields.";
+    private customControls: CustomControlCL[] = [];
+    private customContents: Control[] = [];
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
@@ -177,5 +180,34 @@ export default abstract class EntryCL extends ModelCL {
 
     public setUseMetadataLabels(useMetadataLabels: boolean) {
         this.useMetadataLabels = useMetadataLabels;
+    }
+
+    public getErrorMessage(): string {
+        return this.errorMessage;
+    }
+
+    public setErrorMessage(message: string) {
+        this.errorMessage = message;
+    }
+
+    public addCustomControl(control: CustomControlCL) {
+        this.customControls.push(control);
+    }
+
+    public getCustomControls(): CustomControlCL[] {
+        return this.customControls;
+    }
+
+    public getCustomControl(propertyName: string): CustomControlCL | undefined {
+        const customControl = this.customControls.find(control => control.getPropertyName() === propertyName);
+        return customControl;
+    }
+
+    public addCustomContent(content: Control) {
+        this.customContents.push(content);
+    }
+
+    public getCustomContents(): Control[] {
+        return this.customContents;
     }
 }

@@ -8,6 +8,14 @@ import ContentCL from "ui5/antares/ui/ContentCL";
 import DialogCL from "ui5/antares/ui/DialogCL";
 import EntryCL from "ui5/antares/entry/v2/EntryCL";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
+import MessageBox from "sap/m/MessageBox";
+import SmartForm from "sap/ui/comp/smartform/SmartForm";
+import GroupElement from "sap/ui/comp/smartform/GroupElement";
+import SmartField from "sap/ui/comp/smartfield/SmartField";
+import SimpleForm from "sap/ui/layout/form/SimpleForm";
+import Input from "sap/m/Input";
+import DatePicker from "sap/m/DatePicker";
+import DateTimePicker from "sap/m/DateTimePicker";
 
 /**
  * @namespace ui5.antares.entry.v2
@@ -24,6 +32,9 @@ export default class EntryCreateCL<EntityT extends object> extends EntryCL {
         if (!this.getSourceView()) {
             throw new Error("createNewEntry() method cannot be used on the UIComponent!");
         }
+
+        this.getODataModel().setDefaultBindingMode("TwoWay");
+        this.getODataModel().setUseBatch(true);
 
         if (this.getFragmentPath()) {
         } else {
@@ -52,11 +63,19 @@ export default class EntryCreateCL<EntityT extends object> extends EntryCL {
             smartForm.setModel(this.getODataModel());
             smartForm.setBindingContext(this.entryContext);
             this.entryDialog.addContent(smartForm);
+
+            this.getCustomContents().forEach((content)=>{
+                this.entryDialog.addContent(content);
+            });
         } else {
             const simpleForm = await content.getSimpleForm();
             simpleForm.setModel(this.getODataModel());
             simpleForm.setBindingContext(this.entryContext);
             this.entryDialog.addContent(simpleForm);
+
+            this.getCustomContents().forEach((content)=>{
+                this.entryDialog.addContent(content);
+            });            
         }
 
         (this.getSourceView() as View).addDependent(this.entryDialog.getDialog());
@@ -64,7 +83,10 @@ export default class EntryCreateCL<EntityT extends object> extends EntryCL {
     }
 
     private onCreateCompleted(event: Button$PressEvent) {
-
+        if (this.mandatoryFieldCheck()) {
+            MessageBox.error(this.getErrorMessage());
+            return;
+        }
     }
 
     private onEntryCanceled(event: Button$PressEvent) {
@@ -83,5 +105,76 @@ export default class EntryCreateCL<EntityT extends object> extends EntryCL {
         if (this.getODataModel().hasPendingChanges()) {
             this.getODataModel().resetChanges([this.entryContext.getPath()]);
         }
+    }
+
+    private mandatoryFieldCheck(): boolean {
+        let checkFailed = false;
+
+        if (this.getFormType() === FormTypes.SMART) {
+            const smartGroupElements = (this.entryDialog.getDialog().getContent()[0] as SmartForm).getGroups()[0].getGroupElements() as GroupElement[];
+
+            smartGroupElements.forEach((element) => {
+                const control = element.getElements()[0];
+                const customData = control.getCustomData().find(data => data.getKey() === "UI5AntaresCustomControlName");
+
+                if (customData) {
+                    const customControl = this.getCustomControl(customData.getValue());
+
+                    if (customControl) {
+                        if (customControl.getMandatoryHandler()?.call(customControl.getListener(), customControl.getControl())) {
+                            checkFailed = true;
+                        }
+                    }
+                } else {
+                    if ((control as SmartField).getMandatory() && !(control as SmartField).getValue()) {
+                        (control as SmartField).setValueState("Error");
+                        checkFailed = true;
+                    }
+                }
+            });
+        } else {
+            const simpleFormElements = (this.entryDialog.getDialog().getContent()[0] as SimpleForm).getContent();
+
+            for (const element of simpleFormElements) {
+                const customData = element.getCustomData().find(data => data.getKey() === "UI5AntaresCustomControlName");
+
+                if (customData) {
+                    const customControl = this.getCustomControl(customData.getValue());
+
+                    if (customControl) {
+                        if (customControl.getMandatoryHandler()?.call(customControl.getListener(), customControl.getControl())) {
+                            checkFailed = true;
+                        }
+                    }
+                } else {
+                    if (element.getMetadata().getName() === "sap.m.Label" || element.getMetadata().getName() === "sap.m.CheckBox") {
+                        continue;
+                    }
+
+                    switch (element.getMetadata().getName()) {
+                        case "sap.m.Input":
+                            if ((element as Input).getRequired() && !(element as Input).getValue()) {
+                                (element as Input).setValueState("Error");
+                                checkFailed = true;
+                            }
+                            break;
+                        case "sap.m.DatePicker":
+                            if ((element as DatePicker).getRequired() && !(element as DatePicker).getValue()) {
+                                (element as DatePicker).setValueState("Error");
+                                checkFailed = true;
+                            }
+                            break;
+                        case "sap.m.DateTimePicker":
+                            if ((element as DateTimePicker).getRequired() && !(element as DateTimePicker).getValue()) {
+                                (element as DateTimePicker).setValueState("Error");
+                                checkFailed = true;
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+
+        return checkFailed;
     }
 }

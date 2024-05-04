@@ -15,6 +15,7 @@ import EntryCL from "ui5/antares/entry/v2/EntryCL";
 import { PropertyType } from "ui5/antares/types/entity/type";
 import Controller from "sap/ui/core/mvc/Controller";
 import UIComponent from "sap/ui/core/UIComponent";
+import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 
 /**
  * @namespace ui5.antares.ui
@@ -74,9 +75,21 @@ export default class ContentCL<T extends EntryCL> extends EntityCL {
 
         entityTypeKeys.forEach((key) => {
             if (this.entry.getFormType() === FormTypes.SMART) {
-                this.addSmartField(key.propertyName);
+                const customControl = this.entry.getCustomControl(key.propertyName);
+
+                if (customControl) {
+                    this.addSmartCustomControl(customControl, key.propertyName);
+                } else {
+                    this.addSmartField(key.propertyName);
+                }
             } else {
-                this.addSimpleFormField(key.propertyName, key.propertyType);
+                const customControl = this.entry.getCustomControl(key.propertyName);
+
+                if (customControl) {
+                    this.addSimpleCustomControl(customControl, key.propertyName);
+                } else {
+                    this.addSimpleFormField(key.propertyName, key.propertyType);
+                }
             }
         });
     }
@@ -91,10 +104,22 @@ export default class ContentCL<T extends EntryCL> extends EntityCL {
             }
 
             if (this.entry.getFormType() === FormTypes.SMART) {
-                this.addSmartField(property);
+                const customControl = this.entry.getCustomControl(property);
+
+                if (customControl) {
+                    this.addSmartCustomControl(customControl, property);
+                } else {
+                    this.addSmartField(property);
+                }
             } else {
-                let propertyType: PropertyType = entityTypeProperties.find(prop => prop.propertyName === property)?.propertyType || "Edm.String";
-                this.addSimpleFormField(property, propertyType);
+                const customControl = this.entry.getCustomControl(property);
+
+                if (customControl) {
+                    this.addSimpleCustomControl(customControl, property);
+                } else {
+                    let propertyType: PropertyType = entityTypeProperties.find(prop => prop.propertyName === property)?.propertyType || "Edm.String";
+                    this.addSimpleFormField(property, propertyType);
+                }
             }
         }
 
@@ -107,9 +132,21 @@ export default class ContentCL<T extends EntryCL> extends EntityCL {
                 }
 
                 if (this.entry.getFormType() === FormTypes.SMART) {
-                    this.addSmartField(property.propertyName);
+                    const customControl = this.entry.getCustomControl(property.propertyName);
+
+                    if (customControl) {
+                        this.addSmartCustomControl(customControl, property.propertyName);
+                    } else {
+                        this.addSmartField(property.propertyName);
+                    }
                 } else {
-                    this.addSimpleFormField(property.propertyName, property.propertyType);
+                    const customControl = this.entry.getCustomControl(property.propertyName);
+
+                    if (customControl) {
+                        this.addSimpleCustomControl(customControl, property.propertyName);
+                    } else {
+                        this.addSimpleFormField(property.propertyName, property.propertyType);
+                    }
                 }
             }
         }
@@ -191,5 +228,22 @@ export default class ContentCL<T extends EntryCL> extends EntityCL {
         }
 
         this.simpleFormElements.push(input);
+    }
+
+    private addSmartCustomControl(control: CustomControlCL, property: string) {
+        const groupElement = new GroupElement({
+            elements: [control.getControl()]
+        });
+
+        if (!this.entry.getUseMetadataLabels()) {
+            groupElement.setLabel(this.getEntityTypePropLabel(property));
+        }
+
+        this.smartGroup.addGroupElement(groupElement);
+    }
+
+    private addSimpleCustomControl(control: CustomControlCL, property: string) {
+        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property) }));
+        this.simpleFormElements.push(control.getControl());
     }
 }
