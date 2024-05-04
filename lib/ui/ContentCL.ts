@@ -20,12 +20,12 @@ import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 /**
  * @namespace ui5.antares.ui
  */
-export default class ContentCL<T extends EntryCL> extends EntityCL {
-    private entry: T;
+export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends object = object> extends EntityCL {
+    private entry: EntryT;
     private smartGroup: Group;
     private simpleFormElements: UI5Element[];
 
-    constructor(controller: Controller | UIComponent, entry: T, modelName?: string) {
+    constructor(controller: Controller | UIComponent, entry: EntryT, modelName?: string) {
         super(controller, entry.getEntityName(), entry.getResourceBundlePrefix(), entry.getNamingStrategy(), modelName);
         this.entry = entry;
     }

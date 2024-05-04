@@ -30,17 +30,9 @@ export default class Homepage extends BaseController {
 
     public async onCreateProduct(): Promise<void> {
         const entry = new EntryCreateCL<IProducts>(this, "Products");
-        entry.setBeginButtonText("Kaydet");
-        entry.setBeginButtonType(ButtonType.Critical);
-        entry.setEndButtonText("Çıkış");
-        entry.setFormTitle("Yeni Ürün");
         entry.setMandatoryProperties(["CategoryID"]);
-        entry.setExcludedProperties(["SupplierID"]);
-        entry.setPropertyOrder(["Price", "Currency"]);
-        entry.setErrorMessage("Lütfen tüm alanları doldurunuz");
-        entry.addCustomControl(new CustomControlCL(new CheckBox(), "CategoryID", this.checkMandatory, this));
-        entry.addCustomContent(new DatePicker());
-        entry.createNewEntry();
+        entry.setBeginButtonText("Kaydet");
+        entry.createNewEntry({ Price: 5 });
     }
 
     /* ======================================================================================================================= */
