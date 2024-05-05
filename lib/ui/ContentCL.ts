@@ -174,13 +174,13 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
 
         switch (propertyType) {
             case "Edm.Boolean":
-                this.addCheckBox(property)
+                this.addCheckBox(property);
                 break;
             case "Edm.DateTime":
-                this.addDatePicker(property)
+                this.addDatePicker(property);
                 break;
             case "Edm.DateTimeOffset":
-                this.addDateTimePicker(property)
+                this.addDateTimePicker(property);
                 break;
             default:
                 this.addInput(property);
@@ -189,14 +189,18 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
     }
 
     private addCheckBox(property: string) {
+        const selected = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+
         this.simpleFormElements.push(new CheckBox({
-            selected: `{${property}}`
+            selected: `{${selected}}`
         }));
     }
 
     private addDatePicker(property: string) {
+        const value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+
         const datePicker = new DatePicker({
-            value: `{constraints : {displayFormat : 'Date'}, path : '${property}', type : 'sap.ui.model.odata.type.DateTime'}`
+            value: `{constraints : {displayFormat : 'Date'}, path : '${value}', type : 'sap.ui.model.odata.type.DateTime'}`
         });
 
         if (this.entry.getMandatoryProperties().includes(property)) {
@@ -207,8 +211,10 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
     }
 
     private addDateTimePicker(property: string) {
+        const value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+
         const dateTimePicker = new DateTimePicker({
-            value: `path : '${property}', type : 'sap.ui.model.odata.type.DateTimeOffset'`
+            value: `path : '${value}', type : 'sap.ui.model.odata.type.DateTimeOffset'`
         });
 
         if (this.entry.getMandatoryProperties().includes(property)) {
@@ -219,12 +225,20 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
     }
 
     private addInput(property: string) {
+        const valueHelp = this.entry.getValueHelp(property);
+        const value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+
         const input = new Input({
-            value: `{${property}}`
+            value: `{${value}}`
         });
 
         if (this.entry.getMandatoryProperties().includes(property)) {
             input.setRequired(true);
+        }
+
+        if (valueHelp) {
+            input.setShowValueHelp(true);
+            input.attachValueHelpRequest({}, valueHelp.openValueHelpDialog, valueHelp);
         }
 
         this.simpleFormElements.push(input);

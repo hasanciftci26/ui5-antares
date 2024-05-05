@@ -19,6 +19,7 @@ import { ODataMethods } from "ui5/antares/types/odata/enums";
 import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 import DialogCL from "ui5/antares/ui/DialogCL";
 import ResponseCL from "ui5/antares/entry/v2/ResponseCL";
+import ValueHelpCL from "ui5/antares/ui/ValueHelpCL";
 
 /**
  * @namespace ui5.antares.entry.v2
@@ -50,6 +51,7 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
     private submitCompletedListener?: object;
     private submitFailed?: (response: ResponseCL<ISubmitResponse>) => void;
     private submitFailedListener?: object;
+    private valueHelps: ValueHelpCL[] = [];
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
@@ -228,6 +230,19 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
 
     public getCustomContents(): Control[] {
         return this.customContents;
+    }
+
+    public addValueHelp(valueHelp: ValueHelpCL) {
+        this.valueHelps.push(valueHelp);
+    }
+
+    public getValueHelps(): ValueHelpCL[] {
+        return this.valueHelps;
+    }
+
+    public getValueHelp(propertyName: string): ValueHelpCL | undefined {
+        const valueHelp = this.valueHelps.find(vh => vh.getPropertyName() === propertyName);
+        return valueHelp;
     }
 
     public attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object) {

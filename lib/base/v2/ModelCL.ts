@@ -80,12 +80,6 @@ export default abstract class ModelCL extends BaseObject {
         this.oDataModel.setDefaultBindingMode(this.bindingMode);
     }
 
-    public setModelName(modelName?: string): void {
-        this.modelName = modelName;
-        this.oDataModel = this.ownerComponent.getModel(this.modelName) as ODataModel;
-        this.setMetadataUrl();
-    }
-
     private setMetadataUrl(): void {
         const modelEntry: IManifestModels | undefined = this.ownerComponent.getManifestEntry(`/sap.ui5/models/${this.modelName || ""}`);
 

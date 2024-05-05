@@ -53,8 +53,8 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
             });
         } else {
             const simpleForm = await content.getSimpleForm();
-            simpleForm.setModel(this.getODataModel());
-            simpleForm.setBindingContext(this.getEntryContext());
+            simpleForm.setModel(this.getODataModel(), this.getModelName());
+            simpleForm.setBindingContext(this.getEntryContext(), this.getModelName());
             this.getEntryDialog().addContent(simpleForm);
 
             this.getCustomContents().forEach((content) => {
