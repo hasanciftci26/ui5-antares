@@ -71,6 +71,8 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
             MessageBox.error(this.getErrorMessage());
             return;
         }
+
+        this.submit();
     }
 
     private onEntryCanceled(event: Button$PressEvent) {

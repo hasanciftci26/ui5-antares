@@ -3,6 +3,7 @@ import BaseObject from "sap/ui/base/Object";
 import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";
 import View from "sap/ui/core/mvc/View";
+import BindingMode from "sap/ui/model/BindingMode";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import { IManifestDataSources, IManifestModels } from "ui5/antares/types/common";
@@ -18,6 +19,7 @@ export default abstract class ModelCL extends BaseObject {
     private metadataUrl: string;
     private modelName?: string;
     private resourceBundle?: ResourceBundle;
+    private bindingMode: BindingMode | "Default" | "OneTime" | "OneWay" | "TwoWay";
 
     constructor(controller: Controller | UIComponent, modelName?: string) {
         super();
@@ -38,6 +40,7 @@ export default abstract class ModelCL extends BaseObject {
         }
 
         this.oDataModel = this.ownerComponent.getModel(this.modelName) as ODataModel;
+        this.bindingMode = this.oDataModel.getDefaultBindingMode();
         this.setMetadataUrl();
     }
 
@@ -71,6 +74,10 @@ export default abstract class ModelCL extends BaseObject {
 
     protected getResourceBundle(): ResourceBundle | undefined {
         return this.resourceBundle;
+    }
+
+    protected setOldBindingMode() {
+        this.oDataModel.setDefaultBindingMode(this.bindingMode);
     }
 
     public setModelName(modelName?: string): void {

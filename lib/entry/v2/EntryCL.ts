@@ -5,6 +5,7 @@ import { ButtonType } from "sap/m/library";
 import SmartField from "sap/ui/comp/smartfield/SmartField";
 import GroupElement from "sap/ui/comp/smartform/GroupElement";
 import SmartForm from "sap/ui/comp/smartform/SmartForm";
+import BusyIndicator from "sap/ui/core/BusyIndicator";
 import Control from "sap/ui/core/Control";
 import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";
@@ -13,9 +14,11 @@ import Context from "sap/ui/model/Context";
 import ModelCL from "ui5/antares/base/v2/ModelCL";
 import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL";
 import { FormTypes, NamingStrategies } from "ui5/antares/types/entry/enums";
+import { ISubmitResponse, ISubmitChangeResponse } from "ui5/antares/types/entry/submit";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
 import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 import DialogCL from "ui5/antares/ui/DialogCL";
+import ResponseCL from "ui5/antares/entry/v2/ResponseCL";
 
 /**
  * @namespace ui5.antares.entry.v2
@@ -43,6 +46,10 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
     private customContents: Control[] = [];
     private entryContext: Context;
     private entryDialog: DialogCL;
+    private submitCompleted?: (response: ResponseCL<EntityT>) => void;
+    private submitCompletedListener?: object;
+    private submitFailed?: (response: ResponseCL<ISubmitResponse>) => void;
+    private submitFailedListener?: object;
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
@@ -223,6 +230,26 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
         return this.customContents;
     }
 
+    public attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object) {
+        this.submitCompleted = submitCompleted;
+
+        if (listener) {
+            this.submitCompletedListener = listener;
+        } else {
+            this.submitCompletedListener = this.getSourceController();
+        }
+    }
+
+    public attachSubmitFailed(submitFailed: (response: ResponseCL<ISubmitResponse>) => void, listener: object) {
+        this.submitFailed = submitFailed;
+
+        if (listener) {
+            this.submitFailedListener = listener;
+        } else {
+            this.submitFailedListener = this.getSourceController();
+        }
+    }
+
     protected createEntryContext(data?: EntityT) {
         const entry = new ODataCreateCL<EntityT>(this.getSourceController(), this.entityPath, this.getModelName());
 
@@ -342,5 +369,80 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
                 this.getODataModel().resetChanges([this.entryContext.getPath()]);
             }
         }
+        this.setOldBindingMode();
+    }
+
+    public submit(resetAllOnFail: boolean = false) {
+        if (this.getODataModel().hasPendingChanges()) {
+            BusyIndicator.show(1);
+
+            this.getODataModel().submitChanges({
+                success: (response?: ISubmitChangeResponse<EntityT>) => {
+                    BusyIndicator.hide();
+
+                    if (response?.__batchResponses) {
+                        let statusCode = response.__batchResponses[0].response?.statusCode;
+
+                        if (!statusCode && response.__batchResponses[0].__changeResponses) {
+                            statusCode = response.__batchResponses[0].__changeResponses[0].statusCode ||
+                                response.__batchResponses[0].__changeResponses[0].response?.statusCode;
+                        }
+
+                        if (statusCode) {
+                            if (statusCode.startsWith("4") || statusCode.startsWith("5")) {
+                                this.reset(resetAllOnFail);
+
+                                if (this.submitFailed) {
+                                    let responseObject = response.__batchResponses[0].response;
+
+                                    if (!responseObject && response.__batchResponses[0].__changeResponses) {
+                                        responseObject = response.__batchResponses[0].__changeResponses[0].response;
+                                    }
+                                    const errorResponse = new ResponseCL<ISubmitResponse>(responseObject, statusCode);
+                                    this.submitFailed.call(this.submitFailedListener, errorResponse);
+                                }
+                            } else {
+                                if (this.submitCompleted) {
+                                    let responseData: EntityT | undefined;
+
+                                    if (response.__batchResponses[0].__changeResponses) {
+                                        responseData = response.__batchResponses[0].__changeResponses[0].data;
+                                    }
+
+                                    const successResponse = new ResponseCL<EntityT>(responseData, statusCode);
+                                    this.submitCompleted.call(this.submitCompletedListener, successResponse);
+                                }
+                            }
+                        } else {
+                            this.reset();
+                            if (this.submitFailed) {
+                                const responseObject: ISubmitResponse = {
+                                    statusCode: "422",
+                                    statusText: "Status Code was not found!"
+                                };
+                                const errorResponse = new ResponseCL<ISubmitResponse>(responseObject, "422");
+                                this.submitFailed.call(this.submitFailedListener, errorResponse);
+                            }
+                        }
+                    }
+                },
+                error: () => {
+                    BusyIndicator.hide();
+                    this.reset();
+                    if (this.submitFailed) {
+                        const responseObject: ISubmitResponse = {
+                            statusCode: "500",
+                            statusText: "An unknown error occured!"
+                        };
+                        const errorResponse = new ResponseCL<ISubmitResponse>(responseObject, "500");
+                        this.submitFailed.call(this.submitFailedListener, errorResponse);
+                    }
+                }
+            });
+        }
+
+        this.setOldBindingMode();
+        this.closeEntryDialog();
+        this.destroyEntryDialog();
     }
 }
