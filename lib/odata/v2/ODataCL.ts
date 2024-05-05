@@ -1,6 +1,7 @@
 import Controller from "sap/ui/core/mvc/Controller";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
 import ModelCL from "ui5/antares/base/v2/ModelCL";
+import UIComponent from "sap/ui/core/UIComponent";
 
 /**
  * @namespace ui5.antares.odata.v2
@@ -10,7 +11,7 @@ export default abstract class ODataCL extends ModelCL {
     private entityName: string;
     private method: ODataMethods;
 
-    constructor(controller: Controller, entityPath: string, method: ODataMethods,  modelName?: string) {
+    constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods,  modelName?: string) {
         super(controller, modelName);
         this.method = method;
         this.entityPath = entityPath.startsWith("/") ? entityPath : `/${entityPath}`;

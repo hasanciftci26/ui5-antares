@@ -1,6 +1,5 @@
-export interface IEntityType {
-    originalProperty: string;
-    propertyType: "Edm.Boolean" |
+export type PropertyType =
+    "Edm.Boolean" |
     "Edm.String" |
     "Edm.Binary" |
     "Edm.Byte" |
@@ -16,5 +15,8 @@ export interface IEntityType {
     "Edm.Single" |
     "Edm.Stream" |
     "Edm.Time";
-    generatedLabel: string;
+
+export interface IEntityType {
+    propertyName: string;
+    propertyType: PropertyType;
 }

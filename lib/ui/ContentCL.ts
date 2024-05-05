@@ -3,7 +3,6 @@ import SmartForm from "sap/ui/comp/smartform/SmartForm";
 import Group from "sap/ui/comp/smartform/Group";
 import SmartField from "sap/ui/comp/smartfield/SmartField";
 import GroupElement from "sap/ui/comp/smartform/GroupElement";
-import { IContentConfigurations } from "ui5/antares/types/ui/content";
 import SimpleForm from "sap/ui/layout/form/SimpleForm";
 import UI5Element from "sap/ui/core/Element";
 import Label from "sap/m/Label";
@@ -12,49 +11,44 @@ import DatePicker from "sap/m/DatePicker";
 import DateTimePicker from "sap/m/DateTimePicker";
 import Input from "sap/m/Input";
 import { FormTypes } from "ui5/antares/types/entry/enums";
+import EntryCL from "ui5/antares/entry/v2/EntryCL";
+import { PropertyType } from "ui5/antares/types/entity/type";
+import Controller from "sap/ui/core/mvc/Controller";
+import UIComponent from "sap/ui/core/UIComponent";
+import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 
 /**
  * @namespace ui5.antares.ui
  */
-export default class ContentCL extends EntityCL {
-    private formPropertyOrder?: string[];
-    private mandatoryProperties: string[];
-    private excludeOtherProps: boolean;
-    private excludedProperties: string[];
-    private useMetadataLabels: boolean;
-    private formType: FormTypes;
+export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends object = object> extends EntityCL {
+    private entry: EntryT;
     private smartGroup: Group;
     private simpleFormElements: UI5Element[];
 
-    constructor(config: IContentConfigurations) {
-        super(config.controller, config.entityName, config.resourceBundlePrefix, config.namingStrategy, config.modelName);
-        this.formPropertyOrder = config.formPropertyOrder;
-        this.mandatoryProperties = config.mandatoryProperties;
-        this.excludeOtherProps = config.excludeOtherProps;
-        this.excludedProperties = config.excludedProperties;
-        this.useMetadataLabels = config.useMetadataLabels;
-        this.formType = config.formType;
+    constructor(controller: Controller | UIComponent, entry: EntryT, modelName?: string) {
+        super(controller, entry.getEntityName(), entry.getResourceBundlePrefix(), entry.getNamingStrategy(), modelName);
+        this.entry = entry;
     }
 
-    public async getSmartForm(formTitle?: string): Promise<SmartForm> {
+    public async getSmartForm(): Promise<SmartForm> {
         const smartFormGroup = await this.getSmartFormGroup();
 
         const smartForm = new SmartForm({
             editTogglable: false,
             editable: true,
-            title: formTitle || `Create New ${this.getEntityName()}`,
+            title: this.entry.getFormTitle(),
             groups: [smartFormGroup]
         });
 
         return smartForm;
     }
 
-    public async getSimpleForm(formTitle?: string): Promise<SimpleForm> {
+    public async getSimpleForm(): Promise<SimpleForm> {
         const simpleFormContent = await this.getSimpleFormContent();
 
         const simpleForm = new SimpleForm({
             editable: true,
-            title: formTitle || `Create New ${this.getEntityName()}`,
+            title: this.entry.getFormTitle(),
             content: simpleFormContent
         });
 
@@ -63,221 +57,153 @@ export default class ContentCL extends EntityCL {
 
     private async getSmartFormGroup(): Promise<Group> {
         this.smartGroup = new Group();
-
         await this.addKeyProperties();
-
-        if (this.formPropertyOrder) {
-            await this.addOrderedProperties();
-        } else {
-            await this.addProperties();
-        }
-
+        await this.addProperties();
         return this.smartGroup;
     }
 
     private async getSimpleFormContent(): Promise<UI5Element[]> {
         this.simpleFormElements = [];
         await this.addKeyProperties();
-
-        if (this.formPropertyOrder) {
-            await this.addOrderedProperties();
-        } else {
-            await this.addProperties();
-        }
-
+        await this.addProperties();
         return this.simpleFormElements;
-    }    
+    }
 
     private async addKeyProperties() {
         const entityTypeKeys = await this.getEntityTypeKeys();
-
-        if (this.formType === FormTypes.SIMPLE) {
-            this.mandatoryProperties.push(...entityTypeKeys.map(key => key.originalProperty));
-        }
+        this.entry.setMandatoryProperties([...this.entry.getMandatoryProperties(), ...entityTypeKeys.map(key => key.propertyName)]);
 
         entityTypeKeys.forEach((key) => {
-            if (this.formType === FormTypes.SMART) {
-                const smartField = new SmartField({
-                    value: `{${key.originalProperty}}`
-                });
+            if (this.entry.getFormType() === FormTypes.SMART) {
+                const customControl = this.entry.getCustomControl(key.propertyName);
 
-                const groupElement = new GroupElement({
-                    elements: [smartField]
-                });
-
-                if (!this.useMetadataLabels) {
-                    groupElement.setLabel(key.generatedLabel);
+                if (customControl) {
+                    this.addSmartCustomControl(customControl, key.propertyName);
+                } else {
+                    this.addSmartField(key.propertyName);
                 }
-
-                this.smartGroup.addGroupElement(groupElement);
             } else {
-                this.simpleFormElements.push(new Label({ text: key.generatedLabel }));
+                const customControl = this.entry.getCustomControl(key.propertyName);
 
-                switch (key.propertyType) {
-                    case "Edm.Boolean":
-                        this.addCheckBox(key.originalProperty)
-                        break;
-                    case "Edm.DateTime":
-                        this.addDatePicker(key.originalProperty)
-                        break;
-                    case "Edm.DateTimeOffset":
-                        this.addDateTimePicker(key.originalProperty)
-                        break;
-                    default:
-                        this.addInput(key.originalProperty);
-                        break;
+                if (customControl) {
+                    this.addSimpleCustomControl(customControl, key.propertyName);
+                } else {
+                    this.addSimpleFormField(key.propertyName, key.propertyType);
                 }
             }
         });
-    }
-
-    private async addOrderedProperties() {
-        const entityTypeKeys = await this.getEntityTypeKeys();
-        const entityTypeProperties = await this.getEntityTypeProperties();
-
-        for (const order of this.formPropertyOrder!) {
-            if (entityTypeKeys.some(key => key.originalProperty === order) || !entityTypeProperties.find(prop => prop.originalProperty === order)) {
-                continue;
-            }
-
-            if (this.formType === FormTypes.SMART) {
-                const smartField = new SmartField({
-                    mandatory: this.mandatoryProperties.includes(order),
-                    value: `{${order}}`
-                });
-
-                const groupElement = new GroupElement({
-                    elements: [smartField]
-                });
-
-                if (!this.useMetadataLabels) {
-                    groupElement.setLabel(this.getEntityTypePropLabel(order));
-                }
-
-                this.smartGroup.addGroupElement(groupElement);
-            } else {
-                const propertyType = entityTypeProperties.find(prop => prop.originalProperty === order)!.propertyType;
-                this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(order) }));
-
-                switch (propertyType) {
-                    case "Edm.Boolean":
-                        this.addCheckBox(order)
-                        break;
-                    case "Edm.DateTime":
-                        this.addDatePicker(order)
-                        break;
-                    case "Edm.DateTimeOffset":
-                        this.addDateTimePicker(order)
-                        break;
-                    default:
-                        this.addInput(order);
-                        break;
-                }
-            }
-        }
-
-        if (!this.excludeOtherProps) {
-            for (const property of entityTypeProperties) {
-                if (entityTypeKeys.some(key => key.originalProperty === property.originalProperty) ||
-                    this.formPropertyOrder!.includes(property.originalProperty) ||
-                    this.excludedProperties.includes(property.originalProperty)) {
-                    continue;
-                }
-
-                if (this.formType === FormTypes.SMART) {
-                    const smartField = new SmartField({
-                        mandatory: this.mandatoryProperties.includes(property.originalProperty),
-                        value: `{${property.originalProperty}}`
-                    });
-
-                    const groupElement = new GroupElement({
-                        elements: [smartField]
-                    });
-
-                    if (!this.useMetadataLabels) {
-                        groupElement.setLabel(property.generatedLabel);
-                    }
-
-                    this.smartGroup.addGroupElement(groupElement);
-                } else {
-                    this.simpleFormElements.push(new Label({ text: property.generatedLabel }));
-
-                    switch (property.propertyType) {
-                        case "Edm.Boolean":
-                            this.addCheckBox(property.originalProperty)
-                            break;
-                        case "Edm.DateTime":
-                            this.addDatePicker(property.originalProperty)
-                            break;
-                        case "Edm.DateTimeOffset":
-                            this.addDateTimePicker(property.originalProperty)
-                            break;
-                        default:
-                            this.addInput(property.originalProperty);
-                            break;
-                    }
-                }
-            }
-        }
     }
 
     private async addProperties() {
         const entityTypeKeys = await this.getEntityTypeKeys();
         const entityTypeProperties = await this.getEntityTypeProperties();
 
-        for (const property of entityTypeProperties) {
-            if (entityTypeKeys.some(key => key.originalProperty === property.originalProperty) || this.excludedProperties.includes(property.originalProperty)) {
+        for (const property of this.entry.getPropertyOrder()) {
+            if (entityTypeKeys.some(key => key.propertyName === property) || !entityTypeProperties.some(prop => prop.propertyName === property)) {
                 continue;
             }
 
-            if (this.formType === FormTypes.SMART) {
-                const smartField = new SmartField({
-                    mandatory: this.mandatoryProperties.includes(property.originalProperty),
-                    value: `{${property.originalProperty}}`
-                });
+            if (this.entry.getFormType() === FormTypes.SMART) {
+                const customControl = this.entry.getCustomControl(property);
 
-                const groupElement = new GroupElement({
-                    elements: [smartField]
-                });
+                if (customControl) {
+                    this.addSmartCustomControl(customControl, property);
+                } else {
+                    this.addSmartField(property);
+                }
+            } else {
+                const customControl = this.entry.getCustomControl(property);
 
-                if (!this.useMetadataLabels) {
-                    groupElement.setLabel(property.generatedLabel);
+                if (customControl) {
+                    this.addSimpleCustomControl(customControl, property);
+                } else {
+                    let propertyType: PropertyType = entityTypeProperties.find(prop => prop.propertyName === property)?.propertyType || "Edm.String";
+                    this.addSimpleFormField(property, propertyType);
+                }
+            }
+        }
+
+        if (this.entry.getUseAllProperties()) {
+            for (const property of entityTypeProperties) {
+                if (entityTypeKeys.some(key => key.propertyName === property.propertyName) ||
+                    this.entry.getPropertyOrder().includes(property.propertyName) ||
+                    this.entry.getExcludedProperties().includes(property.propertyName)) {
+                    continue;
                 }
 
-                this.smartGroup.addGroupElement(groupElement);
-            } else {
-                this.simpleFormElements.push(new Label({ text: property.generatedLabel }));
+                if (this.entry.getFormType() === FormTypes.SMART) {
+                    const customControl = this.entry.getCustomControl(property.propertyName);
 
-                switch (property.propertyType) {
-                    case "Edm.Boolean":
-                        this.addCheckBox(property.originalProperty)
-                        break;
-                    case "Edm.DateTime":
-                        this.addDatePicker(property.originalProperty)
-                        break;
-                    case "Edm.DateTimeOffset":
-                        this.addDateTimePicker(property.originalProperty)
-                        break;
-                    default:
-                        this.addInput(property.originalProperty);
-                        break;
+                    if (customControl) {
+                        this.addSmartCustomControl(customControl, property.propertyName);
+                    } else {
+                        this.addSmartField(property.propertyName);
+                    }
+                } else {
+                    const customControl = this.entry.getCustomControl(property.propertyName);
+
+                    if (customControl) {
+                        this.addSimpleCustomControl(customControl, property.propertyName);
+                    } else {
+                        this.addSimpleFormField(property.propertyName, property.propertyType);
+                    }
                 }
             }
         }
     }
 
+    private addSmartField(property: string) {
+        const smartField = new SmartField({
+            mandatory: this.entry.getMandatoryProperties().includes(property),
+            value: `{${property}}`
+        });
+
+        const groupElement = new GroupElement({
+            elements: [smartField]
+        });
+
+        if (!this.entry.getUseMetadataLabels()) {
+            groupElement.setLabel(this.getEntityTypePropLabel(property));
+        }
+
+        this.smartGroup.addGroupElement(groupElement);
+    }
+
+    private addSimpleFormField(property: string, propertyType: PropertyType) {
+        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property) }));
+
+        switch (propertyType) {
+            case "Edm.Boolean":
+                this.addCheckBox(property);
+                break;
+            case "Edm.DateTime":
+                this.addDatePicker(property);
+                break;
+            case "Edm.DateTimeOffset":
+                this.addDateTimePicker(property);
+                break;
+            default:
+                this.addInput(property);
+                break;
+        }
+    }
+
     private addCheckBox(property: string) {
+        const selected = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+
         this.simpleFormElements.push(new CheckBox({
-            selected: `{${property}}`
+            selected: `{${selected}}`
         }));
     }
 
     private addDatePicker(property: string) {
+        const value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+
         const datePicker = new DatePicker({
-            value: `{constraints : {displayFormat : 'Date'}, path : '${property}', type : 'sap.ui.model.odata.type.DateTime'}`
+            value: `{constraints : {displayFormat : 'Date'}, path : '${value}', type : 'sap.ui.model.odata.type.DateTime'}`
         });
 
-        if (this.mandatoryProperties.includes(property)) {
+        if (this.entry.getMandatoryProperties().includes(property)) {
             datePicker.setRequired(true);
         }
 
@@ -285,11 +211,13 @@ export default class ContentCL extends EntityCL {
     }
 
     private addDateTimePicker(property: string) {
+        const value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+
         const dateTimePicker = new DateTimePicker({
-            value: `path : '${property}', type : 'sap.ui.model.odata.type.DateTimeOffset'`
+            value: `path : '${value}', type : 'sap.ui.model.odata.type.DateTimeOffset'`
         });
 
-        if (this.mandatoryProperties.includes(property)) {
+        if (this.entry.getMandatoryProperties().includes(property)) {
             dateTimePicker.setRequired(true);
         }
 
@@ -297,14 +225,39 @@ export default class ContentCL extends EntityCL {
     }
 
     private addInput(property: string) {
+        const valueHelp = this.entry.getValueHelp(property);
+        const value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+
         const input = new Input({
-            value: `{${property}}`
+            value: `{${value}}`
         });
 
-        if (this.mandatoryProperties.includes(property)) {
+        if (this.entry.getMandatoryProperties().includes(property)) {
             input.setRequired(true);
         }
 
+        if (valueHelp) {
+            input.setShowValueHelp(true);
+            input.attachValueHelpRequest({}, valueHelp.openValueHelpDialog, valueHelp);
+        }
+
         this.simpleFormElements.push(input);
+    }
+
+    private addSmartCustomControl(control: CustomControlCL, property: string) {
+        const groupElement = new GroupElement({
+            elements: [control.getControl()]
+        });
+
+        if (!this.entry.getUseMetadataLabels()) {
+            groupElement.setLabel(this.getEntityTypePropLabel(property));
+        }
+
+        this.smartGroup.addGroupElement(groupElement);
+    }
+
+    private addSimpleCustomControl(control: CustomControlCL, property: string) {
+        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property) }));
+        this.simpleFormElements.push(control.getControl());
     }
 }

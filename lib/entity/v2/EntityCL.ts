@@ -66,9 +66,8 @@ export default class EntityCL extends ModelCL {
 
         return entityType.key.propertyRef.map((key) => {
             return {
-                originalProperty: key.name,
-                propertyType: entityTypeProps.find(prop => prop.originalProperty === key.name)!.propertyType,
-                generatedLabel: this.getEntityTypePropLabel(key.name)
+                propertyName: key.name,
+                propertyType: entityTypeProps.find(prop => prop.propertyName === key.name)?.propertyType || "Edm.String"
             }
         });
     }
@@ -82,9 +81,8 @@ export default class EntityCL extends ModelCL {
 
         return entityType.property.map((prop) => {
             return {
-                originalProperty: prop.name,
-                propertyType: prop.type,
-                generatedLabel: this.getEntityTypePropLabel(prop.name)
+                propertyName: prop.name,
+                propertyType: prop.type
             }
         });
     }

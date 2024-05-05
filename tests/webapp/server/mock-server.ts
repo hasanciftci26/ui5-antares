@@ -12,9 +12,9 @@ export default {
             bGenerateMissingMockData: true
         });
 
-        server.attachAfter(MockServer.HTTPMETHOD.POST, function (event: IPOSTRequest) {
+        server.attachBefore(MockServer.HTTPMETHOD.POST, function (event: IPOSTRequest) {
             const oXhr = event.getParameter("oXhr") as SinonFakeXMLHttpRequest;
-            oXhr.respond(401, {}, "Unauthorized");
+            oXhr.respond(500, { message: "test" }, "Entity Exists");
             Object.assign(oXhr, { readyState: 1 });
         }, "Categories");
 

@@ -5,6 +5,7 @@ import { ODataMethods } from "ui5/antares/types/odata/enums";
 import Filter from "sap/ui/model/Filter";
 import Sorter from "sap/ui/model/Sorter";
 import { IODataReadResult } from "ui5/antares/types/odata/read";
+import UIComponent from "sap/ui/core/UIComponent";
 
 /**
  * @namespace ui5.antares.odata.v2
@@ -14,7 +15,7 @@ export default class ODataReadCL<EntityT extends object = object, EntityKeyT ext
     private sorters: Sorter[] = [];
     private urlParameters?: Record<string, string>;
 
-    constructor(controller: Controller, entityPath: string, modelName?: string) {
+    constructor(controller: Controller | UIComponent, entityPath: string, modelName?: string) {
         super(controller, entityPath, ODataMethods.READ, modelName);
     }
 
