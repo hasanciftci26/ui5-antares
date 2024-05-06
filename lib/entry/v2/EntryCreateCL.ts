@@ -1,11 +1,13 @@
 import { Button$PressEvent } from "sap/m/Button";
 import Controller from "sap/ui/core/mvc/Controller";
 import View from "sap/ui/core/mvc/View";
-import { FormTypes } from "ui5/antares/types/entry/enums";
+import { DialogStrategies, FormTypes } from "ui5/antares/types/entry/enums";
 import ContentCL from "ui5/antares/ui/ContentCL";
 import EntryCL from "ui5/antares/entry/v2/EntryCL";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
 import MessageBox from "sap/m/MessageBox";
+import FragmentCL from "ui5/antares/ui/FragmentCL";
+import DialogCL from "ui5/antares/ui/DialogCL";
 
 /**
  * @namespace ui5.antares.entry.v2
@@ -16,7 +18,7 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         super(controller, entityPath, ODataMethods.CREATE, modelName);
     }
 
-    public createNewEntry(data?: EntityT) {
+    public async createNewEntry(data?: EntityT) {
         if (!this.getSourceView()) {
             throw new Error("createNewEntry() method cannot be used on the UIComponent!");
         }
@@ -24,9 +26,10 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         this.getODataModel().setDefaultBindingMode("TwoWay");
         this.getODataModel().setUseBatch(true);
 
-        if (this.getFragmentPath()) {
+        if (this.getDialogStrategy() === DialogStrategies.LOAD) {
+            await this.loadDialog(data);
         } else {
-            this.createDialog(data);
+            await this.createDialog(data);
         }
     }
 
@@ -35,9 +38,10 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
 
         // Create Dialog
         this.createEntryDialog(`diaUI5AntaresCreateNew${this.getEntityName()}`);
-        this.getEntryDialog().addBeginButton(this.getBeginButtonText(), this.getBeginButtonType(), this.onCreateTriggered, this);
-        this.getEntryDialog().addEndButton(this.getEndButtonText(), this.getEndButtonType(), this.onEntryCanceled, this);
-        this.getEntryDialog().addEscapeHandler(this.onEscapePressed, this);
+        const entryDialog = this.getEntryDialog() as DialogCL;
+        entryDialog.addBeginButton(this.getBeginButtonText(), this.getBeginButtonType(), this.onCreateTriggered, this);
+        entryDialog.addEndButton(this.getEndButtonText(), this.getEndButtonType(), this.onEntryCanceled, this);
+        entryDialog.addEscapeHandler(this.onEscapePressed, this);
 
         //Create Context
         this.createEntryContext(data);
@@ -46,24 +50,24 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
             const smartForm = await content.getSmartForm();
             smartForm.setModel(this.getODataModel());
             smartForm.setBindingContext(this.getEntryContext());
-            this.getEntryDialog().addContent(smartForm);
+            entryDialog.addContent(smartForm);
 
             this.getCustomContents().forEach((content) => {
-                this.getEntryDialog().addContent(content);
+                entryDialog.addContent(content);
             });
         } else {
             const simpleForm = await content.getSimpleForm();
             simpleForm.setModel(this.getODataModel(), this.getModelName());
             simpleForm.setBindingContext(this.getEntryContext(), this.getModelName());
-            this.getEntryDialog().addContent(simpleForm);
+            entryDialog.addContent(simpleForm);
 
             this.getCustomContents().forEach((content) => {
-                this.getEntryDialog().addContent(content);
+                entryDialog.addContent(content);
             });
         }
 
-        (this.getSourceView() as View).addDependent(this.getEntryDialog().getDialog());
-        this.getEntryDialog().getDialog().open();
+        (this.getSourceView() as View).addDependent(entryDialog.getDialog());
+        entryDialog.getDialog().open();
     }
 
     private onCreateTriggered(event: Button$PressEvent) {
@@ -85,5 +89,27 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         this.reset();
         event.resolve();
         this.destroyEntryDialog();
+    }
+
+    private async loadDialog(data?: EntityT) {
+        await this.addMandatoryKeyProperties();
+        
+        // Create Dialog
+        this.createEntryDialog();
+        const fragment = this.getEntryDialog() as FragmentCL;
+        await fragment.load();
+
+        // Set context and open the dialog
+        this.createEntryContext(data);
+
+        if (this.getContainsSmartForm()) {
+            fragment.getFragment().setModel(this.getODataModel());
+            fragment.getFragment().setBindingContext(this.getEntryContext());
+        } else {
+            fragment.getFragment().setModel(this.getODataModel(), this.getModelName());
+            fragment.getFragment().setBindingContext(this.getEntryContext(), this.getModelName());
+        }
+
+        fragment.open();
     }
 }

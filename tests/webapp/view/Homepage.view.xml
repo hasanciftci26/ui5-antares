@@ -13,6 +13,8 @@
                         <ToolbarSpacer />
                         <Button text="Create a Product"
                             press="onCreateProduct"/>
+                        <Button text="Create a Product Custom Fragment"
+                            press="onCreateProductFragment"/>
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>

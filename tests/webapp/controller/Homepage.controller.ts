@@ -21,6 +21,7 @@ import Table from "sap/m/Table";
  */
 QUnit.config.autostart = false;
 export default class Homepage extends BaseController {
+    private fragmentEntry: EntryCreateCL<IProducts>;
 
     /* ======================================================================================================================= */
     /* Lifecycle methods                                                                                                       */
@@ -40,16 +41,23 @@ export default class Homepage extends BaseController {
 
     public async onCreateProduct(): Promise<void> {
         const entry = new EntryCreateCL<IProducts>(this, "Products");
-        const categoryValueHelp = new ValueHelpCL(this, {
-            valueHelpEntity: "Categories",
-            propertyName: "CategoryID",
-            valueHelpProperty: "ID",
-            readonlyProperties: ["Name"]
-        });
-
-        entry.addValueHelp(categoryValueHelp);
-        entry.setFormType(FormTypes.SIMPLE);
+        entry.setMandatoryProperties(["CategoryID"]);
         entry.createNewEntry();
+    }
+
+    public async onCreateProductFragment(): Promise<void> {
+        this.fragmentEntry = new EntryCreateCL<IProducts>(this, "Products");
+        this.fragmentEntry.setFragmentPath("test.ui5.antares.fragments.CreateProduct");
+        this.fragmentEntry.setMandatoryProperties(["CategoryID"]);
+        this.fragmentEntry.createNewEntry({ ID: 182 });
+    }
+
+    public onCompleteCreate() {
+        this.fragmentEntry.submit();
+    }
+
+    public onCloseDialog() {
+        this.fragmentEntry.reset();
     }
 
     /* ======================================================================================================================= */

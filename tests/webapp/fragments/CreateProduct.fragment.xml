@@ -1,0 +1,50 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form">
+    <Dialog id="diaNewProduct"
+        showHeader="false">
+        <content>
+            <form:SimpleForm id="sfNewProduct"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                title="New Product"
+                labelSpanXL="3"
+                labelSpanL="3"
+                labelSpanM="3"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="4"
+                emptySpanL="4"
+                emptySpanM="4"
+                emptySpanS="0"
+                columnsXL="1"
+                columnsL="1"
+                columnsM="1"
+                singleContainerFullSize="false"
+                visible="true">
+                <form:content>
+                    <Label text="Product ID"/>
+                    <Input value="{ID}"/>
+                    <Label text="Product Name"/>
+                    <Input value="{Name}"/>
+                    <Label text="Price"/>
+                    <Input value="{Price}"/>
+                    <Label text="Currency"/>
+                    <Input value="{Currency}"/>
+                    <Label text="Category ID"/>
+                    <Input value="{CategoryID}"/>
+                    <Label text="Supplier ID"/>
+                    <Input value="{SupplierID}"/>
+                </form:content>
+            </form:SimpleForm>
+        </content>
+        <beginButton>
+            <Button text="Create"
+                press="onCompleteCreate" />
+        </beginButton>
+        <endButton>
+            <Button text="Close"
+                press="onCloseDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

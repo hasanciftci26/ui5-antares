@@ -13,20 +13,22 @@ import SimpleForm from "sap/ui/layout/form/SimpleForm";
 import Context from "sap/ui/model/Context";
 import ModelCL from "ui5/antares/base/v2/ModelCL";
 import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL";
-import { FormTypes, NamingStrategies } from "ui5/antares/types/entry/enums";
+import { DialogStrategies, FormTypes, NamingStrategies } from "ui5/antares/types/entry/enums";
 import { ISubmitResponse, ISubmitChangeResponse } from "ui5/antares/types/entry/submit";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
 import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 import DialogCL from "ui5/antares/ui/DialogCL";
 import ResponseCL from "ui5/antares/entry/v2/ResponseCL";
 import ValueHelpCL from "ui5/antares/ui/ValueHelpCL";
+import FragmentCL from "ui5/antares/ui/FragmentCL";
+import EntityCL from "ui5/antares/entity/v2/EntityCL";
+import MessageBox from "sap/m/MessageBox";
 
 /**
  * @namespace ui5.antares.entry.v2
  */
 export default abstract class EntryCL<EntityT extends object = object> extends ModelCL {
     private fragmentPath?: string;
-    private formId?: string;
     private formTitle: string;
     private entityPath: string;
     private entityName: string;
@@ -46,12 +48,15 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
     private customControls: CustomControlCL[] = [];
     private customContents: Control[] = [];
     private entryContext: Context;
-    private entryDialog: DialogCL;
+    private entryDialog: DialogCL | FragmentCL;
     private submitCompleted?: (response: ResponseCL<EntityT>) => void;
     private submitCompletedListener?: object;
     private submitFailed?: (response: ResponseCL<ISubmitResponse>) => void;
     private submitFailedListener?: object;
     private valueHelps: ValueHelpCL[] = [];
+    private dialogStrategy: DialogStrategies = DialogStrategies.CREATE;
+    private containsSmartForm: boolean = false;
+    private autoMandatoryCheck: boolean = true;
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
@@ -90,16 +95,10 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
         return this.fragmentPath;
     }
 
-    public setFragmentPath(fragmentPath: string) {
+    public setFragmentPath(fragmentPath: string, containsSmartForm: boolean = false) {
         this.fragmentPath = fragmentPath;
-    }
-
-    public getFormId(): string | undefined {
-        return this.formId;
-    }
-
-    public setFormId(formId: string) {
-        this.formId = formId;
+        this.containsSmartForm = containsSmartForm;
+        this.setDialogStrategy(DialogStrategies.LOAD);
     }
 
     public getFormType(): FormTypes {
@@ -245,6 +244,35 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
         return valueHelp;
     }
 
+    protected setDialogStrategy(strategy: DialogStrategies) {
+        this.dialogStrategy = strategy;
+    }
+
+    protected getDialogStrategy(): DialogStrategies {
+        return this.dialogStrategy;
+    }
+
+    protected getContainsSmartForm(): boolean {
+        return this.containsSmartForm;
+    }
+
+    public setAutoMandatoryCheck(autoMandatoryCheck: boolean) {
+        this.autoMandatoryCheck = autoMandatoryCheck;
+    }
+
+    public getAutoMandatoryCheck(): boolean {
+        return this.autoMandatoryCheck;
+    }
+
+    protected async addMandatoryKeyProperties() {
+        const entity = new EntityCL(this.getSourceController(), this.entityName, this.getResourceBundlePrefix(), this.namingStrategy, this.getModelName());
+        const entityTypeKeys = await entity.getEntityTypeKeys();
+
+        entityTypeKeys.forEach((key) => {
+            this.mandatoryProperties.push(key.propertyName);
+        });
+    }
+
     public attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object) {
         this.submitCompleted = submitCompleted;
 
@@ -275,24 +303,36 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
         this.entryContext = entry.createEntry();
     }
 
-    protected getEntryContext(): Context {
+    public getEntryContext(): Context {
         return this.entryContext;
     }
 
-    protected createEntryDialog(dialogId: string) {
-        this.entryDialog = new DialogCL(dialogId);
+    protected createEntryDialog(dialogId?: string) {
+        if (dialogId) {
+            this.entryDialog = new DialogCL(dialogId);
+        } else {
+            this.entryDialog = new FragmentCL(this.getSourceController(), this.fragmentPath!);
+        }
     }
 
-    protected getEntryDialog(): DialogCL {
+    protected getEntryDialog(): DialogCL | FragmentCL {
         return this.entryDialog;
     }
 
     protected closeEntryDialog() {
-        this.entryDialog.getDialog().close();
+        if (this.entryDialog instanceof DialogCL) {
+            this.entryDialog.getDialog().close();
+        } else {
+            this.entryDialog.close();
+        }
     }
 
     protected destroyEntryDialog() {
-        this.entryDialog.getDialog().destroy();
+        if (this.entryDialog instanceof DialogCL) {
+            this.entryDialog.getDialog().destroy();
+        } else {
+            this.entryDialog.destroyFragment();
+        }
     }
 
     protected mandatoryFieldCheck(): boolean {
@@ -305,7 +345,7 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
 
     private checkSmartMandatory(): boolean {
         let checkFailed = false;
-        const smartGroupElements = (this.entryDialog.getDialog().getContent()[0] as SmartForm).getGroups()[0].getGroupElements() as GroupElement[];
+        const smartGroupElements = ((this.entryDialog as DialogCL).getDialog().getContent()[0] as SmartForm).getGroups()[0].getGroupElements() as GroupElement[];
 
         smartGroupElements.forEach((element) => {
             const control = element.getElements()[0];
@@ -332,7 +372,7 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
 
     private checkSimpleMandatory(): boolean {
         let checkFailed = false;
-        const simpleFormElements = (this.entryDialog.getDialog().getContent()[0] as SimpleForm).getContent();
+        const simpleFormElements = ((this.entryDialog as DialogCL).getDialog().getContent()[0] as SimpleForm).getContent();
 
         for (const element of simpleFormElements) {
             const customData = element.getCustomData().find(data => data.getKey() === "UI5AntaresCustomControlName");
@@ -376,6 +416,12 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
         return checkFailed;
     }
 
+    private checkContextMandatory(): boolean {
+        const entryObject = this.entryContext.getObject();
+        const objectKeys = Object.keys(entryObject);
+        return this.mandatoryProperties.every(prop => objectKeys.includes(prop));
+    }
+
     public reset(resetAll: boolean = false) {
         if (this.getODataModel().hasPendingChanges()) {
             if (resetAll) {
@@ -384,11 +430,24 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
                 this.getODataModel().resetChanges([this.entryContext.getPath()]);
             }
         }
+
         this.setOldBindingMode();
+
+        if (this.getDialogStrategy() === DialogStrategies.LOAD) {
+            this.closeEntryDialog();
+            this.destroyEntryDialog();
+        }
     }
 
     public submit(resetAllOnFail: boolean = false) {
         if (this.getODataModel().hasPendingChanges()) {
+            if (this.dialogStrategy === DialogStrategies.LOAD && this.autoMandatoryCheck) {
+                if (!this.checkContextMandatory()) {
+                    MessageBox.error(this.errorMessage);
+                    return;
+                }
+            }
+
             BusyIndicator.show(1);
 
             this.getODataModel().submitChanges({
