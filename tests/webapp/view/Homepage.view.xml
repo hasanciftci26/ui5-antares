@@ -7,7 +7,9 @@
         showHeader="true"
         title="UI5 Antares Test App">
         <content>
-            <Table items="{/Products}">
+            <Table id="tblProducts"
+                mode="SingleSelectMaster"
+                items="{/Products}">
                 <headerToolbar>
                     <OverflowToolbar >
                         <ToolbarSpacer />

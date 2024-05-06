@@ -23,11 +23,17 @@ import ValueHelpCL from "ui5/antares/ui/ValueHelpCL";
 import FragmentCL from "ui5/antares/ui/FragmentCL";
 import EntityCL from "ui5/antares/entity/v2/EntityCL";
 import MessageBox from "sap/m/MessageBox";
+import Table from "sap/m/Table";
+import SmartTable from "sap/ui/comp/smarttable/SmartTable";
+import View from "sap/ui/core/mvc/View";
+import UITable from "sap/ui/table/Table";
+import TreeTable from "sap/ui/table/TreeTable";
+import AnalyticalTable from "sap/ui/table/AnalyticalTable";
 
 /**
  * @namespace ui5.antares.entry.v2
  */
-export default abstract class EntryCL<EntityT extends object = object> extends ModelCL {
+export default abstract class EntryCL<EntityT extends object = object, EntityKeysT extends object = object> extends ModelCL {
     private fragmentPath?: string;
     private formTitle: string;
     private entityPath: string;
@@ -44,7 +50,8 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
     private mandatoryProperties: string[] = [];
     private resourceBundlePrefix: string = "antares";
     private useMetadataLabels: boolean = false;
-    private errorMessage: string = "Please fill in all required fields.";
+    private mandatoryErrorMessage: string = "Please fill in all required fields.";
+    private selectRowMessage: string = "Please select a row from the table.";
     private customControls: CustomControlCL[] = [];
     private customContents: Control[] = [];
     private entryContext: Context;
@@ -57,6 +64,14 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
     private dialogStrategy: DialogStrategies = DialogStrategies.CREATE;
     private containsSmartForm: boolean = false;
     private autoMandatoryCheck: boolean = true;
+    private tableModes: string[] = ["SingleSelect", "SingleSelectLeft", "SingleSelectMaster"];
+    private uiTableModes: string[] = ["Single"];
+    private tableId?: string;
+    private supportedTableTypes: string[] = [
+        "sap.m.Table", "sap.ui.table.Table", "sap.ui.comp.smarttable.SmartTable",
+        "sap.ui.table.TreeTable", "sap.ui.table.AnalyticalTable"
+    ];
+    private entityKeys?: EntityKeysT;
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
@@ -202,12 +217,12 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
         this.useMetadataLabels = useMetadataLabels;
     }
 
-    public getErrorMessage(): string {
-        return this.errorMessage;
+    public getMandatoryErrorMessage(): string {
+        return this.mandatoryErrorMessage;
     }
 
-    public setErrorMessage(message: string) {
-        this.errorMessage = message;
+    public setMandatoryErrorMessage(message: string) {
+        this.mandatoryErrorMessage = message;
     }
 
     public addCustomControl(control: CustomControlCL) {
@@ -262,6 +277,22 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
 
     public getAutoMandatoryCheck(): boolean {
         return this.autoMandatoryCheck;
+    }
+
+    public setEntityKeys(keys: EntityKeysT) {
+        this.entityKeys = keys;
+    }
+
+    public getEntityKeys(): EntityKeysT | undefined {
+        return this.entityKeys;
+    }
+
+    public setSelectRowMessage(message: string) {
+        this.selectRowMessage = message;
+    }
+
+    public getSelectRowMessage(): string {
+        return this.selectRowMessage;
     }
 
     protected async addMandatoryKeyProperties() {
@@ -443,7 +474,7 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
         if (this.getODataModel().hasPendingChanges()) {
             if (this.dialogStrategy === DialogStrategies.LOAD && this.autoMandatoryCheck) {
                 if (!this.checkContextMandatory()) {
-                    MessageBox.error(this.errorMessage);
+                    MessageBox.error(this.mandatoryErrorMessage);
                     return;
                 }
             }
@@ -492,7 +523,7 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
                             if (this.submitFailed) {
                                 const responseObject: ISubmitResponse = {
                                     statusCode: "422",
-                                    statusText: "Status Code was not found!"
+                                    statusText: "Status Code not found!"
                                 };
                                 const errorResponse = new ResponseCL<ISubmitResponse>(responseObject, "422");
                                 this.submitFailed.call(this.submitFailedListener, errorResponse);
@@ -518,5 +549,123 @@ export default abstract class EntryCL<EntityT extends object = object> extends M
         this.setOldBindingMode();
         this.closeEntryDialog();
         this.destroyEntryDialog();
+    }
+
+    protected async initializeContext(initializer?: string | Context) {
+        if (initializer) {
+            this.setInitializer(initializer);
+
+            if (this.tableId) {
+                this.initContextFromTable();
+            }
+        } else {
+            await this.createBindingContext();
+        }
+    }
+
+    private setInitializer(initializer: string | Context) {
+        if (initializer instanceof Context) {
+            this.entryContext = initializer;
+        } else {
+            this.tableId = initializer;
+        }
+    }
+
+    private initContextFromTable() {
+        const table = (this.getSourceView() as View).byId(this.tableId!);
+
+        if (!table) {
+            throw new Error(`Table with ID: ${this.tableId} not found!`);
+        }
+
+        if (table instanceof Table) {
+            this.tableContext(table);
+        } else if (table instanceof UITable) {
+            this.uiTableContext(table);
+        } else if (table instanceof SmartTable) {
+            const innerTable = table.getTable();
+
+            if (innerTable instanceof Table) {
+                this.tableContext(innerTable);
+            } else if (innerTable instanceof UITable) {
+                this.uiTableContext(innerTable);
+            } else if (innerTable instanceof TreeTable) {
+                this.uiTableContext(innerTable);
+            } else if (innerTable instanceof AnalyticalTable) {
+                this.uiTableContext(innerTable);
+            }
+        } else if (table instanceof TreeTable) {
+            this.uiTableContext(table);
+        } else if (table instanceof AnalyticalTable) {
+            this.uiTableContext(table);
+        } else {
+            throw new Error(`Supported table types: ${this.supportedTableTypes.join(", ")}`);
+        }
+    }
+
+    private tableContext(table: Table) {
+        const selectionMode = table.getMode();
+
+        if (!this.tableModes.includes(selectionMode)) {
+            throw new Error(`Please activate one of the following selection modes: ${this.tableModes.join(", ")}`);
+        }
+
+        const selectedItem = table.getSelectedItem();
+
+        if (!selectedItem) {
+            MessageBox.error(this.selectRowMessage);
+            throw new Error("No row selected by the end user!");
+        }
+
+        const bindingContext = selectedItem.getBindingContext();
+
+        if (!bindingContext) {
+            throw new Error("Only OData binding is supported!");
+        }
+
+        this.entryContext = bindingContext;
+    }
+
+    private uiTableContext(table: UITable | TreeTable | AnalyticalTable) {
+        const selectionMode = table.getSelectionMode();
+
+        if (!this.uiTableModes.includes(selectionMode)) {
+            throw new Error(`Please activate one of the following selection modes: ${this.uiTableModes.join(", ")}`);
+        }
+
+        const selectedIndices = table.getSelectedIndices();
+
+        if (!selectedIndices.length) {
+            MessageBox.error(this.selectRowMessage);
+            throw new Error("No row selected by the end user!");
+        }
+
+        const bindingContext = table.getContextByIndex(selectedIndices[0]);
+
+        if (!bindingContext) {
+            throw new Error("Only OData binding is supported!");
+        }
+
+        this.entryContext = bindingContext;
+    }
+
+    private createBindingContext(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const entityKeys = this.getEntityKeys();
+
+            if (!entityKeys) {
+                throw new Error("Entity key values must be provided through setEntityKeys() method!");
+            }
+
+            const path = this.getODataModel().createKey(this.entityPath, entityKeys);
+            this.getODataModel().createBindingContext(path, (context: Context | null) => {
+                if (!context) {
+                    throw new Error(`No data found for the following path: ${path}`);
+                }
+
+                this.entryContext = context;
+                resolve();
+            });
+        });
     }
 }

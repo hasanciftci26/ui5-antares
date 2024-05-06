@@ -8,13 +8,14 @@ import { ODataMethods } from "ui5/antares/types/odata/enums";
 import MessageBox from "sap/m/MessageBox";
 import FragmentCL from "ui5/antares/ui/FragmentCL";
 import DialogCL from "ui5/antares/ui/DialogCL";
+import UIComponent from "sap/ui/core/UIComponent";
 
 /**
  * @namespace ui5.antares.entry.v2
  */
 export default class EntryCreateCL<EntityT extends object = object> extends EntryCL<EntityT> {
 
-    constructor(controller: Controller, entityPath: string, modelName?: string) {
+    constructor(controller: Controller | UIComponent, entityPath: string, modelName?: string) {
         super(controller, entityPath, ODataMethods.CREATE, modelName);
     }
 
@@ -72,7 +73,7 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
 
     private onCreateTriggered(event: Button$PressEvent) {
         if (this.mandatoryFieldCheck()) {
-            MessageBox.error(this.getErrorMessage());
+            MessageBox.error(this.getMandatoryErrorMessage());
             return;
         }
 
