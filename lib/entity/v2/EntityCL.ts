@@ -67,7 +67,9 @@ export default class EntityCL extends ModelCL {
         return entityType.key.propertyRef.map((key) => {
             return {
                 propertyName: key.name,
-                propertyType: entityTypeProps.find(prop => prop.propertyName === key.name)?.propertyType || "Edm.String"
+                propertyType: entityTypeProps.find(prop => prop.propertyName === key.name)?.propertyType || "Edm.String",
+                precision: entityTypeProps.find(prop => prop.propertyName === key.name)?.precision,
+                scale: entityTypeProps.find(prop => prop.propertyName === key.name)?.scale
             }
         });
     }
@@ -80,10 +82,17 @@ export default class EntityCL extends ModelCL {
         }
 
         return entityType.property.map((prop) => {
-            return {
+            let property: IEntityType = {
                 propertyName: prop.name,
                 propertyType: prop.type
+            };
+
+            if (prop.type === "Edm.Decimal") {
+                property.precision = prop.precision;
+                property.scale = prop.scale;
             }
+
+            return property;
         });
     }
 

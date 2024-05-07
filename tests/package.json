@@ -11,7 +11,7 @@
     "main": "webapp/index.test.html",
     "scripts": {
         "start": "ui5 serve --port 8080 -o index.test.html",
-        "prestart": "shx rm -r ./webapp/antares/ && shx cp -r ../lib/ ./webapp/antares/"
+        "prestart": "shx rm -rf ./webapp/antares/ && shx cp -r ../lib/ ./webapp/antares/"
     },
     "devDependencies": {
         "@sap-ux/eslint-plugin-fiori-tools": "^0.4.1",

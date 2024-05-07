@@ -16,6 +16,9 @@ import Image from "sap/m/Image";
 import ODataCL from "ui5/antares/odata/v2/ODataCL";
 import ValueHelpCL from "ui5/antares/ui/ValueHelpCL";
 import Table from "sap/m/Table";
+import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
+import { ValidationOperator } from "ui5/antares/types/ui/enums";
+import { ValidatorValue, ValidatorValueParameter } from "ui5/antares/types/ui/validation";
 
 /**
  * @namespace test.ui5.antares.controller
@@ -32,22 +35,31 @@ export default class Homepage extends BaseController {
 
     }
 
-    public onAfterRendering(): void | undefined {
-        // (this.getView()?.byId("tblProducts") as Table).setModel(this.getODataModel("testModel"), "testModel");  
-    }
-
     /* ======================================================================================================================= */
     /* Event Handlers                                                                                                          */
     /* ======================================================================================================================= */
 
     public async onCreateProduct(): Promise<void> {
-        // const entry = new EntryCreateCL<IProducts>(this, "Products");
-        // entry.setMandatoryProperties(["CategoryID"]);
-        // entry.createNewEntry();
+        const entry = new EntryCreateCL<IProducts>(this, "Products");
+        entry.setBeginButtonText("Kaydet");
+        entry.setEndButtonText("İptal");
+        entry.setBeginButtonType(ButtonType.Default);
+        entry.setEndButtonType(ButtonType.Attention);
+        entry.setFormTitle("Yeni Ürün Yarat");
+        entry.setFormType(FormTypes.SIMPLE);
+        entry.setMandatoryErrorMessage("Lütfen gerekli tüm alanları doldurunuz.");
+        entry.addValidationLogic(new ValidationLogicCL({
+            propertyName: "Price",
+            operator: ValidationOperator.BT,
+            value1: 999,
+            value2: 2350,
+            message: "Price 999-2350 arası olabilir"
+        }));
+        entry.createNewEntry();
+    }
 
-        const entry = new EntryUpdateCL(this, { entityPath: "Products", initializer: "tblProducts" });
-        entry.setEntityKeys({ ID: 1 });
-        entry.updateEntry();
+    public onValidate(value: ValidatorValueParameter): boolean {
+        return false;
     }
 
     public async onCreateProductFragment(): Promise<void> {

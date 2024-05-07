@@ -17,7 +17,9 @@
         <Property Name="Name"
           Type="Edm.String" />
         <Property Name="Price"
-          Type="Edm.Decimal" />
+          Type="Edm.Decimal"
+          Precision="9"
+          Scale="3"/>
         <Property Name="Currency"
           Type="Edm.String" />
         <Property Name="CategoryID"

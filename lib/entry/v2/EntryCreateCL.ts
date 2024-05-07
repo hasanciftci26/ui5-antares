@@ -53,8 +53,8 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
             smartForm.setBindingContext(this.getEntryContext());
             entryDialog.addContent(smartForm);
 
-            this.getCustomContents().forEach((content) => {
-                entryDialog.addContent(content);
+            this.getCustomContents().forEach((customContent) => {
+                entryDialog.addContent(customContent);
             });
         } else {
             const simpleForm = await content.getSimpleForm();
@@ -62,8 +62,8 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
             simpleForm.setBindingContext(this.getEntryContext(), this.getModelName());
             entryDialog.addContent(simpleForm);
 
-            this.getCustomContents().forEach((content) => {
-                entryDialog.addContent(content);
+            this.getCustomContents().forEach((customContent) => {
+                entryDialog.addContent(customContent);
             });
         }
 
@@ -72,8 +72,10 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
     }
 
     private onCreateTriggered(event: Button$PressEvent) {
-        if (this.mandatoryFieldCheck()) {
-            MessageBox.error(this.getMandatoryErrorMessage());
+        const validation = this.valueValidation();
+
+        if (!validation.validated) {
+            MessageBox.error(validation.message);
             return;
         }
 
@@ -94,7 +96,7 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
 
     private async loadDialog(data?: EntityT) {
         await this.addMandatoryKeyProperties();
-        
+
         // Create Dialog
         this.createEntryDialog();
         const fragment = this.getEntryDialog() as FragmentCL;
