@@ -1,7 +1,7 @@
 import BaseObject from "sap/ui/base/Object";
 import Control from "sap/ui/core/Control";
 import CustomData from "sap/ui/core/CustomData";
-import ValidationLogicCL from "./ValidationLogicCL";
+import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
 
 /**
  * @namespace ui5.antares.ui

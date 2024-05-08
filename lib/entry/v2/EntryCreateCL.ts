@@ -9,6 +9,7 @@ import MessageBox from "sap/m/MessageBox";
 import FragmentCL from "ui5/antares/ui/FragmentCL";
 import DialogCL from "ui5/antares/ui/DialogCL";
 import UIComponent from "sap/ui/core/UIComponent";
+import Dialog from "sap/m/Dialog";
 
 /**
  * @namespace ui5.antares.entry.v2
@@ -101,18 +102,24 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         this.createEntryDialog();
         const fragment = this.getEntryDialog() as FragmentCL;
         await fragment.load();
+        const content = fragment.getFragmentContent();
 
-        // Set context and open the dialog
-        this.createEntryContext(data);
+        if (content instanceof Dialog) {
+            // Set context and open the dialog
+            this.createEntryContext(data);
 
-        if (this.getContainsSmartForm()) {
-            fragment.getFragment().setModel(this.getODataModel());
-            fragment.getFragment().setBindingContext(this.getEntryContext());
+            if (this.getContainsSmartForm()) {
+                content.setModel(this.getODataModel());
+                content.setBindingContext(this.getEntryContext());
+            } else {
+                content.setModel(this.getODataModel(), this.getModelName());
+                content.setBindingContext(this.getEntryContext(), this.getModelName());
+            }
+
+            fragment.open();
         } else {
-            fragment.getFragment().setModel(this.getODataModel(), this.getModelName());
-            fragment.getFragment().setBindingContext(this.getEntryContext(), this.getModelName());
+            fragment.destroyFragmentContent();
+            throw new Error("Provided fragment must contain a sap.m.Dialog control. Put all the controls into a sap.m.Dialog");
         }
-
-        fragment.open();
     }
 }

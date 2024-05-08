@@ -12,7 +12,7 @@ import DateTimePicker from "sap/m/DateTimePicker";
 import Input from "sap/m/Input";
 import { FormTypes } from "ui5/antares/types/entry/enums";
 import EntryCL from "ui5/antares/entry/v2/EntryCL";
-import { PropertyType } from "ui5/antares/types/entity/type";
+import { IEntityType } from "ui5/antares/types/entity/type";
 import Controller from "sap/ui/core/mvc/Controller";
 import UIComponent from "sap/ui/core/UIComponent";
 import CustomControlCL from "ui5/antares/ui/CustomControlCL";
@@ -82,17 +82,17 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                 const customControl = this.entry.getCustomControl(key.propertyName);
 
                 if (customControl) {
-                    this.addSmartCustomControl(customControl, key.propertyName);
+                    this.addSmartCustomControl(customControl, key);
                 } else {
-                    this.addSmartField(key.propertyName, key.propertyType);
+                    this.addSmartField(key);
                 }
             } else {
                 const customControl = this.entry.getCustomControl(key.propertyName);
 
                 if (customControl) {
-                    this.addSimpleCustomControl(customControl, key.propertyName);
+                    this.addSimpleCustomControl(customControl, key);
                 } else {
-                    this.addSimpleFormField(key.propertyName, key.propertyType, key.precision, key.scale);
+                    this.addSimpleFormField(key);
                 }
             }
         });
@@ -107,23 +107,23 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                 continue;
             }
 
+            let entityTypeProperty = entityTypeProperties.find(prop => prop.propertyName === property) as IEntityType;
+
             if (this.entry.getFormType() === FormTypes.SMART) {
                 const customControl = this.entry.getCustomControl(property);
 
                 if (customControl) {
-                    this.addSmartCustomControl(customControl, property);
+                    this.addSmartCustomControl(customControl, entityTypeProperty);
                 } else {
-                    let propertyType: PropertyType = entityTypeProperties.find(prop => prop.propertyName === property)?.propertyType || "Edm.String";
-                    this.addSmartField(property, propertyType);
+                    this.addSmartField(entityTypeProperty);
                 }
             } else {
                 const customControl = this.entry.getCustomControl(property);
 
                 if (customControl) {
-                    this.addSimpleCustomControl(customControl, property);
+                    this.addSimpleCustomControl(customControl, entityTypeProperty);
                 } else {
-                    let entityTypeProperty = entityTypeProperties.find(prop => prop.propertyName === property);
-                    this.addSimpleFormField(property, entityTypeProperty?.propertyType || "Edm.String", entityTypeProperty?.precision, entityTypeProperty?.scale);
+                    this.addSimpleFormField(entityTypeProperty);
                 }
             }
         }
@@ -140,117 +140,121 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                     const customControl = this.entry.getCustomControl(property.propertyName);
 
                     if (customControl) {
-                        this.addSmartCustomControl(customControl, property.propertyName);
+                        this.addSmartCustomControl(customControl, property);
                     } else {
-                        this.addSmartField(property.propertyName, property.propertyType);
+                        this.addSmartField(property);
                     }
                 } else {
                     const customControl = this.entry.getCustomControl(property.propertyName);
 
                     if (customControl) {
-                        this.addSimpleCustomControl(customControl, property.propertyName);
+                        this.addSimpleCustomControl(customControl, property);
                     } else {
-                        this.addSimpleFormField(property.propertyName, property.propertyType, property.precision, property.scale);
+                        this.addSimpleFormField(property);
                     }
                 }
             }
         }
     }
 
-    private addSmartField(property: string, propertyType: PropertyType) {
+    private addSmartField(property: IEntityType) {
         const smartField = new SmartField({
-            mandatory: this.entry.getMandatoryProperties().includes(property),
-            value: `{${property}}`
+            mandatory: this.entry.getMandatoryProperties().includes(property.propertyName),
+            value: `{${property.propertyName}}`
         });
 
-        smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property }));
-        smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: propertyType }));
+        smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
+        smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
 
         const groupElement = new GroupElement({
             elements: [smartField]
         });
 
         if (!this.entry.getUseMetadataLabels()) {
-            groupElement.setLabel(this.getEntityTypePropLabel(property));
+            groupElement.setLabel(this.getEntityTypePropLabel(property.propertyName));
         }
 
         this.smartGroup.addGroupElement(groupElement);
     }
 
-    private addSimpleFormField(property: string, propertyType: PropertyType, precision?: string, scale?: string) {
-        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property) }));
+    private addSimpleFormField(property: IEntityType) {
+        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property.propertyName) }));
 
-        switch (propertyType) {
+        switch (property.propertyType) {
             case "Edm.Boolean":
                 this.addCheckBox(property);
                 break;
             case "Edm.DateTime":
-                this.addDatePicker(property, propertyType);
+                this.addDatePicker(property);
                 break;
             case "Edm.DateTimeOffset":
-                this.addDateTimePicker(property, propertyType);
+                this.addDateTimePicker(property);
                 break;
             default:
-                this.addInput(property, propertyType, precision, scale);
+                this.addInput(property);
                 break;
         }
     }
 
-    private addCheckBox(property: string) {
-        const selected = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+    private addCheckBox(property: IEntityType) {
+        const selected = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
 
         this.simpleFormElements.push(new CheckBox({
             selected: `{${selected}}`
         }));
     }
 
-    private addDatePicker(property: string, propertyType: PropertyType) {
-        const value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+    private addDatePicker(property: IEntityType) {
+        const value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
 
         const datePicker = new DatePicker({
             value: `{constraints : {displayFormat : 'Date'}, path : '${value}', type : 'sap.ui.model.odata.type.DateTime'}`
         });
 
-        datePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property }));
-        datePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: propertyType }));
+        datePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
+        datePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
 
-        if (this.entry.getMandatoryProperties().includes(property)) {
+        if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
             datePicker.setRequired(true);
         }
 
         this.simpleFormElements.push(datePicker);
     }
 
-    private addDateTimePicker(property: string, propertyType: PropertyType) {
-        const value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+    private addDateTimePicker(property: IEntityType) {
+        const value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
 
         const dateTimePicker = new DateTimePicker({
             value: `path : '${value}', type : 'sap.ui.model.odata.type.DateTimeOffset'`
         });
 
-        dateTimePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property }));
-        dateTimePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: propertyType }));
+        dateTimePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
+        dateTimePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
 
-        if (this.entry.getMandatoryProperties().includes(property)) {
+        if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
             dateTimePicker.setRequired(true);
         }
 
         this.simpleFormElements.push(dateTimePicker);
     }
 
-    private addInput(property: string, propertyType: PropertyType, precision?: string, scale?: string) {
-        const valueHelp = this.entry.getValueHelp(property);
-        let value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+    private addInput(property: IEntityType) {
+        const valueHelp = this.entry.getValueHelp(property.propertyName);
+        let value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
 
-        if (this.numberTypes.includes(propertyType)) {
-            value = `path : '${value}', type : 'sap.ui.model.odata.type.${propertyType.slice(4)}'`;
+        if (this.numberTypes.includes(property.propertyType)) {
+            value = `path : '${value}', type : 'sap.ui.model.odata.type.${property.propertyType.slice(4)}'`;
 
-            if (propertyType !== "Edm.Decimal" && propertyType !== "Edm.Double") {
-                value = value + ", formatOptions : {groupingEnabled : false}";
-            }
-
-            if (propertyType === "Edm.Decimal" && precision && scale) {
-                value = value + `, constraints : {precision : ${precision}, scale : ${scale}}`;
+            switch (property.propertyType) {
+                case "Edm.Decimal":
+                    if (property.precision && property.scale) {
+                        value = value + `, constraints : {precision : ${property.precision}, scale : ${property.scale}}`;
+                    }
+                    break;
+                default:
+                    const groupingEnabled = property.propertyType === "Edm.Double";
+                    value = value + `, formatOptions : {groupingEnabled : ${groupingEnabled}}`;
+                    break;
             }
         }
 
@@ -258,10 +262,10 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             value: `{${value}}`
         });
 
-        input.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property }));
-        input.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: propertyType }));
+        input.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
+        input.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
 
-        if (this.entry.getMandatoryProperties().includes(property)) {
+        if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
             input.setRequired(true);
         }
 
@@ -273,20 +277,20 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         this.simpleFormElements.push(input);
     }
 
-    private addSmartCustomControl(control: CustomControlCL, property: string) {
+    private addSmartCustomControl(control: CustomControlCL, property: IEntityType) {
         const groupElement = new GroupElement({
             elements: [control.getControl()]
         });
 
         if (!this.entry.getUseMetadataLabels()) {
-            groupElement.setLabel(this.getEntityTypePropLabel(property));
+            groupElement.setLabel(this.getEntityTypePropLabel(property.propertyName));
         }
 
         this.smartGroup.addGroupElement(groupElement);
     }
 
-    private addSimpleCustomControl(control: CustomControlCL, property: string) {
-        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property) }));
+    private addSimpleCustomControl(control: CustomControlCL, property: IEntityType) {
+        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property.propertyName) }));
         this.simpleFormElements.push(control.getControl());
     }
 }

@@ -26,8 +26,8 @@ import UITable from "sap/ui/table/Table";
 import TreeTable from "sap/ui/table/TreeTable";
 import AnalyticalTable from "sap/ui/table/AnalyticalTable";
 import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
-import SmartValidatorCL from "./SmartValidatorCL";
-import SimpleValidatorCL from "./SimpleValidatorCL";
+import SmartValidatorCL from "ui5/antares/entry/v2/SmartValidatorCL";
+import SimpleValidatorCL from "ui5/antares/entry/v2/SimpleValidatorCL";
 
 /**
  * @namespace ui5.antares.entry.v2
@@ -375,7 +375,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         if (this.entryDialog instanceof DialogCL) {
             this.entryDialog.getDialog().destroy();
         } else {
-            this.entryDialog.destroyFragment();
+            this.entryDialog.destroyFragmentContent();
         }
     }
 

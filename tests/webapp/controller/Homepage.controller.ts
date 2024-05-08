@@ -19,6 +19,9 @@ import Table from "sap/m/Table";
 import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
 import { ValidationOperator } from "ui5/antares/types/ui/enums";
 import { ValidatorValue, ValidatorValueParameter } from "ui5/antares/types/ui/validation";
+import UploadSet from "sap/m/upload/UploadSet";
+import ComboBox from "sap/m/ComboBox";
+import Item from "sap/ui/core/Item";
 
 /**
  * @namespace test.ui5.antares.controller
@@ -41,25 +44,15 @@ export default class Homepage extends BaseController {
 
     public async onCreateProduct(): Promise<void> {
         const entry = new EntryCreateCL<IProducts>(this, "Products");
-        entry.setBeginButtonText("Kaydet");
-        entry.setEndButtonText("İptal");
-        entry.setBeginButtonType(ButtonType.Default);
-        entry.setEndButtonType(ButtonType.Attention);
-        entry.setFormTitle("Yeni Ürün Yarat");
-        entry.setFormType(FormTypes.SIMPLE);
-        entry.setMandatoryErrorMessage("Lütfen gerekli tüm alanları doldurunuz.");
-        entry.addValidationLogic(new ValidationLogicCL({
-            propertyName: "Price",
-            operator: ValidationOperator.BT,
-            value1: 999,
-            value2: 2350,
-            message: "Price 999-2350 arası olabilir"
-        }));
         entry.createNewEntry();
     }
 
     public onValidate(value: ValidatorValueParameter): boolean {
-        return false;
+        if ((value as ComboBox).getSelectedKey() === "TRY") {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public async onCreateProductFragment(): Promise<void> {

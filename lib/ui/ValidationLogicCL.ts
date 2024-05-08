@@ -97,7 +97,7 @@ export default class ValidationLogicCL extends BaseObject {
         }
     }
 
-    private valueControl(propertyValue: ValidatorValue) {
+    private valueControl(value: ValidatorValue) {
         if ((this.operator === ValidationOperator.BT || this.operator === ValidationOperator.NB) && (!this.value1 || !this.value2)) {
             throw new Error("value1 and value2 must be set with ValidationOperator.BT and ValidationOperator.NB");
         }
@@ -106,14 +106,14 @@ export default class ValidationLogicCL extends BaseObject {
             throw new Error("value1 must be set.");
         }
 
-        if (this.stringMethods.includes(this.operator) && (typeof this.value1 !== "string" || typeof propertyValue !== "string")) {
+        if (this.stringMethods.includes(this.operator) && (typeof this.value1 !== "string" || typeof value !== "string")) {
             throw new Error(`Following operators can only be used with a string type: ${this.stringMethods.join(", ")}`);
         }
     }
 
-    private valueCorrection(propertyValue: ValidatorValue, type: PropertyType | "UNKNOWN"): ICorrectedValues {
+    private valueCorrection(value: ValidatorValue, type: PropertyType | "UNKNOWN"): ICorrectedValues {
         const correctedValues: ICorrectedValues = {
-            originalValue: propertyValue,
+            originalValue: value,
             value1: this.value1!,
             value2: this.value2
         };
@@ -123,25 +123,24 @@ export default class ValidationLogicCL extends BaseObject {
         }
 
         if (this.numberTypes.includes(type)) {
-            this.numberCorrection(propertyValue, correctedValues);
+            this.numberCorrection(correctedValues);
         } else if (type === "Edm.DateTime" || type === "Edm.DateTimeOffset") {
-            this.dateCorrection(propertyValue, correctedValues);
+            this.dateCorrection(correctedValues);
         }
 
         return correctedValues;
     }
 
-    private numberCorrection(propertyValue: ValidatorValue, correctedValues: ICorrectedValues) {
-        this.numberPropertyCorrection(propertyValue, correctedValues);
+    private numberCorrection(correctedValues: ICorrectedValues) {
+        this.numberPropertyCorrection(correctedValues);
         this.numberValue1Correction(correctedValues);
         this.numberValue2Correction(correctedValues);
     }
 
-    private numberPropertyCorrection(propertyValue: ValidatorValue, correctedValues: ICorrectedValues) {
-        if (!(typeof propertyValue === "number")) {
-            correctedValues.originalValue = propertyValue;
+    private numberPropertyCorrection(correctedValues: ICorrectedValues) {
+        if (!(typeof correctedValues.originalValue === "number")) {
             const float = NumberFormat.getFloatInstance();
-            const parsedValue = float.parse(propertyValue as string);
+            const parsedValue = float.parse(correctedValues.originalValue as string);
 
             if (typeof parsedValue === "number") {
                 if (isNaN(parsedValue)) {
@@ -195,15 +194,27 @@ export default class ValidationLogicCL extends BaseObject {
         }
     }
 
-    private dateCorrection(propertyValue: ValidatorValue, correctedValues: ICorrectedValues) {
+    private dateCorrection(correctedValues: ICorrectedValues) {
+        this.datePropertyCorrection(correctedValues);
         this.dateValue1Correction(correctedValues);
         this.dateValue2Correction(correctedValues);
     }
 
-    private dateValue1Correction(correctedValues: ICorrectedValues) {
-        if (!(correctedValues.value1 instanceof Date) || !(correctedValues.value1 instanceof UI5Date)) {
-            throw new Error(`value1 must be an instance of Date or UI5Date for property ${this.propertyName}`);
+    private datePropertyCorrection(correctedValues: ICorrectedValues) {
+        if (correctedValues.originalValue instanceof UI5Date || correctedValues.originalValue instanceof Date) {
+            return;
         }
+
+        this.showErrorMessageBox();
+        throw new Error(`Invalid date for property: ${this.propertyName}`);
+    }
+
+    private dateValue1Correction(correctedValues: ICorrectedValues) {
+        if (correctedValues.value1 instanceof UI5Date || correctedValues.value1 instanceof Date) {
+            return;
+        }
+
+        throw new Error(`value1 must be an instance of Date or UI5Date for property ${this.propertyName}`);
     }
 
     private dateValue2Correction(correctedValues: ICorrectedValues) {
@@ -211,9 +222,11 @@ export default class ValidationLogicCL extends BaseObject {
             return;
         }
 
-        if (!(correctedValues.value2 instanceof Date) || !(correctedValues.value2 instanceof UI5Date)) {
-            throw new Error(`value2 must be an instance of Date or UI5Date for property ${this.propertyName}`);
+        if (correctedValues.value2 instanceof UI5Date || correctedValues.value2 instanceof Date) {
+            return;
         }
+
+        throw new Error(`value1 must be an instance of Date or UI5Date for property ${this.propertyName}`);
     }
 
     private showErrorMessageBox() {

@@ -15,7 +15,7 @@ export default class FragmentCL extends BaseObject {
     private fragmentPath: string;
     private sourceView?: View;
     private openByControl?: Control;
-    private fragment?: Dialog | Popover;
+    private fragment?: Control | Control[];
 
     constructor(controller: Controller | UIComponent, fragmentPath: string, openByControl?: Control) {
         super();
@@ -28,16 +28,25 @@ export default class FragmentCL extends BaseObject {
         }
     }
 
-    public async openAsync() {
+    public async openAsync(): Promise<void> {
         const fragment = await this.load();
+
         if (fragment instanceof Dialog) {
             fragment.open();
-        } else {
+            return;
+        }
+
+        if (fragment instanceof Popover) {
             if (!this.openByControl) {
+                (this.fragment as Popover).destroy();
                 throw new Error("Popover requires a control to be opened by. Provide the control through the class constructor.");
             }
+
             fragment.openBy(this.openByControl);
+            return;
         }
+
+        throw new Error("openAsync() method can only be used with fragments that contain Dialog or Popover.");
     }
 
     public open() {
@@ -47,15 +56,24 @@ export default class FragmentCL extends BaseObject {
 
         if (this.fragment instanceof Dialog) {
             this.fragment.open();
-        } else {
+            return;
+        }
+
+        if (this.fragment instanceof Popover) {
             if (!this.openByControl) {
+                (this.fragment as Popover).destroy();
                 throw new Error("Popover requires a control to be opened by. Provide the control through the class constructor.");
             }
+
             this.fragment.openBy(this.openByControl);
+            return;
         }
+
+        this.destroyFragmentContent();
+        throw new Error("open() method can only be used with fragments that contain Dialog or Popover.");
     }
 
-    public getFragment(): Dialog | Popover {
+    public getFragmentContent(): Control | Control[] {
         if (!this.fragment) {
             throw new Error("No fragment was found to return. Use load() or openAsync() method to initialize the fragment.");
         }
@@ -68,29 +86,49 @@ export default class FragmentCL extends BaseObject {
             throw new Error("No fragment was found to close. Use load() or openAsync() method to initialize the fragment.");
         }
 
-        this.fragment.close();
+        if (this.fragment instanceof Dialog || this.fragment instanceof Popover) {
+            this.fragment.close();
+        } else {
+            this.destroyFragmentContent();
+            throw new Error("close() method can only be used with fragments that contain Dialog or Popover.");
+        }
     }
 
-    public destroyFragment() {
+    public destroyFragmentContent() {
         if (!this.fragment) {
             throw new Error("No fragment was found to destroy. Use load() or openAsync() method to initialize the fragment.");
         }
 
-        this.fragment.destroy();
+        if (Array.isArray(this.fragment)) {
+            this.fragment.forEach((control) => {
+                control.destroy();
+            });
+        } else {
+            this.fragment.destroy();
+        }
     }
 
-    public async load(): Promise<Dialog | Popover> {
-        if (!this.sourceView) {
+    public async load(): Promise<Control | Control[]> {
+        const sourceView = this.sourceView;
+
+        if (!sourceView) {
             throw new Error("FragmentCL methods can only be used in a controller!");
         }
 
         const fragment = await (Fragment.load({
-            id: this.sourceView.getId(),
+            id: sourceView.getId(),
             name: this.fragmentPath,
             controller: this.sourceController
-        }) as Promise<Dialog | Popover>);
+        }) as Promise<Control | Control[]>);
 
-        this.sourceView.addDependent(fragment);
+        if (Array.isArray(fragment)) {
+            fragment.forEach((control) => {
+                sourceView.addDependent(control);
+            })
+        } else {
+            sourceView.addDependent(fragment);
+        }
+
         this.fragment = fragment;
         return fragment;
     }
