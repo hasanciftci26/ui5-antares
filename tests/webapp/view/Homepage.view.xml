@@ -19,6 +19,8 @@
                             press="onCreateProductFragment"/>
                         <Button text="Update a Product"
                             press="onUpdateProduct"/>                            
+                        <Button text="Read a Product"
+                            press="onReadProduct"/>                            
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>

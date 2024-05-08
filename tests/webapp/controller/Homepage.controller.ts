@@ -2,6 +2,7 @@ import BaseController from "test/ui5/antares/controller/BaseController";
 import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL";
 import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL";
 import EntryUpdateCL from "ui5/antares/entry/v2/EntryUpdateCL";
+import EntryReadCL from "ui5/antares/entry/v2/EntryReadCL";
 import { IProducts } from "../types/create";
 import { FormTypes, NamingStrategies } from "ui5/antares/types/entry/enums";
 import { ButtonType } from "sap/m/library";
@@ -64,6 +65,14 @@ export default class Homepage extends BaseController {
         await entry.addControlFromFragment(new FragmentCL(this, "test.ui5.antares.fragments.ProductsCustomControls"));
         entry.setFormType(FormTypes.SIMPLE);
         entry.updateEntry();
+    }
+
+    public async onReadProduct(): Promise<void> {
+        const entry = new EntryReadCL<IProducts>(this, {
+            entityPath: "Products",
+            initializer: "tblProducts"
+        });
+        entry.readEntry();
     }
 
     public onCheckCurrency(control: ComboBox): boolean {
