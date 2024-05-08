@@ -20,8 +20,9 @@ import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
 import { ValidationOperator } from "ui5/antares/types/ui/enums";
 import { ValidatorValue, ValidatorValueParameter } from "ui5/antares/types/ui/validation";
 import UploadSet from "sap/m/upload/UploadSet";
-import ComboBox from "sap/m/ComboBox";
+import ComboBox, { ComboBox$SelectionChangeEvent } from "sap/m/ComboBox";
 import Item from "sap/ui/core/Item";
+import FragmentCL from "ui5/antares/ui/FragmentCL";
 
 /**
  * @namespace test.ui5.antares.controller
@@ -44,7 +45,21 @@ export default class Homepage extends BaseController {
 
     public async onCreateProduct(): Promise<void> {
         const entry = new EntryCreateCL<IProducts>(this, "Products");
+        await entry.addControlFromFragment(new FragmentCL(this, "test.ui5.antares.fragments.ProductsCustomControls"));
+        await entry.addContentFromFragment(new FragmentCL(this, "test.ui5.antares.fragments.ProductsCustomContents"));
         entry.createNewEntry();
+    }
+
+    public onCheckCurrency(control: ComboBox): boolean {
+        if (control.getSelectedKey() === "TRY") {
+            return false;
+        }
+
+        return true;
+    }
+
+    public onChange(event: ComboBox$SelectionChangeEvent) {
+        let test = "x";
     }
 
     public onValidate(value: ValidatorValueParameter): boolean {

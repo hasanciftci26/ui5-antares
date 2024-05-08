@@ -121,14 +121,6 @@ export default class FragmentCL extends BaseObject {
             controller: this.sourceController
         }) as Promise<Control | Control[]>);
 
-        if (Array.isArray(fragment)) {
-            fragment.forEach((control) => {
-                sourceView.addDependent(control);
-            })
-        } else {
-            sourceView.addDependent(fragment);
-        }
-
         this.fragment = fragment;
         return fragment;
     }

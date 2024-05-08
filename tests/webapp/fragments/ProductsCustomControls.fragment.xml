@@ -1,0 +1,27 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+    <ComboBox selectedKey="{Currency}"
+        selectionChange="onChange"
+        app:UI5AntaresEntityPropertyName="Currency"
+        app:UI5AntaresValidationLogic="onCheckCurrency"
+        app:UI5AntaresValidationMessage="No message">
+        <items>
+            <core:Item key="TRY"
+                text="Turkish Lira"/>
+            <core:Item key="EUR"
+                text="Euro"/>
+            <core:Item key="USD"
+                text="US Dollars"/>
+        </items>
+    </ComboBox>
+    <ComboBox selectedKey="{CategoryID}"
+        app:UI5AntaresEntityPropertyName="CategoryID"
+        items="{/Categories}">
+        <items>
+            <core:Item key="{ID}"
+                text="{Name}"/>
+        </items>
+    </ComboBox>
+</core:FragmentDefinition>

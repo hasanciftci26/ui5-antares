@@ -308,6 +308,52 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         return logic;
     }
 
+    public async addControlFromFragment(fragment: FragmentCL) {
+        await fragment.load();
+        const content = fragment.getFragmentContent();
+
+        if (Array.isArray(content)) {
+            for (const control of content) {
+                const customControlData = control.getCustomData().find(data => data.getKey() === "UI5AntaresEntityPropertyName");
+                const controlName = control.getMetadata().getName();
+
+                if (!customControlData) {
+                    throw new Error(`Custom Data with key UI5AntaresEntityPropertyName is missing in the control: ${controlName}`);
+                }
+
+                const propertyName = customControlData.getValue();
+                const validationMessage = this.getValidationLogicMessage(control);
+                const validationLogic = this.getValidationLogicMethod(control, propertyName, validationMessage);
+                const customControl = new CustomControlCL(control, propertyName, validationLogic);
+                this.customControls.push(customControl);
+            }
+        } else {
+            const customControlData = content.getCustomData().find(data => data.getKey() === "UI5AntaresEntityPropertyName");
+            const controlName = content.getMetadata().getName();
+
+            if (!customControlData) {
+                throw new Error(`Custom Data with key UI5AntaresEntityPropertyName is missing in the control: ${controlName}`);
+            }
+
+            const propertyName = customControlData.getValue();
+            const validationMessage = this.getValidationLogicMessage(content);
+            const validationLogic = this.getValidationLogicMethod(content, propertyName, validationMessage);
+            const customControl = new CustomControlCL(content, propertyName, validationLogic);
+            this.customControls.push(customControl);
+        }
+    }
+
+    public async addContentFromFragment(fragment: FragmentCL) {
+        await fragment.load();
+        const content = fragment.getFragmentContent();
+
+        if (Array.isArray(content)) {
+            content.forEach(control => this.customContents.push(control));
+        } else {
+            this.customContents.push(content);
+        }
+    }
+
     protected async addMandatoryKeyProperties() {
         const entity = new EntityCL(this.getSourceController(), this.entityName, this.getResourceBundlePrefix(), this.namingStrategy, this.getModelName());
         const entityTypeKeys = await entity.getEntityTypeKeys();
@@ -619,5 +665,39 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
                 resolve();
             });
         });
+    }
+
+    private getValidationLogicMethod(control: Control, propertyName: string, validationMessage?: string): ValidationLogicCL | undefined {
+        let validationLogic: ValidationLogicCL | undefined;
+        const validationLogicData = control.getCustomData().find(data => data.getKey() === "UI5AntaresValidationLogic");
+
+        if (validationLogicData) {
+            const methodName = validationLogicData.getValue() as string;
+            const sourceController = this.getSourceController() as any;
+
+            if (methodName in sourceController) {
+                if (typeof sourceController[methodName] === "function") {
+                    validationLogic = new ValidationLogicCL({
+                        propertyName: propertyName,
+                        validator: sourceController[methodName],
+                        listener: this.getSourceController(),
+                        message: validationMessage
+                    });
+                }
+            }
+        }
+
+        return validationLogic;
+    }
+
+    private getValidationLogicMessage(control: Control): string | undefined {
+        control.setModel(this.getResourceModel(), "i18n");
+        const validationLogicData = control.getCustomData().find(data => data.getKey() === "UI5AntaresValidationMessage");
+
+        if (!validationLogicData) {
+            return;
+        }
+
+        return validationLogicData.getValue();
     }
 }
