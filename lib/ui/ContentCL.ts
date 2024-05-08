@@ -17,6 +17,7 @@ import Controller from "sap/ui/core/mvc/Controller";
 import UIComponent from "sap/ui/core/UIComponent";
 import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 import CustomData from "sap/ui/core/CustomData";
+import { ODataMethods } from "ui5/antares/types/odata/enums";
 
 /**
  * @namespace ui5.antares.ui
@@ -24,14 +25,16 @@ import CustomData from "sap/ui/core/CustomData";
 export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends object = object> extends EntityCL {
     private entry: EntryT;
     private smartGroup: Group;
+    private method: ODataMethods;
     private simpleFormElements: UI5Element[];
     private numberTypes: string[] = [
         "Edm.Decimal", "Edm.Double", "Edm.Int16", "Edm.Int32", "Edm.Int64"
     ];
 
-    constructor(controller: Controller | UIComponent, entry: EntryT, modelName?: string) {
+    constructor(controller: Controller | UIComponent, entry: EntryT, method: ODataMethods, modelName?: string) {
         super(controller, entry.getEntityName(), entry.getResourceBundlePrefix(), entry.getNamingStrategy(), modelName);
         this.entry = entry;
+        this.method = method;
     }
 
     public async getSmartForm(): Promise<SmartForm> {
@@ -84,7 +87,7 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                 if (customControl) {
                     this.addSmartCustomControl(customControl, key);
                 } else {
-                    this.addSmartField(key);
+                    this.addSmartField(key, true);
                 }
             } else {
                 const customControl = this.entry.getCustomControl(key.propertyName);
@@ -92,7 +95,7 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                 if (customControl) {
                     this.addSimpleCustomControl(customControl, key);
                 } else {
-                    this.addSimpleFormField(key);
+                    this.addSimpleFormField(key, true);
                 }
             }
         });
@@ -157,7 +160,7 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         }
     }
 
-    private addSmartField(property: IEntityType) {
+    private addSmartField(property: IEntityType, keyField: boolean = false) {
         const smartField = new SmartField({
             mandatory: this.entry.getMandatoryProperties().includes(property.propertyName),
             value: `{${property.propertyName}}`
@@ -165,6 +168,10 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
 
         smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
         smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
+
+        if (keyField || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+            smartField.setEditable(false);
+        }
 
         const groupElement = new GroupElement({
             elements: [smartField]
@@ -177,34 +184,39 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         this.smartGroup.addGroupElement(groupElement);
     }
 
-    private addSimpleFormField(property: IEntityType) {
+    private addSimpleFormField(property: IEntityType, keyField: boolean = false) {
         this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property.propertyName) }));
 
         switch (property.propertyType) {
             case "Edm.Boolean":
-                this.addCheckBox(property);
+                this.addCheckBox(property, keyField);
                 break;
             case "Edm.DateTime":
-                this.addDatePicker(property);
+                this.addDatePicker(property, keyField);
                 break;
             case "Edm.DateTimeOffset":
-                this.addDateTimePicker(property);
+                this.addDateTimePicker(property, keyField);
                 break;
             default:
-                this.addInput(property);
+                this.addInput(property, keyField);
                 break;
         }
     }
 
-    private addCheckBox(property: IEntityType) {
+    private addCheckBox(property: IEntityType, keyField: boolean) {
         const selected = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
-
-        this.simpleFormElements.push(new CheckBox({
+        const checkbox = new CheckBox({
             selected: `{${selected}}`
-        }));
+        });
+
+        if (keyField || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+            checkbox.setEditable(false);
+        }
+
+        this.simpleFormElements.push(checkbox);
     }
 
-    private addDatePicker(property: IEntityType) {
+    private addDatePicker(property: IEntityType, keyField: boolean) {
         const value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
 
         const datePicker = new DatePicker({
@@ -214,6 +226,10 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         datePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
         datePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
 
+        if (keyField || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+            datePicker.setEditable(false);
+        }
+
         if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
             datePicker.setRequired(true);
         }
@@ -221,7 +237,7 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         this.simpleFormElements.push(datePicker);
     }
 
-    private addDateTimePicker(property: IEntityType) {
+    private addDateTimePicker(property: IEntityType, keyField: boolean) {
         const value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
 
         const dateTimePicker = new DateTimePicker({
@@ -231,6 +247,10 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         dateTimePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
         dateTimePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
 
+        if (keyField || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+            dateTimePicker.setEditable(false);
+        }
+
         if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
             dateTimePicker.setRequired(true);
         }
@@ -238,7 +258,7 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         this.simpleFormElements.push(dateTimePicker);
     }
 
-    private addInput(property: IEntityType) {
+    private addInput(property: IEntityType, keyField: boolean) {
         const valueHelp = this.entry.getValueHelp(property.propertyName);
         let value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
 
@@ -264,6 +284,10 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
 
         input.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
         input.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
+
+        if (keyField || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+            input.setEditable(false);
+        }
 
         if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
             input.setRequired(true);

@@ -50,6 +50,22 @@ export default class Homepage extends BaseController {
         entry.createNewEntry();
     }
 
+    public async onUpdateProduct(): Promise<void> {
+        const entry = new EntryUpdateCL<IProducts>(this, {
+            entityPath: "Products",
+            initializer: "tblProducts"
+        });
+
+        entry.addValidationLogic(new ValidationLogicCL({
+            propertyName: "Price",
+            operator: ValidationOperator.GT,
+            value1: 1550
+        }));
+        await entry.addControlFromFragment(new FragmentCL(this, "test.ui5.antares.fragments.ProductsCustomControls"));
+        entry.setFormType(FormTypes.SIMPLE);
+        entry.updateEntry();
+    }
+
     public onCheckCurrency(control: ComboBox): boolean {
         if (control.getSelectedKey() === "TRY") {
             return false;

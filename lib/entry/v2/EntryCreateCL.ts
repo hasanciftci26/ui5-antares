@@ -36,7 +36,7 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
     }
 
     private async createDialog(data?: EntityT) {
-        const content = new ContentCL<EntryCreateCL<EntityT>, EntityT>(this.getSourceController(), this, this.getModelName());
+        const content = new ContentCL<EntryCreateCL<EntityT>, EntityT>(this.getSourceController(), this, ODataMethods.CREATE, this.getModelName());
 
         // Create Dialog
         this.createEntryDialog(`diaUI5AntaresCreateNew${this.getEntityName()}`);

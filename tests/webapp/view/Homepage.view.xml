@@ -17,6 +17,8 @@
                             press="onCreateProduct"/>
                         <Button text="Create a Product Custom Fragment"
                             press="onCreateProductFragment"/>
+                        <Button text="Update a Product"
+                            press="onUpdateProduct"/>                            
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
