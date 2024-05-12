@@ -1,59 +1,128 @@
-<mvc:View xmlns:mvc="sap.ui.core.mvc"
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
     xmlns:core="sap.ui.core"
+    xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
+    xmlns:smartTable="sap.ui.comp.smarttable"
     xmlns="sap.m"
+    displayBlock="true"
     controllerName="test.ui5.antares.controller.Homepage"
-    displayBlock="true">
-    <Page id="Homepage"
+>
+    <Page
+        id="Homepage"
         showHeader="true"
-        title="UI5 Antares Test App">
+        title="UI5 Antares Test App"
+    >
         <content>
-            <Table id="tblProducts"
-                mode="SingleSelectMaster"
-                items="{/Products}">
-                <headerToolbar>
-                    <OverflowToolbar >
-                        <ToolbarSpacer />
-                        <Button text="Create a Product"
-                            press="onCreateProduct"/>
-                        <Button text="Create a Product Custom Fragment"
-                            press="onCreateProductFragment"/>
-                        <Button text="Update a Product"
-                            press="onUpdateProduct"/>                            
-                        <Button text="Read a Product"
-                            press="onReadProduct"/>                            
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column >
-                        <Label text="ID"/>
-                    </Column>
-                    <Column >
-                        <Label text="Name"/>
-                    </Column>
-                    <Column >
-                        <Label text="Price"/>
-                    </Column>
-                    <Column >
-                        <Label text="Currency"/>
-                    </Column>
-                    <Column >
-                        <Label text="Category ID"/>
-                    </Column>
-                    <Column >
-                        <Label text="Supplier ID"/>
-                    </Column>
-                </columns>
+            <IconTabBar
+                expanded="true"
+                class="sapUiResponsiveContentPadding"
+            >
                 <items>
-                    <ColumnListItem >
-                        <Text text="{ID}"/>
-                        <Text text="{Name}"/>
-                        <Text text="{Price}"/>
-                        <Text text="{Currency}"/>
-                        <Text text="{CategoryID}"/>
-                        <Text text="{SupplierID}"/>
-                    </ColumnListItem>
+                    <IconTabFilter
+                        text="Categories"
+                        key="category"
+                    >
+                        <Table items="{/Categories}">
+                            <headerToolbar>
+                                <OverflowToolbar>
+                                    <ToolbarSpacer />
+                                    <Button
+                                        text="Create a Category"
+                                        press="onCreateCategory"
+                                    />
+                                    <Button
+                                        text="Update a Category"
+                                        press="onUpdateCategory"
+                                    />
+                                    <Button
+                                        text="Delete a Category"
+                                        press="onDeleteCategory"
+                                    />
+                                    <Button
+                                        text="Read a Category"
+                                        press="onReadCategory"
+                                    />
+                                </OverflowToolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column>
+                                    <Label text="Category ID" />
+                                </Column>
+                                <Column>
+                                    <Label text="Category Name" />
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <Text text="{ID}" />
+                                    <Text text="{Name}" />
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </IconTabFilter>
+                    <IconTabFilter
+                        text="Products"
+                        key="product"
+                    >
+                        <smartFilterBar:SmartFilterBar
+                            id="sfbProducts"
+                            entitySet="Products"
+                            enableBasicSearch="true"
+                        />
+                        <smartTable:SmartTable
+                            id="stProducts"
+                            tableType="ResponsiveTable"
+                            entitySet="Products"
+                            smartFilterId="sfbProducts"
+                            enableExport="true"
+                            useVariantManagement="false"
+                            useTablePersonalisation="true"
+                            header="Products"
+                            showRowCount="true"
+                            enableAutoBinding="true"
+                        >
+                            <smartTable:customToolbar>
+                                <OverflowToolbar>
+                                    <ToolbarSpacer />
+                                    <Button
+                                        text="Create a Product"
+                                        press="onCreateProduct"
+                                    />
+                                    <Button
+                                        text="Create a Product From Fragment"
+                                        press="onCreateProductFragment"
+                                    />
+                                    <Button
+                                        text="Update a Product"
+                                        press="onUpdateProduct"
+                                    />
+                                    <Button
+                                        text="Delete a Product"
+                                        press="onDeleteProduct"
+                                    />
+                                    <Button
+                                        text="Read a Product"
+                                        press="onReadProduct"
+                                    />
+                                </OverflowToolbar>
+                            </smartTable:customToolbar>
+                            <Table mode="SingleSelectMaster" />
+                        </smartTable:SmartTable>
+                    </IconTabFilter>
+                    <IconTabFilter
+                        text="Suppliers"
+                        key="supplier"
+                    />
+                    <IconTabFilter
+                        text="Customers"
+                        key="customer"
+                    />
+                    <IconTabFilter
+                        text="Orders"
+                        key="order"
+                    />
                 </items>
-            </Table>
+            </IconTabBar>
         </content>
     </Page>
 </mvc:View>

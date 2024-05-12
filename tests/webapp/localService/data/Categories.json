@@ -1,18 +1,22 @@
 [
     {
-        "ID": 1,
+        "ID": "cf8d5e22-84a5-4e12-9676-2f292e2eb6bc",
         "Name": "Electronics"
     },
     {
-        "ID": 2,
-        "Name": "Clothing"
+        "ID": "d64f9f43-2510-4e91-8d4e-71e0c036a9ef",
+        "Name": "Mobile Devices"
     },
     {
-        "ID": 3,
-        "Name": "Books"
+        "ID": "b512bb0f-bf2b-4e67-9a88-065d7c48a1e2",
+        "Name": "Computing"
     },
     {
-        "ID": 4,
-        "Name": "Furniture"
+        "ID": "a3e8c6e5-6b78-4787-ba2d-fac19c80d40d",
+        "Name": "Home Appliances"
+    },
+    {
+        "ID": "f9a2de42-7a45-4c1e-82b7-fb0d8f503b2d",
+        "Name": "Fashion"
     }
 ]
