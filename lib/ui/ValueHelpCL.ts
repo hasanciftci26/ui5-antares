@@ -1,5 +1,5 @@
 import Column from "sap/m/Column";
-import TableSelectDialog, { TableSelectDialog$CancelEvent, TableSelectDialog$ConfirmEvent, TableSelectDialog$SearchEvent } from "sap/m/TableSelectDialog";
+import TableSelectDialog, { TableSelectDialog$ConfirmEvent, TableSelectDialog$SearchEvent } from "sap/m/TableSelectDialog";
 import Text from "sap/m/Text";
 import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";

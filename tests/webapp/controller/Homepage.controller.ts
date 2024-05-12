@@ -104,7 +104,7 @@ export default class Homepage extends BaseController {
         this.fragmentEntry = new EntryCreateCL<IProducts>(this, "Products");
         this.fragmentEntry.setFragmentPath("test.ui5.antares.fragments.CreateProduct");
         this.fragmentEntry.setMandatoryProperties(["CategoryID"]);
-        this.fragmentEntry.createNewEntry({ ID: 182 });
+        this.fragmentEntry.createNewEntry();
     }
 
     public onCompleteCreate() {
