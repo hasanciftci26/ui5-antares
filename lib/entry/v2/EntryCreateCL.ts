@@ -108,7 +108,8 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
 
         if (content instanceof Dialog) {
             // Set context and open the dialog
-            this.createEntryContext(data);
+            const dataWithGuid = await this.generateGuid(data);
+            this.createEntryContext(dataWithGuid);
 
             if (this.getContainsSmartForm()) {
                 content.setModel(this.getODataModel());
