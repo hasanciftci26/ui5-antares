@@ -9,7 +9,7 @@ import SimpleForm from "sap/ui/layout/form/SimpleForm";
 import Context from "sap/ui/model/Context";
 import ModelCL from "ui5/antares/base/v2/ModelCL";
 import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL";
-import { DialogStrategies, FormTypes, NamingStrategies } from "ui5/antares/types/entry/enums";
+import { DialogStrategies, FormTypes, GuidStrategies, NamingStrategies } from "ui5/antares/types/entry/enums";
 import { ISubmitResponse, ISubmitChangeResponse, IValueValidation } from "ui5/antares/types/entry/submit";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
 import CustomControlCL from "ui5/antares/ui/CustomControlCL";
@@ -72,6 +72,8 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     ];
     private entityKeys?: EntityKeysT;
     private validationLogics: ValidationLogicCL[] = [];
+    private displayGuidProperties: GuidStrategies = GuidStrategies.ONLY_NON_KEY;
+    private generateRandomGuid: GuidStrategies = GuidStrategies.ONLY_KEY;
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
@@ -306,6 +308,22 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     public getValidationLogic(propertyName: string): ValidationLogicCL | undefined {
         const logic = this.validationLogics.find(logic => logic.getPropertyName() === propertyName);
         return logic;
+    }
+
+    public setDisplayGuidProperties(strategy: GuidStrategies) {
+        this.displayGuidProperties = strategy;
+    }
+
+    public getDisplayGuidProperties(): GuidStrategies {
+        return this.displayGuidProperties;
+    }
+
+    public setGenerateRandomGuid(strategy: GuidStrategies) {
+        this.generateRandomGuid = strategy;
+    }
+
+    public getGenerateRandomGuid(): GuidStrategies {
+        return this.generateRandomGuid;
     }
 
     public async addControlFromFragment(fragment: FragmentCL) {

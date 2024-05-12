@@ -1,82 +1,82 @@
 [
     {
-        "ID": 1,
+        "ID": "5283934a-d79b-46ff-8b78-89b91ef09d60",
         "Name": "Laptop",
         "Price": 1200,
         "Currency": "USD",
         "CategoryID": 1,
-        "SupplierID": 1
+        "SupplierID": "b05ee67f-b8a8-4938-a2ac-78f69db7d0a3"
     },
     {
-        "ID": 2,
+        "ID": "d3e6fe58-153a-4931-b33b-405ab58e4a78",
         "Name": "Smartphone",
         "Price": 800,
         "Currency": "USD",
         "CategoryID": 1,
-        "SupplierID": 2
+        "SupplierID": "468efdd9-bed4-4ff1-afe0-8e90465b6872"
     },
     {
-        "ID": 3,
+        "ID": "f352766d-fc76-4366-abfe-3ad2ba20a5fb",
         "Name": "Tablet",
         "Price": 500,
         "Currency": "USD",
         "CategoryID": 1,
-        "SupplierID": 3
+        "SupplierID": "cb70cc91-f7cc-40dd-8f8c-fc1e47538502"
     },
     {
-        "ID": 4,
+        "ID": "eee34ae5-296b-4bf6-abd4-e965693b99d5",
         "Name": "Headphones",
         "Price": 150,
         "Currency": "USD",
         "CategoryID": 1,
-        "SupplierID": 1
+        "SupplierID": "7c5a307b-1289-435d-905d-1ec783d8db5b"
     },
     {
-        "ID": 5,
+        "ID": "22450d59-c44e-497b-acc2-a88e5cf74b55",
         "Name": "Smart Watch",
         "Price": 300,
         "Currency": "USD",
         "CategoryID": 1,
-        "SupplierID": 2
+        "SupplierID": "bd91bff4-6b1c-45e4-b277-672c9d7b220a"
     },
     {
-        "ID": 6,
+        "ID": "af1fa9e0-3ece-4252-bc3c-ced37593acd2",
         "Name": "LED TV",
         "Price": 1500,
         "Currency": "USD",
         "CategoryID": 1,
-        "SupplierID": 3
+        "SupplierID": "b05ee67f-b8a8-4938-a2ac-78f69db7d0a3"
     },
     {
-        "ID": 7,
+        "ID": "68fc3083-5418-4846-9bc6-6eb17e5faeef",
         "Name": "T-shirt",
         "Price": 25,
         "Currency": "USD",
         "CategoryID": 2,
-        "SupplierID": 4
+        "SupplierID": "468efdd9-bed4-4ff1-afe0-8e90465b6872"
     },
     {
-        "ID": 8,
+        "ID": "11372899-2d45-4d88-a85a-7ad0e1d81caf",
         "Name": "Jeans",
         "Price": 60,
         "Currency": "USD",
         "CategoryID": 2,
-        "SupplierID": 4
+        "SupplierID": "cb70cc91-f7cc-40dd-8f8c-fc1e47538502"
     },
     {
-        "ID": 9,
+        "ID": "0095375d-2e1b-43f9-8861-3fe48883e45f",
         "Name": "Novel Book",
         "Price": 20,
         "Currency": "USD",
         "CategoryID": 3,
-        "SupplierID": 5
+        "SupplierID": "7c5a307b-1289-435d-905d-1ec783d8db5b"
     },
     {
-        "ID": 10,
+        "ID": "fd165e15-bb9b-4df6-9973-cb9b79b27ace",
         "Name": "Cookbook",
         "Price": 30,
         "Currency": "USD",
         "CategoryID": 3,
-        "SupplierID": 5
+        "SupplierID": "bd91bff4-6b1c-45e4-b277-672c9d7b220a"
     }
 ]

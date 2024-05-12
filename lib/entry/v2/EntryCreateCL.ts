@@ -1,7 +1,7 @@
 import { Button$PressEvent } from "sap/m/Button";
 import Controller from "sap/ui/core/mvc/Controller";
 import View from "sap/ui/core/mvc/View";
-import { DialogStrategies, FormTypes } from "ui5/antares/types/entry/enums";
+import { DialogStrategies, FormTypes, GuidStrategies } from "ui5/antares/types/entry/enums";
 import ContentCL from "ui5/antares/ui/ContentCL";
 import EntryCL from "ui5/antares/entry/v2/EntryCL";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
@@ -10,6 +10,7 @@ import FragmentCL from "ui5/antares/ui/FragmentCL";
 import DialogCL from "ui5/antares/ui/DialogCL";
 import UIComponent from "sap/ui/core/UIComponent";
 import Dialog from "sap/m/Dialog";
+import EntityCL from "ui5/antares/entity/v2/EntityCL";
 
 /**
  * @namespace ui5.antares.entry.v2
@@ -46,7 +47,8 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         entryDialog.addEscapeHandler(this.onEscapePressed, this);
 
         //Create Context
-        this.createEntryContext(data);
+        const dataWithGuid = await this.generateGuid(data);
+        this.createEntryContext(dataWithGuid);
 
         if (this.getFormType() === FormTypes.SMART) {
             const smartForm = await content.getSmartForm();
@@ -121,5 +123,59 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
             fragment.destroyFragmentContent();
             throw new Error("Provided fragment must contain a sap.m.Dialog control. Put all the controls into a sap.m.Dialog");
         }
+    }
+
+    private async generateGuid(data?: EntityT): Promise<EntityT | undefined> {
+        const guidStrategy = this.getGenerateRandomGuid();
+
+        if (guidStrategy === GuidStrategies.NONE) {
+            return;
+        }
+
+        const entity = new EntityCL(this.getSourceController(), this.getEntityName(), this.getResourceBundlePrefix(), this.getNamingStrategy(), this.getModelName());
+        let dataWithGuid: EntityT = {} as EntityT;
+        const entityTypeProperties = await entity.getEntityTypeProperties();
+        const entityTypeKeys = await entity.getEntityTypeKeys();
+
+        if (data) {
+            dataWithGuid = data;
+        }
+
+        switch (guidStrategy) {
+            case GuidStrategies.ALL:
+                entityTypeProperties.forEach((property) => {
+                    if (property.propertyType === "Edm.Guid") {
+                        dataWithGuid[property.propertyName as keyof typeof dataWithGuid] = window.crypto.randomUUID() as EntityT[keyof EntityT];
+                    }
+                });
+
+                break;
+            case GuidStrategies.ONLY_KEY:
+                entityTypeKeys.forEach((keyProperty) => {
+                    if (keyProperty.propertyType === "Edm.Guid") {
+                        dataWithGuid[keyProperty.propertyName as keyof typeof dataWithGuid] = window.crypto.randomUUID() as EntityT[keyof EntityT];
+                    }
+                });
+
+                break;
+            case GuidStrategies.ONLY_NON_KEY:
+                const mappedKeys = entityTypeKeys.map(key => key.propertyName);
+
+                for (const property of entityTypeProperties) {
+                    if (mappedKeys.includes(property.propertyName)) {
+                        continue;
+                    }
+
+                    dataWithGuid[property.propertyName as keyof typeof dataWithGuid] = window.crypto.randomUUID() as EntityT[keyof EntityT];
+                }
+
+                break;
+        }
+
+        if (!Object.keys(dataWithGuid).length) {
+            return;
+        }
+
+        return dataWithGuid;
     }
 }

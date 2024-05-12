@@ -10,7 +10,7 @@ import CheckBox from "sap/m/CheckBox";
 import DatePicker from "sap/m/DatePicker";
 import DateTimePicker from "sap/m/DateTimePicker";
 import Input from "sap/m/Input";
-import { FormTypes } from "ui5/antares/types/entry/enums";
+import { FormTypes, GuidStrategies } from "ui5/antares/types/entry/enums";
 import EntryCL from "ui5/antares/entry/v2/EntryCL";
 import { IEntityType } from "ui5/antares/types/entity/type";
 import Controller from "sap/ui/core/mvc/Controller";
@@ -169,8 +169,46 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
         smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
 
-        if (keyField || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+        if ((this.method === ODataMethods.UPDATE && keyField) || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
             smartField.setEditable(false);
+        }
+
+        if (this.method === ODataMethods.CREATE) {
+            switch (this.entry.getGenerateRandomGuid()) {
+                case GuidStrategies.ALL:
+                    if (property.propertyType === "Edm.Guid") {
+                        smartField.setEditable(false);
+                    }
+                    break;
+                case GuidStrategies.ONLY_KEY:
+                    if (property.propertyType === "Edm.Guid" && keyField) {
+                        smartField.setEditable(false);
+                    }
+                    break;
+                case GuidStrategies.ONLY_NON_KEY:
+                    if (property.propertyType === "Edm.Guid" && !keyField) {
+                        smartField.setEditable(false);
+                    }
+                    break;
+            }
+        }
+
+        switch (this.entry.getDisplayGuidProperties()) {
+            case GuidStrategies.NONE:
+                if (property.propertyType === "Edm.Guid") {
+                    smartField.setVisible(false);
+                }
+                break;
+            case GuidStrategies.ONLY_KEY:
+                if (property.propertyType === "Edm.Guid" && !keyField) {
+                    smartField.setVisible(false);
+                }
+                break;
+            case GuidStrategies.ONLY_NON_KEY:
+                if (property.propertyType === "Edm.Guid" && keyField) {
+                    smartField.setVisible(false);
+                }
+                break;
         }
 
         const groupElement = new GroupElement({
@@ -209,7 +247,7 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             selected: `{${selected}}`
         });
 
-        if (keyField || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+        if ((this.method === ODataMethods.UPDATE && keyField) || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
             checkbox.setEditable(false);
         }
 
@@ -226,7 +264,7 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         datePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
         datePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
 
-        if (keyField || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+        if ((this.method === ODataMethods.UPDATE && keyField) || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
             datePicker.setEditable(false);
         }
 
@@ -247,7 +285,7 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         dateTimePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
         dateTimePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
 
-        if (keyField || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+        if ((this.method === ODataMethods.UPDATE && keyField) || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
             dateTimePicker.setEditable(false);
         }
 
@@ -285,8 +323,46 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         input.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
         input.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
 
-        if (keyField || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+        if ((this.method === ODataMethods.UPDATE && keyField) || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
             input.setEditable(false);
+        }
+
+        if (this.method === ODataMethods.CREATE) {
+            switch (this.entry.getGenerateRandomGuid()) {
+                case GuidStrategies.ALL:
+                    if (property.propertyType === "Edm.Guid") {
+                        input.setEditable(false);
+                    }
+                    break;
+                case GuidStrategies.ONLY_KEY:
+                    if (property.propertyType === "Edm.Guid" && keyField) {
+                        input.setEditable(false);
+                    }
+                    break;
+                case GuidStrategies.ONLY_NON_KEY:
+                    if (property.propertyType === "Edm.Guid" && !keyField) {
+                        input.setEditable(false);
+                    }
+                    break;
+            }
+        }
+
+        switch (this.entry.getDisplayGuidProperties()) {
+            case GuidStrategies.NONE:
+                if (property.propertyType === "Edm.Guid") {
+                    input.setVisible(false);
+                }
+                break;
+            case GuidStrategies.ONLY_KEY:
+                if (property.propertyType === "Edm.Guid" && !keyField) {
+                    input.setVisible(false);
+                }
+                break;
+            case GuidStrategies.ONLY_NON_KEY:
+                if (property.propertyType === "Edm.Guid" && keyField) {
+                    input.setVisible(false);
+                }
+                break;
         }
 
         if (this.entry.getMandatoryProperties().includes(property.propertyName)) {

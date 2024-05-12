@@ -12,7 +12,7 @@
           <PropertyRef Name="ID" />
         </Key>
         <Property Name="ID"
-          Type="Edm.Int32"
+          Type="Edm.Guid"
           Nullable="false" />
         <Property Name="Name"
           Type="Edm.String" />
@@ -25,7 +25,7 @@
         <Property Name="CategoryID"
           Type="Edm.Int32" />
         <Property Name="SupplierID"
-          Type="Edm.Int32" />
+          Type="Edm.Guid" />
         <NavigationProperty Name="toCategory"
           Relationship="UI5Antares.Product_Category_Association"
           FromRole="Product"
@@ -58,7 +58,7 @@
           <PropertyRef Name="ID" />
         </Key>
         <Property Name="ID"
-          Type="Edm.Int32"
+          Type="Edm.Guid"
           Nullable="false" />
         <Property Name="CompanyName"
           Type="Edm.String" />

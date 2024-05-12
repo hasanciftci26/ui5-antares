@@ -4,7 +4,7 @@ import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL";
 import EntryUpdateCL from "ui5/antares/entry/v2/EntryUpdateCL";
 import EntryReadCL from "ui5/antares/entry/v2/EntryReadCL";
 import { IProducts } from "../types/create";
-import { FormTypes, NamingStrategies } from "ui5/antares/types/entry/enums";
+import { FormTypes, GuidStrategies, NamingStrategies } from "ui5/antares/types/entry/enums";
 import { ButtonType } from "sap/m/library";
 import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 import Input from "sap/m/Input";
@@ -46,6 +46,9 @@ export default class Homepage extends BaseController {
 
     public async onCreateProduct(): Promise<void> {
         const entry = new EntryCreateCL<IProducts>(this, "Products");
+        entry.setFormType(FormTypes.SIMPLE);
+        entry.setDisplayGuidProperties(GuidStrategies.ALL);
+        entry.setGenerateRandomGuid(GuidStrategies.ALL);
         await entry.addControlFromFragment(new FragmentCL(this, "test.ui5.antares.fragments.ProductsCustomControls"));
         await entry.addContentFromFragment(new FragmentCL(this, "test.ui5.antares.fragments.ProductsCustomContents"));
         entry.createNewEntry();
@@ -62,6 +65,7 @@ export default class Homepage extends BaseController {
             operator: ValidationOperator.GT,
             value1: 1550
         }));
+        entry.setDisplayGuidProperties(GuidStrategies.ALL);
         await entry.addControlFromFragment(new FragmentCL(this, "test.ui5.antares.fragments.ProductsCustomControls"));
         entry.setFormType(FormTypes.SIMPLE);
         entry.updateEntry();
@@ -72,6 +76,7 @@ export default class Homepage extends BaseController {
             entityPath: "Products",
             initializer: "tblProducts"
         });
+        entry.setDisplayGuidProperties(GuidStrategies.ALL);
         entry.readEntry();
     }
 
