@@ -20,6 +20,7 @@ export default abstract class ModelCL extends BaseObject {
     private modelName?: string;
     private resourceBundle?: ResourceBundle;
     private bindingMode: BindingMode | "Default" | "OneTime" | "OneWay" | "TwoWay";
+    private resourceModel?: ResourceModel;
 
     constructor(controller: Controller | UIComponent, modelName?: string) {
         super();
@@ -37,6 +38,7 @@ export default abstract class ModelCL extends BaseObject {
 
         if (resourceModel instanceof ResourceModel) {
             this.resourceBundle = resourceModel.getResourceBundle() as ResourceBundle;
+            this.resourceModel = resourceModel;
         }
 
         this.oDataModel = this.ownerComponent.getModel(this.modelName) as ODataModel;
@@ -78,6 +80,10 @@ export default abstract class ModelCL extends BaseObject {
 
     protected setOldBindingMode() {
         this.oDataModel.setDefaultBindingMode(this.bindingMode);
+    }
+
+    protected getResourceModel(): ResourceModel | undefined {
+        return this.resourceModel;
     }
 
     private setMetadataUrl(): void {

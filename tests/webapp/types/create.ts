@@ -1,8 +1,12 @@
 export interface IProducts {
-    ID?: number;
+    ID?: string;
     Name?: string;
     Price?: number;
     Currency?: string;
-    CategoryID?: number;
-    SupplierID?: number;
+    CategoryID?: string;
+    SupplierID?: string;
+}
+
+export interface IProductKeys {
+    ID: string;
 }

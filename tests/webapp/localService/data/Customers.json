@@ -1,0 +1,92 @@
+[
+    {
+        "ID": "CUS-001",
+        "FirstName": "John",
+        "LastName": "Doe",
+        "Email": "johndoe@example.com",
+        "Address": "123 Main St, Anytown, USA",
+        "Phone": "+1 (555) 123-4567",
+        "BirthDate": "1980-05-15"
+    },
+    {
+        "ID": "CUS-002",
+        "FirstName": "Jane",
+        "LastName": "Smith",
+        "Email": "janesmith@example.com",
+        "Address": "456 Oak Ave, Anycity, USA",
+        "Phone": "+1 (555) 987-6543",
+        "BirthDate": "1992-08-22"
+    },
+    {
+        "ID": "CUS-003",
+        "FirstName": "Michael",
+        "LastName": "Johnson",
+        "Email": "michaeljohnson@example.com",
+        "Address": "789 Elm Rd, Anystate, USA",
+        "Phone": "+1 (555) 222-3333",
+        "BirthDate": "1975-12-10"
+    },
+    {
+        "ID": "CUS-004",
+        "FirstName": "Sarah",
+        "LastName": "Brown",
+        "Email": "sarahbrown@example.com",
+        "Address": "321 Pine Blvd, Anycity, USA",
+        "Phone": "+1 (555) 444-5555",
+        "BirthDate": "1988-03-28"
+    },
+    {
+        "ID": "CUS-005",
+        "FirstName": "Robert",
+        "LastName": "Williams",
+        "Email": "robertwilliams@example.com",
+        "Address": "567 Cedar Ln, Anytown, USA",
+        "Phone": "+1 (555) 777-8888",
+        "BirthDate": "1995-06-17"
+    },
+    {
+        "ID": "CUS-006",
+        "FirstName": "Emily",
+        "LastName": "Davis",
+        "Email": "emilydavis@example.com",
+        "Address": "987 Maple Ave, Anystate, USA",
+        "Phone": "+1 (555) 321-6543",
+        "BirthDate": "1983-09-05"
+    },
+    {
+        "ID": "CUS-007",
+        "FirstName": "David",
+        "LastName": "Wilson",
+        "Email": "davidwilson@example.com",
+        "Address": "654 Birch St, Anycity, USA",
+        "Phone": "+1 (555) 888-7777",
+        "BirthDate": "1990-11-18"
+    },
+    {
+        "ID": "CUS-008",
+        "FirstName": "Mary",
+        "LastName": "Taylor",
+        "Email": "marytaylor@example.com",
+        "Address": "234 Oak Rd, Anytown, USA",
+        "Phone": "+1 (555) 456-7890",
+        "BirthDate": "1977-04-12"
+    },
+    {
+        "ID": "CUS-009",
+        "FirstName": "James",
+        "LastName": "Anderson",
+        "Email": "jamesanderson@example.com",
+        "Address": "876 Pine Ave, Anystate, USA",
+        "Phone": "+1 (555) 999-1111",
+        "BirthDate": "1986-01-30"
+    },
+    {
+        "ID": "CUS-010",
+        "FirstName": "Laura",
+        "LastName": "Moore",
+        "Email": "lauramoore@example.com",
+        "Address": "543 Elm St, Anycity, USA",
+        "Phone": "+1 (555) 666-3333",
+        "BirthDate": "1998-07-25"
+    }
+]

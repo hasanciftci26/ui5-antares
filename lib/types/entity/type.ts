@@ -19,4 +19,6 @@ export type PropertyType =
 export interface IEntityType {
     propertyName: string;
     propertyType: PropertyType;
+    precision?: string;
+    scale?: string;
 }

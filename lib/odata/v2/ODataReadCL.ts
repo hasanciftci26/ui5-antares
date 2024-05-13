@@ -1,6 +1,6 @@
 import Controller from "sap/ui/core/mvc/Controller";
 import ODataCL from "ui5/antares/odata/v2/ODataCL";
-import { IError } from "ui5/antares/types/common";
+import { IError, IReadResponse } from "ui5/antares/types/common";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
 import Filter from "sap/ui/model/Filter";
 import Sorter from "sap/ui/model/Sorter";
@@ -14,6 +14,7 @@ export default class ODataReadCL<EntityT extends object = object, EntityKeyT ext
     private filters: Filter[] = [];
     private sorters: Sorter[] = [];
     private urlParameters?: Record<string, string>;
+    private response?: IReadResponse<EntityT>;
 
     constructor(controller: Controller | UIComponent, entityPath: string, modelName?: string) {
         super(controller, entityPath, ODataMethods.READ, modelName);
@@ -27,6 +28,10 @@ export default class ODataReadCL<EntityT extends object = object, EntityKeyT ext
         this.filters.push(filter);
     }
 
+    public getFilters(): Filter[] {
+        return this.filters;
+    }
+
     public setSorters(sorters: Sorter[]) {
         this.sorters = sorters;
     }
@@ -35,8 +40,20 @@ export default class ODataReadCL<EntityT extends object = object, EntityKeyT ext
         this.sorters.push(sorter);
     }
 
+    public getSorters(): Sorter[] {
+        return this.sorters;
+    }
+
     public setUrlParameters(urlParameters: Record<string, string>): void {
         this.urlParameters = urlParameters;
+    }
+
+    public getUrlParameters(): Record<string, string> | undefined {
+        return this.urlParameters;
+    }
+
+    public getResponse(): IReadResponse<EntityT> | undefined {
+        return this.response;
     }
 
     public read(): Promise<EntityT[]> {
@@ -47,7 +64,8 @@ export default class ODataReadCL<EntityT extends object = object, EntityKeyT ext
                 filters: this.filters,
                 sorters: this.sorters,
                 urlParameters: this.urlParameters,
-                success: (responseData: IODataReadResult<EntityT>) => {
+                success: (responseData: IODataReadResult<EntityT>, response: IReadResponse<EntityT>) => {
+                    this.response = response;
                     resolve(responseData.results);
                 },
                 error: (error: IError) => {
@@ -64,7 +82,8 @@ export default class ODataReadCL<EntityT extends object = object, EntityKeyT ext
         return new Promise((resolve, reject) => {
             oDataModel.read(path, {
                 urlParameters: this.urlParameters,
-                success: (responseData: EntityT) => {
+                success: (responseData: EntityT, response: IReadResponse<EntityT>) => {
+                    this.response = response;
                     resolve(responseData);
                 },
                 error: (error: IError) => {

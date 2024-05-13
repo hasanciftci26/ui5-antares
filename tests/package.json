@@ -8,10 +8,10 @@
         "UI5",
         "OData"
     ],
-    "main": "webapp/index.test.html",
+    "main": "webapp/index.html",
     "scripts": {
-        "start": "ui5 serve --port 8080 -o index.test.html",
-        "prestart": "shx rm -r ./webapp/antares/ && shx cp -r ../lib/ ./webapp/antares/"
+        "start": "ui5 serve --port 8080 -o index.html",
+        "prestart": "shx rm -rf ./webapp/antares/ && shx cp -r ../lib/ ./webapp/antares/"
     },
     "devDependencies": {
         "@sap-ux/eslint-plugin-fiori-tools": "^0.4.1",

@@ -1,0 +1,11 @@
+<core:FragmentDefinition xmlns:upload="sap.m.upload"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form">
+    <FlexBox justifyContent="Center"
+        alignItems="Center">
+        <VBox width="95%">
+            <upload:UploadSet ></upload:UploadSet>
+        </VBox>
+    </FlexBox>
+</core:FragmentDefinition>

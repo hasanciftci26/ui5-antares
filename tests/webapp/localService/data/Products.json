@@ -1,82 +1,210 @@
 [
     {
-        "ID": 1,
-        "Name": "Laptop",
-        "Price": 1200,
-        "Currency": "USD",
-        "CategoryID": 1,
-        "SupplierID": 1
-    },
-    {
-        "ID": 2,
+        "ID": "b17e8840-7c3c-48b8-a4e8-0c3f70c116bc",
         "Name": "Smartphone",
-        "Price": 800,
+        "Price": 599.99,
         "Currency": "USD",
-        "CategoryID": 1,
-        "SupplierID": 2
+        "CategoryID": "d64f9f43-2510-4e91-8d4e-71e0c036a9ef",
+        "SupplierID": "e7a871c5-fa43-40d2-97a5-6a89f287c3b1"
     },
     {
-        "ID": 3,
-        "Name": "Tablet",
-        "Price": 500,
+        "ID": "7e943f98-cb04-4f91-83b4-92d265a6f60e",
+        "Name": "Laptop",
+        "Price": 899.99,
         "Currency": "USD",
-        "CategoryID": 1,
-        "SupplierID": 3
+        "CategoryID": "b512bb0f-bf2b-4e67-9a88-065d7c48a1e2",
+        "SupplierID": "b5c6d7e8-f9a0-b1c2-d3e4-f5a6b7c8d9e0"
     },
     {
-        "ID": 4,
+        "ID": "0d7c5e61-80a7-4929-9c36-7d9d74643818",
         "Name": "Headphones",
-        "Price": 150,
+        "Price": 99.99,
         "Currency": "USD",
-        "CategoryID": 1,
-        "SupplierID": 1
+        "CategoryID": "f9a2de42-7a45-4c1e-82b7-fb0d8f503b2d",
+        "SupplierID": "f78c9921-1874-4ff0-8b23-ae4c993cc1c2"
     },
     {
-        "ID": 5,
-        "Name": "Smart Watch",
-        "Price": 300,
+        "ID": "4b7b4a95-4b5b-4e03-b1d4-f3906a288148",
+        "Name": "Refrigerator",
+        "Price": 1299.99,
         "Currency": "USD",
-        "CategoryID": 1,
-        "SupplierID": 2
+        "CategoryID": "a3e8c6e5-6b78-4787-ba2d-fac19c80d40d",
+        "SupplierID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6"
     },
     {
-        "ID": 6,
+        "ID": "8f7b2a92-485f-4df4-9e95-b58d2699073a",
+        "Name": "Tablet",
+        "Price": 399.99,
+        "Currency": "USD",
+        "CategoryID": "d64f9f43-2510-4e91-8d4e-71e0c036a9ef",
+        "SupplierID": "df9a87c7-3d63-4c3d-b1f5-3cf034db1c8d"
+    },
+    {
+        "ID": "b2fcf70b-9c4f-4a8f-a036-5b95c6d7e84b",
+        "Name": "Smartwatch",
+        "Price": 199.99,
+        "Currency": "USD",
+        "CategoryID": "f9a2de42-7a45-4c1e-82b7-fb0d8f503b2d",
+        "SupplierID": "f78c9921-1874-4ff0-8b23-ae4c993cc1c2"
+    },
+    {
+        "ID": "fd55b5e4-1c8d-4f6e-87f4-843961db78fc",
+        "Name": "Desktop PC",
+        "Price": 1299.99,
+        "Currency": "USD",
+        "CategoryID": "b512bb0f-bf2b-4e67-9a88-065d7c48a1e2",
+        "SupplierID": "b5c6d7e8-f9a0-b1c2-d3e4-f5a6b7c8d9e0"
+    },
+    {
+        "ID": "0b59716e-595e-4a93-8c29-641db1d73c9e",
+        "Name": "Microwave Oven",
+        "Price": 199.99,
+        "Currency": "USD",
+        "CategoryID": "a3e8c6e5-6b78-4787-ba2d-fac19c80d40d",
+        "SupplierID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6"
+    },
+    {
+        "ID": "32eaf740-f034-467c-96b6-11f0667c928e",
+        "Name": "Camera",
+        "Price": 499.99,
+        "Currency": "USD",
+        "CategoryID": "f9a2de42-7a45-4c1e-82b7-fb0d8f503b2d",
+        "SupplierID": "f78c9921-1874-4ff0-8b23-ae4c993cc1c2"
+    },
+    {
+        "ID": "8c7f61c0-4b5a-4fb8-898e-3e53520e0f2e",
         "Name": "LED TV",
-        "Price": 1500,
+        "Price": 899.99,
         "Currency": "USD",
-        "CategoryID": 1,
-        "SupplierID": 3
+        "CategoryID": "a3e8c6e5-6b78-4787-ba2d-fac19c80d40d",
+        "SupplierID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6"
     },
     {
-        "ID": 7,
-        "Name": "T-shirt",
-        "Price": 25,
+        "ID": "4d7e3fe5-8df1-4d6c-9d96-f8a60a76a826",
+        "Name": "Wireless Earbuds",
+        "Price": 149.99,
         "Currency": "USD",
-        "CategoryID": 2,
-        "SupplierID": 4
+        "CategoryID": "f9a2de42-7a45-4c1e-82b7-fb0d8f503b2d",
+        "SupplierID": "f78c9921-1874-4ff0-8b23-ae4c993cc1c2"
     },
     {
-        "ID": 8,
-        "Name": "Jeans",
-        "Price": 60,
+        "ID": "b9750527-21a4-4b32-bb7a-148524a1f58e",
+        "Name": "Air Conditioner",
+        "Price": 799.99,
         "Currency": "USD",
-        "CategoryID": 2,
-        "SupplierID": 4
+        "CategoryID": "a3e8c6e5-6b78-4787-ba2d-fac19c80d40d",
+        "SupplierID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6"
     },
     {
-        "ID": 9,
-        "Name": "Novel Book",
-        "Price": 20,
+        "ID": "cff0cc4a-325a-4c33-bcf2-f6c32e6b9d96",
+        "Name": "Smart Home Hub",
+        "Price": 249.99,
         "Currency": "USD",
-        "CategoryID": 3,
-        "SupplierID": 5
+        "CategoryID": "a3e8c6e5-6b78-4787-ba2d-fac19c80d40d",
+        "SupplierID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6"
     },
     {
-        "ID": 10,
-        "Name": "Cookbook",
-        "Price": 30,
+        "ID": "31fcf256-77d1-4388-8a0d-5d18b46fbb15",
+        "Name": "Wireless Speaker",
+        "Price": 79.99,
         "Currency": "USD",
-        "CategoryID": 3,
-        "SupplierID": 5
+        "CategoryID": "f9a2de42-7a45-4c1e-82b7-fb0d8f503b2d",
+        "SupplierID": "f78c9921-1874-4ff0-8b23-ae4c993cc1c2"
+    },
+    {
+        "ID": "03a11f10-92eb-4b23-bbe0-881d1e63cf4a",
+        "Name": "Gaming Console",
+        "Price": 499.99,
+        "Currency": "USD",
+        "CategoryID": "b512bb0f-bf2b-4e67-9a88-065d7c48a1e2",
+        "SupplierID": "df9a87c7-3d63-4c3d-b1f5-3cf034db1c8d"
+    },
+    {
+        "ID": "7fcfd248-8f93-4705-b871-7d436d017c7a",
+        "Name": "Blender",
+        "Price": 59.99,
+        "Currency": "USD",
+        "CategoryID": "a3e8c6e5-6b78-4787-ba2d-fac19c80d40d",
+        "SupplierID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6"
+    },
+    {
+        "ID": "8571a8d6-817d-41f4-b047-5f34de13cf6c",
+        "Name": "E-reader",
+        "Price": 129.99,
+        "Currency": "USD",
+        "CategoryID": "f9a2de42-7a45-4c1e-82b7-fb0d8f503b2d",
+        "SupplierID": "f78c9921-1874-4ff0-8b23-ae4c993cc1c2"
+    },
+    {
+        "ID": "9e0b38f3-2e1f-4a83-8964-77eaffb83c3e",
+        "Name": "Vacuum Cleaner",
+        "Price": 199.99,
+        "Currency": "USD",
+        "CategoryID": "a3e8c6e5-6b78-4787-ba2d-fac19c80d40d",
+        "SupplierID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6"
+    },
+    {
+        "ID": "e3b105c7-18f2-4f1e-8e88-9d84bda7fdcb",
+        "Name": "Smart Thermostat",
+        "Price": 149.99,
+        "Currency": "USD",
+        "CategoryID": "a3e8c6e5-6b78-4787-ba2d-fac19c80d40d",
+        "SupplierID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6"
+    },
+    {
+        "ID": "8dc703a2-4a29-4cf8-953f-58388dc0a1e6",
+        "Name": "Hair Dryer",
+        "Price": 79.99,
+        "Currency": "USD",
+        "CategoryID": "a3e8c6e5-6b78-4787-ba2d-fac19c80d40d",
+        "SupplierID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6"
+    },
+    {
+        "ID": "a76d8d33-9a8c-4904-9f1f-0e2687a86b52",
+        "Name": "Coffee Maker",
+        "Price": 49.99,
+        "Currency": "USD",
+        "CategoryID": "a3e8c6e5-6b78-4787-ba2d-fac19c80d40d",
+        "SupplierID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6"
+    },
+    {
+        "ID": "1a2345b6-789c-4d5e-a6f7-8g9h0i1j2k3l",
+        "Name": "Smart Speaker",
+        "Price": 149.99,
+        "Currency": "USD",
+        "CategoryID": "cf8d5e22-84a5-4e12-9676-2f292e2eb6bc",
+        "SupplierID": "df9a87c7-3d63-4c3d-b1f5-3cf034db1c8d"
+    },
+    {
+        "ID": "2m3n4o5p-6q7r-8s9t-a0b1-c2d3e4f5g6h7",
+        "Name": "Bluetooth Earphones",
+        "Price": 79.99,
+        "Currency": "USD",
+        "CategoryID": "cf8d5e22-84a5-4e12-9676-2f292e2eb6bc",
+        "SupplierID": "b5c6d7e8-f9a0-b1c2-d3e4-f5a6b7c8d9e0"
+    },
+    {
+        "ID": "3q4w5e6r-7t8y-9u0i-a1s2-d3f4g5h6j7k8",
+        "Name": "Wireless Charger",
+        "Price": 29.99,
+        "Currency": "USD",
+        "CategoryID": "cf8d5e22-84a5-4e12-9676-2f292e2eb6bc",
+        "SupplierID": "f78c9921-1874-4ff0-8b23-ae4c993cc1c2"
+    },
+    {
+        "ID": "4a5s6d7f-8g9h-0j1k-2l3z-4x5c6v7b8n9m",
+        "Name": "Smart Home Camera",
+        "Price": 199.99,
+        "Currency": "USD",
+        "CategoryID": "cf8d5e22-84a5-4e12-9676-2f292e2eb6bc",
+        "SupplierID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6"
+    },
+    {
+        "ID": "5q6w7e8r-9t0y-u1i2-o3p4-a5s6d7f8g9h0",
+        "Name": "VR Headset",
+        "Price": 299.99,
+        "Currency": "USD",
+        "CategoryID": "cf8d5e22-84a5-4e12-9676-2f292e2eb6bc",
+        "SupplierID": "e7a871c5-fa43-40d2-97a5-6a89f287c3b1"
     }
 ]

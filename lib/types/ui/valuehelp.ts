@@ -6,7 +6,6 @@ export interface IValueHelpSettings {
     valueHelpProperty: string;
     readonlyProperties?: string[];
     title?: string;
-    noDataText?: string;
     searchPlaceholder?: string;
     namingStrategy?: NamingStrategies;
     resourceBundlePrefix?: string;

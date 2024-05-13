@@ -25,3 +25,9 @@ export interface ISubmitResponse {
     statusText?: string;
     headers?: object;
 }
+
+export interface IValueValidation {
+    type: "MANDATORY" | "VALIDATION";
+    message: string;
+    validated: boolean;
+}

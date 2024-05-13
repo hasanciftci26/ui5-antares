@@ -10,12 +10,14 @@ import CheckBox from "sap/m/CheckBox";
 import DatePicker from "sap/m/DatePicker";
 import DateTimePicker from "sap/m/DateTimePicker";
 import Input from "sap/m/Input";
-import { FormTypes } from "ui5/antares/types/entry/enums";
+import { FormTypes, GuidStrategies } from "ui5/antares/types/entry/enums";
 import EntryCL from "ui5/antares/entry/v2/EntryCL";
-import { PropertyType } from "ui5/antares/types/entity/type";
+import { IEntityType } from "ui5/antares/types/entity/type";
 import Controller from "sap/ui/core/mvc/Controller";
 import UIComponent from "sap/ui/core/UIComponent";
 import CustomControlCL from "ui5/antares/ui/CustomControlCL";
+import CustomData from "sap/ui/core/CustomData";
+import { ODataMethods } from "ui5/antares/types/odata/enums";
 
 /**
  * @namespace ui5.antares.ui
@@ -23,11 +25,16 @@ import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends object = object> extends EntityCL {
     private entry: EntryT;
     private smartGroup: Group;
+    private method: ODataMethods;
     private simpleFormElements: UI5Element[];
+    private readonly numberTypes: string[] = [
+        "Edm.Decimal", "Edm.Double", "Edm.Int16", "Edm.Int32", "Edm.Int64"
+    ];
 
-    constructor(controller: Controller | UIComponent, entry: EntryT, modelName?: string) {
+    constructor(controller: Controller | UIComponent, entry: EntryT, method: ODataMethods, modelName?: string) {
         super(controller, entry.getEntityName(), entry.getResourceBundlePrefix(), entry.getNamingStrategy(), modelName);
         this.entry = entry;
+        this.method = method;
     }
 
     public async getSmartForm(): Promise<SmartForm> {
@@ -78,17 +85,17 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                 const customControl = this.entry.getCustomControl(key.propertyName);
 
                 if (customControl) {
-                    this.addSmartCustomControl(customControl, key.propertyName);
+                    this.addSmartCustomControl(customControl, key);
                 } else {
-                    this.addSmartField(key.propertyName);
+                    this.addSmartField(key, true);
                 }
             } else {
                 const customControl = this.entry.getCustomControl(key.propertyName);
 
                 if (customControl) {
-                    this.addSimpleCustomControl(customControl, key.propertyName);
+                    this.addSimpleCustomControl(customControl, key);
                 } else {
-                    this.addSimpleFormField(key.propertyName, key.propertyType);
+                    this.addSimpleFormField(key, true);
                 }
             }
         });
@@ -103,22 +110,23 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                 continue;
             }
 
+            let entityTypeProperty = entityTypeProperties.find(prop => prop.propertyName === property) as IEntityType;
+
             if (this.entry.getFormType() === FormTypes.SMART) {
                 const customControl = this.entry.getCustomControl(property);
 
                 if (customControl) {
-                    this.addSmartCustomControl(customControl, property);
+                    this.addSmartCustomControl(customControl, entityTypeProperty);
                 } else {
-                    this.addSmartField(property);
+                    this.addSmartField(entityTypeProperty);
                 }
             } else {
                 const customControl = this.entry.getCustomControl(property);
 
                 if (customControl) {
-                    this.addSimpleCustomControl(customControl, property);
+                    this.addSimpleCustomControl(customControl, entityTypeProperty);
                 } else {
-                    let propertyType: PropertyType = entityTypeProperties.find(prop => prop.propertyName === property)?.propertyType || "Edm.String";
-                    this.addSimpleFormField(property, propertyType);
+                    this.addSimpleFormField(entityTypeProperty);
                 }
             }
         }
@@ -135,104 +143,229 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                     const customControl = this.entry.getCustomControl(property.propertyName);
 
                     if (customControl) {
-                        this.addSmartCustomControl(customControl, property.propertyName);
+                        this.addSmartCustomControl(customControl, property);
                     } else {
-                        this.addSmartField(property.propertyName);
+                        this.addSmartField(property);
                     }
                 } else {
                     const customControl = this.entry.getCustomControl(property.propertyName);
 
                     if (customControl) {
-                        this.addSimpleCustomControl(customControl, property.propertyName);
+                        this.addSimpleCustomControl(customControl, property);
                     } else {
-                        this.addSimpleFormField(property.propertyName, property.propertyType);
+                        this.addSimpleFormField(property);
                     }
                 }
             }
         }
     }
 
-    private addSmartField(property: string) {
+    private addSmartField(property: IEntityType, keyField: boolean = false) {
         const smartField = new SmartField({
-            mandatory: this.entry.getMandatoryProperties().includes(property),
-            value: `{${property}}`
+            mandatory: this.entry.getMandatoryProperties().includes(property.propertyName),
+            value: `{${property.propertyName}}`
         });
+
+        smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
+        smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
+
+        if ((this.method === ODataMethods.UPDATE && keyField) || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+            smartField.setEditable(false);
+        }
+
+        if (this.method === ODataMethods.CREATE) {
+            switch (this.entry.getGenerateRandomGuid()) {
+                case GuidStrategies.ALL:
+                    if (property.propertyType === "Edm.Guid") {
+                        smartField.setEditable(false);
+                    }
+                    break;
+                case GuidStrategies.ONLY_KEY:
+                    if (property.propertyType === "Edm.Guid" && keyField) {
+                        smartField.setEditable(false);
+                    }
+                    break;
+                case GuidStrategies.ONLY_NON_KEY:
+                    if (property.propertyType === "Edm.Guid" && !keyField) {
+                        smartField.setEditable(false);
+                    }
+                    break;
+            }
+        }
+
+        switch (this.entry.getDisplayGuidProperties()) {
+            case GuidStrategies.NONE:
+                if (property.propertyType === "Edm.Guid") {
+                    smartField.setVisible(false);
+                }
+                break;
+            case GuidStrategies.ONLY_KEY:
+                if (property.propertyType === "Edm.Guid" && !keyField) {
+                    smartField.setVisible(false);
+                }
+                break;
+            case GuidStrategies.ONLY_NON_KEY:
+                if (property.propertyType === "Edm.Guid" && keyField) {
+                    smartField.setVisible(false);
+                }
+                break;
+        }
 
         const groupElement = new GroupElement({
             elements: [smartField]
         });
 
         if (!this.entry.getUseMetadataLabels()) {
-            groupElement.setLabel(this.getEntityTypePropLabel(property));
+            groupElement.setLabel(this.getEntityTypePropLabel(property.propertyName));
         }
 
         this.smartGroup.addGroupElement(groupElement);
     }
 
-    private addSimpleFormField(property: string, propertyType: PropertyType) {
-        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property) }));
+    private addSimpleFormField(property: IEntityType, keyField: boolean = false) {
+        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property.propertyName) }));
 
-        switch (propertyType) {
+        switch (property.propertyType) {
             case "Edm.Boolean":
-                this.addCheckBox(property);
+                this.addCheckBox(property, keyField);
                 break;
             case "Edm.DateTime":
-                this.addDatePicker(property);
+                this.addDatePicker(property, keyField);
                 break;
             case "Edm.DateTimeOffset":
-                this.addDateTimePicker(property);
+                this.addDateTimePicker(property, keyField);
                 break;
             default:
-                this.addInput(property);
+                this.addInput(property, keyField);
                 break;
         }
     }
 
-    private addCheckBox(property: string) {
-        const selected = this.getModelName() ? `${this.getModelName()}>${property}` : property;
-
-        this.simpleFormElements.push(new CheckBox({
+    private addCheckBox(property: IEntityType, keyField: boolean) {
+        const selected = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
+        const checkbox = new CheckBox({
             selected: `{${selected}}`
-        }));
+        });
+
+        if ((this.method === ODataMethods.UPDATE && keyField) || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+            checkbox.setEditable(false);
+        }
+
+        this.simpleFormElements.push(checkbox);
     }
 
-    private addDatePicker(property: string) {
-        const value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+    private addDatePicker(property: IEntityType, keyField: boolean) {
+        const value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
 
         const datePicker = new DatePicker({
             value: `{constraints : {displayFormat : 'Date'}, path : '${value}', type : 'sap.ui.model.odata.type.DateTime'}`
         });
 
-        if (this.entry.getMandatoryProperties().includes(property)) {
+        datePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
+        datePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
+
+        if ((this.method === ODataMethods.UPDATE && keyField) || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+            datePicker.setEditable(false);
+        }
+
+        if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
             datePicker.setRequired(true);
         }
 
         this.simpleFormElements.push(datePicker);
     }
 
-    private addDateTimePicker(property: string) {
-        const value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+    private addDateTimePicker(property: IEntityType, keyField: boolean) {
+        const value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
 
         const dateTimePicker = new DateTimePicker({
             value: `path : '${value}', type : 'sap.ui.model.odata.type.DateTimeOffset'`
         });
 
-        if (this.entry.getMandatoryProperties().includes(property)) {
+        dateTimePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
+        dateTimePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
+
+        if ((this.method === ODataMethods.UPDATE && keyField) || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+            dateTimePicker.setEditable(false);
+        }
+
+        if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
             dateTimePicker.setRequired(true);
         }
 
         this.simpleFormElements.push(dateTimePicker);
     }
 
-    private addInput(property: string) {
-        const valueHelp = this.entry.getValueHelp(property);
-        const value = this.getModelName() ? `${this.getModelName()}>${property}` : property;
+    private addInput(property: IEntityType, keyField: boolean) {
+        const valueHelp = this.entry.getValueHelp(property.propertyName);
+        let value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
+
+        if (this.numberTypes.includes(property.propertyType)) {
+            value = `path : '${value}', type : 'sap.ui.model.odata.type.${property.propertyType.slice(4)}'`;
+
+            switch (property.propertyType) {
+                case "Edm.Decimal":
+                    if (property.precision && property.scale) {
+                        value = value + `, constraints : {precision : ${property.precision}, scale : ${property.scale}}`;
+                    }
+                    break;
+                default:
+                    const groupingEnabled = property.propertyType === "Edm.Double";
+                    value = value + `, formatOptions : {groupingEnabled : ${groupingEnabled}}`;
+                    break;
+            }
+        }
 
         const input = new Input({
             value: `{${value}}`
         });
 
-        if (this.entry.getMandatoryProperties().includes(property)) {
+        input.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
+        input.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
+
+        if ((this.method === ODataMethods.UPDATE && keyField) || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
+            input.setEditable(false);
+        }
+
+        if (this.method === ODataMethods.CREATE) {
+            switch (this.entry.getGenerateRandomGuid()) {
+                case GuidStrategies.ALL:
+                    if (property.propertyType === "Edm.Guid") {
+                        input.setEditable(false);
+                    }
+                    break;
+                case GuidStrategies.ONLY_KEY:
+                    if (property.propertyType === "Edm.Guid" && keyField) {
+                        input.setEditable(false);
+                    }
+                    break;
+                case GuidStrategies.ONLY_NON_KEY:
+                    if (property.propertyType === "Edm.Guid" && !keyField) {
+                        input.setEditable(false);
+                    }
+                    break;
+            }
+        }
+
+        switch (this.entry.getDisplayGuidProperties()) {
+            case GuidStrategies.NONE:
+                if (property.propertyType === "Edm.Guid") {
+                    input.setVisible(false);
+                }
+                break;
+            case GuidStrategies.ONLY_KEY:
+                if (property.propertyType === "Edm.Guid" && !keyField) {
+                    input.setVisible(false);
+                }
+                break;
+            case GuidStrategies.ONLY_NON_KEY:
+                if (property.propertyType === "Edm.Guid" && keyField) {
+                    input.setVisible(false);
+                }
+                break;
+        }
+
+        if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
             input.setRequired(true);
         }
 
@@ -244,20 +377,20 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         this.simpleFormElements.push(input);
     }
 
-    private addSmartCustomControl(control: CustomControlCL, property: string) {
+    private addSmartCustomControl(control: CustomControlCL, property: IEntityType) {
         const groupElement = new GroupElement({
             elements: [control.getControl()]
         });
 
         if (!this.entry.getUseMetadataLabels()) {
-            groupElement.setLabel(this.getEntityTypePropLabel(property));
+            groupElement.setLabel(this.getEntityTypePropLabel(property.propertyName));
         }
 
         this.smartGroup.addGroupElement(groupElement);
     }
 
-    private addSimpleCustomControl(control: CustomControlCL, property: string) {
-        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property) }));
+    private addSimpleCustomControl(control: CustomControlCL, property: IEntityType) {
+        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property.propertyName) }));
         this.simpleFormElements.push(control.getControl());
     }
 }

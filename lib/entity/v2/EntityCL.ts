@@ -62,13 +62,18 @@ export default class EntityCL extends ModelCL {
 
     public async getEntityTypeKeys(): Promise<IEntityType[]> {
         const entityType = await this.getEntityType();
-        const entityTypeProps = await this.getEntityTypeProperties();
+        const entityTypeProperties = await this.getEntityTypeProperties();
 
         return entityType.key.propertyRef.map((key) => {
-            return {
+            const entityTypeProperty = entityTypeProperties.find(prop => prop.propertyName === key.name) as IEntityType;
+            const property: IEntityType = {
                 propertyName: key.name,
-                propertyType: entityTypeProps.find(prop => prop.propertyName === key.name)?.propertyType || "Edm.String"
-            }
+                propertyType: entityTypeProperty.propertyType,
+                precision: entityTypeProperty.precision,
+                scale: entityTypeProperty.scale
+            };
+
+            return property;
         });
     }
 
@@ -80,10 +85,17 @@ export default class EntityCL extends ModelCL {
         }
 
         return entityType.property.map((prop) => {
-            return {
+            const property: IEntityType = {
                 propertyName: prop.name,
                 propertyType: prop.type
+            };
+
+            if (prop.type === "Edm.Decimal") {
+                property.precision = prop.precision;
+                property.scale = prop.scale;
             }
+
+            return property;
         });
     }
 

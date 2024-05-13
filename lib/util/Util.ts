@@ -2,7 +2,7 @@ import BaseObject from "sap/ui/base/Object";
 import { NamingStrategies } from "ui5/antares/types/entry/enums";
 
 /**
- * @namespace ui5.antares.annotation.v2
+ * @namespace ui5.antares.util
  */
 export default class Util extends BaseObject {
     public static getGeneratedLabel(property: string, namingStrategy: NamingStrategies): string {

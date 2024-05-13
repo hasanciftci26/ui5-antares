@@ -1,32 +1,32 @@
 [
     {
-        "ID": 1,
-        "CompanyName": "Tech Store Inc.",
-        "ContactName": "John Doe",
+        "ID": "df9a87c7-3d63-4c3d-b1f5-3cf034db1c8d",
+        "CompanyName": "Tech Solutions Inc.",
+        "ContactName": "John Smith",
         "Country": "USA"
     },
     {
-        "ID": 2,
-        "CompanyName": "Mobile Solutions Ltd.",
-        "ContactName": "Alice Smith",
+        "ID": "e7a871c5-fa43-40d2-97a5-6a89f287c3b1",
+        "CompanyName": "MobileTech Ltd.",
+        "ContactName": "Jane Doe",
+        "Country": "Canada"
+    },
+    {
+        "ID": "f78c9921-1874-4ff0-8b23-ae4c993cc1c2",
+        "CompanyName": "Gadget World",
+        "ContactName": "Michael Johnson",
         "Country": "UK"
     },
     {
-        "ID": 3,
-        "CompanyName": "Gadget World GmbH",
-        "ContactName": "Max Müller",
-        "Country": "Germany"
+        "ID": "a1b2c3d4-5e6f-7a8b-9c0d-e1f2a3b4c5d6",
+        "CompanyName": "ElectroTech",
+        "ContactName": "Sarah Brown",
+        "Country": "Australia"
     },
     {
-        "ID": 4,
-        "CompanyName": "Fashion Trends Ltd.",
-        "ContactName": "Emily Brown",
+        "ID": "b5c6d7e8-f9a0-b1c2-d3e4-f5a6b7c8d9e0",
+        "CompanyName": "TechGuru",
+        "ContactName": "Robert Johnson",
         "Country": "USA"
-    },
-    {
-        "ID": 5,
-        "CompanyName": "Bookworm Publishers",
-        "ContactName": "David Johnson",
-        "Country": "Canada"
     }
 ]

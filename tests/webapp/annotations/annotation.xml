@@ -1,0 +1,173 @@
+<edmx:Edmx xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" Version="4.0">
+    <!-- OData service must be referenced here and we should give it a namespace -->
+    <edmx:Reference Uri="/mock/v2/antares/$metadata">
+        <edmx:Include Namespace="UI5Antares" Alias="ServiceEntityTypes"/>
+    </edmx:Reference>
+    <!-- We can add desired vocabularies as references and give them an alias to be used in this XML document -->
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+        <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="UI" />
+    </edmx:Reference>
+    <!-- Common annotation vocabulary reference -->
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common" />
+    </edmx:Reference>
+    <!-- We can define all the annotations in Data Services/Schema -->
+    <edmx:DataServices>
+        <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="">
+            <Annotations Target="ServiceEntityTypes.Product">
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ID" />
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Name" />
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Price" />
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Currency" />
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CategoryID" />
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="SupplierID" />
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.SelectionFields">
+                    <Collection>
+                        <PropertyPath>ID</PropertyPath>
+                        <PropertyPath>Name</PropertyPath>
+                        <PropertyPath>CategoryID</PropertyPath>
+                        <PropertyPath>SupplierID</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ServiceEntityTypes.Product/ID">
+                <Annotation Term="Common.Label" String="Product ID" />
+            </Annotations>
+            <Annotations Target="ServiceEntityTypes.Product/Name">
+                <Annotation Term="Common.Label" String="Product Name" />
+            </Annotations>
+            <Annotations Target="ServiceEntityTypes.Product/Price">
+                <Annotation Term="Common.Label" String="Price" />
+            </Annotations>
+            <Annotations Target="ServiceEntityTypes.Product/Currency">
+                <Annotation Term="Common.Label" String="Currency" />
+            </Annotations>
+            <Annotations Target="ServiceEntityTypes.Product/CategoryID">
+                <Annotation Term="Common.Label" String="Category ID" />
+            </Annotations>
+            <Annotations Target="ServiceEntityTypes.Product/SupplierID">
+                <Annotation Term="Common.Label" String="Supplier ID" />
+            </Annotations>
+			<Annotations Target="ServiceEntityTypes.Product/CategoryID">
+				<Annotation Term="Common.ValueList">
+					<Record Type="Common.ValueListType">
+						<PropertyValue Property="CollectionPath" String="Categories"/>
+						<PropertyValue Property="SearchSupported" Bool="true"/>
+						<PropertyValue Property="Parameters">
+							<Collection>
+								<Record Type="Common.ValueListParameterInOut">
+									<PropertyValue Property="LocalDataProperty" PropertyPath="CategoryID"/>
+									<PropertyValue Property="ValueListProperty" String="ID"/>
+								</Record>
+								<Record Type="Common.ValueListParameterDisplayOnly">
+									<PropertyValue Property="ValueListProperty" String="Name"/>
+								</Record>
+							</Collection>
+						</PropertyValue>
+					</Record>
+				</Annotation>
+			</Annotations>            
+			<Annotations Target="ServiceEntityTypes.Product/SupplierID">
+				<Annotation Term="Common.ValueList">
+					<Record Type="Common.ValueListType">
+						<PropertyValue Property="CollectionPath" String="Suppliers"/>
+						<PropertyValue Property="SearchSupported" Bool="true"/>
+						<PropertyValue Property="Parameters">
+							<Collection>
+								<Record Type="Common.ValueListParameterInOut">
+									<PropertyValue Property="LocalDataProperty" PropertyPath="SupplierID"/>
+									<PropertyValue Property="ValueListProperty" String="ID"/>
+								</Record>
+								<Record Type="Common.ValueListParameterDisplayOnly">
+									<PropertyValue Property="ValueListProperty" String="CompanyName"/>
+								</Record>
+								<Record Type="Common.ValueListParameterDisplayOnly">
+									<PropertyValue Property="ValueListProperty" String="ContactName"/>
+								</Record>
+								<Record Type="Common.ValueListParameterDisplayOnly">
+									<PropertyValue Property="ValueListProperty" String="Country"/>
+								</Record>
+							</Collection>
+						</PropertyValue>
+					</Record>
+				</Annotation>
+			</Annotations>
+            <Annotations Target="ServiceEntityTypes.Category">
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ID" />
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Name" />
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.SelectionFields">
+                    <Collection>
+                        <PropertyPath>ID</PropertyPath>
+                        <PropertyPath>Name</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ServiceEntityTypes.Category/ID">
+                <Annotation Term="Common.Label" String="Category ID" />
+            </Annotations>
+            <Annotations Target="ServiceEntityTypes.Category/Name">
+                <Annotation Term="Common.Label" String="Category Name" />
+            </Annotations>    
+            <Annotations Target="ServiceEntityTypes.Supplier">
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ID" />
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="CompanyName" />
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ContactName" />
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Country" />
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.SelectionFields">
+                    <Collection>
+                        <PropertyPath>ID</PropertyPath>
+                        <PropertyPath>Country</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ServiceEntityTypes.Supplier/ID">
+                <Annotation Term="Common.Label" String="Supplier ID" />
+            </Annotations>
+            <Annotations Target="ServiceEntityTypes.Supplier/CompanyName">
+                <Annotation Term="Common.Label" String="Company Name" />
+            </Annotations>                                     
+            <Annotations Target="ServiceEntityTypes.Supplier/ContactName">
+                <Annotation Term="Common.Label" String="Contact Name" />
+            </Annotations>                                     
+            <Annotations Target="ServiceEntityTypes.Supplier/Country">
+                <Annotation Term="Common.Label" String="Country" />
+            </Annotations>                                     
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>
