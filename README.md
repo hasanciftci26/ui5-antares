@@ -43,6 +43,7 @@ ui5 -v
   - [Prerequisites](#prerequisites)
   - [Table of contents](#table-of-contents)
   - [Versioning](#versioning)
+    - [Supported SAPUI5 Versions](#supported-sapui5-versions)
   - [Installation](#installation)
 
 ## Versioning
@@ -53,18 +54,34 @@ UI5 Antares and SAPUI5 versions are directly related. The SAPUI5 version used ca
 
 You can see examples of versioning below.
 
+**Note**: The versions shown in the example below may not exist.
+
 | UI5 Antares Version | SAPUI5 Version | Description                               |
 | :------------------ | :------------- | :---------------------------------------- |
 | 1.123.1002          | 1.123.1        | Latest Version for 1.123.1                |
 | 1.123.1001          | 1.123.1        | One before the latest version for 1.123.1 |
 | 1.84.001            | 1.84           | Latest Version for 1.84                   |
 
+### Supported SAPUI5 Versions
+
+The table below shows the currently supported and planned SAPUI5 versions. UI5 Antares has initially been released to support version 1.123.1. However, development will also be done for versions with long-term maintenance as specified at [SAPUI5 Version Overview](https://sapui5.hana.ondemand.com/versionoverview.html).
+
+| UI5 Antares Version | SAPUI5 Version | Status    |
+| :------------------ | :------------- | :-------- |
+| 1.123.1001          | 1.123.1        | Available |
+| 1.120.*             | 1.120.*        | Planned   |
+| 1.108.*             | 1.108.*        | Planned   |
+| 1.96.*              | 1.96.*         | Planned   |
+| 1.84.*              | 1.84.*         | Planned   |
+
 ## Installation
 
-**BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites) and [versioning](#versioning)
+**BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites) and [versioning](#versioning).
 
 To install the library, run the following command in the directory where the **package.json** file of your SAPUI5/Fiori Elements application is located. It is usually located in the root directory of a SAPUI5/Fiori Elements application.
 
+**Note:** In the command below, replace ***version*** with the UI5 Antares version that corresponds to the version of your SAPUI5/Fiori Elements application. For example, applications running with **SAPUI5 version 1.123.1** should run the following command: **npm install ui5-antares@1.123.1001**
+
 ```sh
-npm install ui5-antares
+npm install ui5-antares@version
 ```
