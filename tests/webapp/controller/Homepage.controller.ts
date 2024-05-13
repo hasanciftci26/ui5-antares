@@ -3,6 +3,8 @@ import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL";
 import EntryUpdateCL from "ui5/antares/entry/v2/EntryUpdateCL";
 import EntryDeleteCL from "ui5/antares/entry/v2/EntryDeleteCL";
 import { IProducts } from "../types/create";
+import { FormTypes } from "ui5/antares/types/entry/enums";
+import ValueHelpCL from "ui5/antares/ui/ValueHelpCL";
 
 /**
  * @namespace test.ui5.antares.controller
@@ -23,6 +25,19 @@ export default class Homepage extends BaseController {
 
     public async onCreateProduct(): Promise<void> {
         const entry = new EntryCreateCL<IProducts>(this, "Products");
+        entry.setFormType(FormTypes.SIMPLE);
+        entry.addValueHelp(new ValueHelpCL(this, {
+            propertyName: "CategoryID",
+            valueHelpEntity: "Categories",
+            valueHelpProperty: "ID",
+            readonlyProperties: ["Name"]
+        }));
+        entry.addValueHelp(new ValueHelpCL(this, {
+            propertyName: "SupplierID",
+            valueHelpEntity: "Suppliers",
+            valueHelpProperty: "ID",
+            readonlyProperties: ["CompanyName", "ContactName", "Country"]
+        }));
         entry.createNewEntry();
     }
 
