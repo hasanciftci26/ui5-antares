@@ -20,11 +20,11 @@ export default class ValidationLogicCL extends BaseObject {
     private operator: ValidationOperator;
     private showMessageBox: boolean;
     private invalidValueMessage: string;
-    private stringMethods: ValidationOperator[] = [
+    private readonly stringMethods: ValidationOperator[] = [
         ValidationOperator.Contains, ValidationOperator.EndsWith, ValidationOperator.NotContains,
         ValidationOperator.NotEndsWith, ValidationOperator.NotStartsWith, ValidationOperator.StartsWith
     ];
-    private numberTypes: string[] = [
+    private readonly numberTypes: string[] = [
         "Edm.Decimal", "Edm.Double", "Edm.Int16", "Edm.Int32", "Edm.Int64"
     ];
 

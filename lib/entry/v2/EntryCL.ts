@@ -63,10 +63,10 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     private dialogStrategy: DialogStrategies = DialogStrategies.CREATE;
     private containsSmartForm: boolean = false;
     private autoMandatoryCheck: boolean = true;
-    private tableModes: string[] = ["SingleSelect", "SingleSelectLeft", "SingleSelectMaster"];
+    private readonly tableModes: string[] = ["SingleSelect", "SingleSelectLeft", "SingleSelectMaster"];
     private uiTableModes: string[] = ["Single"];
     private tableId?: string;
-    private supportedTableTypes: string[] = [
+    private readonly supportedTableTypes: string[] = [
         "sap.m.Table", "sap.ui.table.Table", "sap.ui.comp.smarttable.SmartTable",
         "sap.ui.table.TreeTable", "sap.ui.table.AnalyticalTable"
     ];

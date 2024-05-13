@@ -3,8 +3,8 @@ export interface IProducts {
     Name?: string;
     Price?: number;
     Currency?: string;
-    CategoryID?: number;
-    SupplierID?: number;
+    CategoryID?: string;
+    SupplierID?: string;
 }
 
 export interface IProductKeys {

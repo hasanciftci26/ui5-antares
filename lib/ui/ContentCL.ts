@@ -27,7 +27,7 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
     private smartGroup: Group;
     private method: ODataMethods;
     private simpleFormElements: UI5Element[];
-    private numberTypes: string[] = [
+    private readonly numberTypes: string[] = [
         "Edm.Decimal", "Edm.Double", "Edm.Int16", "Edm.Int32", "Edm.Int64"
     ];
 
