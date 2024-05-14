@@ -23,3 +23,27 @@ replace(typeMappings).then((results) => {
 }).catch((error) => {
     console.error("Error occurred in type mappings replacement:", error);
 });
+
+const sourceMappings = {
+    files: "dist/resources/ui5/antares/**/*.js",
+    from: new RegExp('//# sourceMappingURL=[A-Za-z]*.js.map', "g"),
+    to: ""
+};
+
+replace(sourceMappings).then((results) => {
+    console.log("Source mappings replacement results:", results);
+}).catch((error) => {
+    console.error("Error occurred in type mappings replacement:", error);
+});
+
+const libraryPreload = {
+    files: "dist/resources/ui5/antares/library-preload.js",
+    from: new RegExp('//# sourceMappingURL=library-preload.js.map', "g"),
+    to: ""
+};
+
+replace(libraryPreload).then((results) => {
+    console.log("Source mappings replacement results:", results);
+}).catch((error) => {
+    console.error("Error occurred in type mappings replacement:", error);
+});

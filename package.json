@@ -1,6 +1,6 @@
 {
   "name": "ui5-antares",
-  "version": "0.0.1",
+  "version": "1.123.1001",
   "description": "UI5 Antares is a set of some useful classes and methods to speed up the development time for OData operations in SAPUI5 applications.",
   "scripts": {
     "build": "ui5 build preload --clean-dest --config ui5-npm.yaml --exclude-task=minify && node correct-types.js"
