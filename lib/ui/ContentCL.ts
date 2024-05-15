@@ -166,6 +166,10 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             value: `{${property.propertyName}}`
         });
 
+        if (property.nullable === "false") {
+            smartField.setMandatory(true);
+        }
+
         smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
         smartField.addCustomData(new CustomData({ key: "UI5AntaresStandardControlType", value: property.propertyType }));
 
@@ -211,19 +215,23 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                 break;
         }
 
+        if (this.entry.getReadonlyProperties().includes(property.propertyName)) {
+            smartField.setEditable(false);
+        }
+
         const groupElement = new GroupElement({
             elements: [smartField]
         });
 
         if (!this.entry.getUseMetadataLabels()) {
-            groupElement.setLabel(this.getEntityTypePropLabel(property.propertyName));
+            groupElement.setLabel(property.annotationLabel || this.getEntityTypePropLabel(property.propertyName));
         }
 
         this.smartGroup.addGroupElement(groupElement);
     }
 
     private addSimpleFormField(property: IEntityType, keyField: boolean = false) {
-        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property.propertyName) }));
+        this.simpleFormElements.push(new Label({ text: property.annotationLabel || this.getEntityTypePropLabel(property.propertyName) }));
 
         switch (property.propertyType) {
             case "Edm.Boolean":
@@ -251,6 +259,14 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             checkbox.setEditable(false);
         }
 
+        if (property.nullable === "false") {
+            checkbox.setRequired(true);
+        }
+
+        if (this.entry.getReadonlyProperties().includes(property.propertyName)) {
+            checkbox.setEditable(false);
+        }
+
         this.simpleFormElements.push(checkbox);
     }
 
@@ -268,8 +284,12 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             datePicker.setEditable(false);
         }
 
-        if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
+        if (this.entry.getMandatoryProperties().includes(property.propertyName) || property.nullable === "false") {
             datePicker.setRequired(true);
+        }
+
+        if (this.entry.getReadonlyProperties().includes(property.propertyName)) {
+            datePicker.setEditable(false);
         }
 
         this.simpleFormElements.push(datePicker);
@@ -289,8 +309,12 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             dateTimePicker.setEditable(false);
         }
 
-        if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
+        if (this.entry.getMandatoryProperties().includes(property.propertyName) || property.nullable === "false") {
             dateTimePicker.setRequired(true);
+        }
+
+        if (this.entry.getReadonlyProperties().includes(property.propertyName)) {
+            dateTimePicker.setEditable(false);
         }
 
         this.simpleFormElements.push(dateTimePicker);
@@ -365,8 +389,12 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                 break;
         }
 
-        if (this.entry.getMandatoryProperties().includes(property.propertyName)) {
+        if (this.entry.getMandatoryProperties().includes(property.propertyName) || property.nullable === "false") {
             input.setRequired(true);
+        }
+
+        if (this.entry.getReadonlyProperties().includes(property.propertyName)) {
+            input.setEditable(false);
         }
 
         if (valueHelp) {
@@ -383,14 +411,14 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         });
 
         if (!this.entry.getUseMetadataLabels()) {
-            groupElement.setLabel(this.getEntityTypePropLabel(property.propertyName));
+            groupElement.setLabel(property.annotationLabel || this.getEntityTypePropLabel(property.propertyName));
         }
 
         this.smartGroup.addGroupElement(groupElement);
     }
 
     private addSimpleCustomControl(control: CustomControlCL, property: IEntityType) {
-        this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property.propertyName) }));
+        this.simpleFormElements.push(new Label({ text: property.annotationLabel || this.getEntityTypePropLabel(property.propertyName) }));
         this.simpleFormElements.push(control.getControl());
     }
 }

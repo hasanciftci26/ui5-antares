@@ -21,4 +21,6 @@ export interface IEntityType {
     propertyType: PropertyType;
     precision?: string;
     scale?: string;
+    nullable?: "false" | "true";
+    annotationLabel?: string;
 }
