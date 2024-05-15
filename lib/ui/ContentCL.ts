@@ -224,14 +224,18 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         });
 
         if (!this.entry.getUseMetadataLabels()) {
-            groupElement.setLabel(property.annotationLabel || this.getEntityTypePropLabel(property.propertyName));
+            groupElement.setLabel(this.getEntityTypePropLabel(property.propertyName));
         }
 
         this.smartGroup.addGroupElement(groupElement);
     }
 
     private addSimpleFormField(property: IEntityType, keyField: boolean = false) {
-        this.simpleFormElements.push(new Label({ text: property.annotationLabel || this.getEntityTypePropLabel(property.propertyName) }));
+        if (this.entry.getUseMetadataLabels()) {
+            this.simpleFormElements.push(new Label({ text: property.annotationLabel || this.getEntityTypePropLabel(property.propertyName) }));
+        } else {
+            this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property.propertyName) }));
+        }
 
         switch (property.propertyType) {
             case "Edm.Boolean":
@@ -411,14 +415,18 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         });
 
         if (!this.entry.getUseMetadataLabels()) {
-            groupElement.setLabel(property.annotationLabel || this.getEntityTypePropLabel(property.propertyName));
+            groupElement.setLabel(this.getEntityTypePropLabel(property.propertyName));
         }
 
         this.smartGroup.addGroupElement(groupElement);
     }
 
     private addSimpleCustomControl(control: CustomControlCL, property: IEntityType) {
-        this.simpleFormElements.push(new Label({ text: property.annotationLabel || this.getEntityTypePropLabel(property.propertyName) }));
+        if (this.entry.getUseMetadataLabels()) {
+            this.simpleFormElements.push(new Label({ text: property.annotationLabel || this.getEntityTypePropLabel(property.propertyName) }));
+        } else {
+            this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property.propertyName) }));
+        }
         this.simpleFormElements.push(control.getControl());
     }
 }
