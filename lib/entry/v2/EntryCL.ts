@@ -47,6 +47,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     private useAllProperties: boolean = true;
     private excludedProperties: string[] = [];
     private mandatoryProperties: string[] = [];
+    private readonlyProperties: string[] = [];
     private resourceBundlePrefix: string = "antares";
     private useMetadataLabels: boolean = false;
     private mandatoryErrorMessage: string = "Please fill in all required fields.";
@@ -324,6 +325,14 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
 
     public getGenerateRandomGuid(): GuidStrategies {
         return this.generateRandomGuid;
+    }
+
+    public setReadonlyProperties(properties: string[]) {
+        this.readonlyProperties = properties;
+    }
+
+    public getReadonlyProperties(): string[] {
+        return this.readonlyProperties;
     }
 
     public async addControlFromFragment(fragment: FragmentCL) {

@@ -69,8 +69,10 @@ export default class EntityCL extends ModelCL {
             const property: IEntityType = {
                 propertyName: key.name,
                 propertyType: entityTypeProperty.propertyType,
+                nullable: entityTypeProperty.nullable,
                 precision: entityTypeProperty.precision,
-                scale: entityTypeProperty.scale
+                scale: entityTypeProperty.scale,
+                annotationLabel: entityTypeProperty.annotationLabel
             };
 
             return property;
@@ -87,12 +89,21 @@ export default class EntityCL extends ModelCL {
         return entityType.property.map((prop) => {
             const property: IEntityType = {
                 propertyName: prop.name,
-                propertyType: prop.type
+                propertyType: prop.type,
+                nullable: prop.nullable
             };
 
             if (prop.type === "Edm.Decimal") {
                 property.precision = prop.precision;
                 property.scale = prop.scale;
+            }
+
+            if (prop.extensions) {
+                const label = prop.extensions.find(ext => ext.name === "label");
+
+                if (label) {
+                    property.annotationLabel = label.value;
+                }
             }
 
             return property;
