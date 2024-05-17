@@ -63,7 +63,7 @@ export default class Homepage extends BaseController {
 
     public async onCreateCustomer(): Promise<void> {
         const entry = new EntryCreateCL(this, "Customers");
-        entry.setFormType(FormTypes.SIMPLE);
+        // entry.setFormType(FormTypes.SIMPLE);
         entry.addValidationLogic(new ValidationLogicCL({
             propertyName: "BirthDate",
             operator: ValidationOperator.GT,
