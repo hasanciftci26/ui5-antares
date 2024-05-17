@@ -116,7 +116,65 @@
                     <IconTabFilter
                         text="Customers"
                         key="customer"
-                    />
+                    >
+                        <Table items="{/Customers}">
+                            <headerToolbar>
+                                <OverflowToolbar>
+                                    <ToolbarSpacer />
+                                    <Button
+                                        text="Create a Customer"
+                                        press="onCreateCustomer"
+                                    />
+                                    <Button
+                                        text="Update a Customer"
+                                        press="onUpdateCustomer"
+                                    />
+                                    <Button
+                                        text="Delete a Customer"
+                                        press="onDeleteCustomer"
+                                    />
+                                    <Button
+                                        text="Read a Customer"
+                                        press="onReadCustomer"
+                                    />
+                                </OverflowToolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column>
+                                    <Label text="Customer ID" />
+                                </Column>
+                                <Column>
+                                    <Label text="First Name" />
+                                </Column>
+                                <Column>
+                                    <Label text="Last Name" />
+                                </Column>
+                                <Column>
+                                    <Label text="Email" />
+                                </Column>
+                                <Column>
+                                    <Label text="Address" />
+                                </Column>
+                                <Column>
+                                    <Label text="Phone" />
+                                </Column>
+                                <Column>
+                                    <Label text="Birth Date" />
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <Text text="{ID}" />
+                                    <Text text="{FirstName}" />
+                                    <Text text="{LastName}" />
+                                    <Text text="{Email}" />
+                                    <Text text="{Address}" />
+                                    <Text text="{Phone}" />
+                                    <Text text="{BirthDate}" />
+                                </ColumnListItem>
+                            </items>
+                        </Table>                    
+                    </IconTabFilter>
                     <IconTabFilter
                         text="Orders"
                         key="order"

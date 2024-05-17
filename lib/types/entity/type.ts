@@ -23,4 +23,5 @@ export interface IEntityType {
     scale?: string;
     nullable?: "false" | "true";
     annotationLabel?: string;
+    displayFormat?: string;
 }

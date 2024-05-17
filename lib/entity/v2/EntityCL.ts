@@ -72,7 +72,8 @@ export default class EntityCL extends ModelCL {
                 nullable: entityTypeProperty.nullable,
                 precision: entityTypeProperty.precision,
                 scale: entityTypeProperty.scale,
-                annotationLabel: entityTypeProperty.annotationLabel
+                annotationLabel: entityTypeProperty.annotationLabel,
+                displayFormat: entityTypeProperty.displayFormat
             };
 
             return property;
@@ -100,9 +101,14 @@ export default class EntityCL extends ModelCL {
 
             if (prop.extensions) {
                 const label = prop.extensions.find(ext => ext.name === "label");
+                const displayFormat = prop.extensions.find(ext => ext.name === "display-format");
 
                 if (label) {
                     property.annotationLabel = label.value;
+                }
+
+                if (displayFormat) {
+                    property.displayFormat = displayFormat.value;
                 }
             }
 
