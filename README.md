@@ -45,6 +45,7 @@ ui5 -v
   - [Versioning](#versioning)
     - [Supported SAPUI5 Versions](#supported-sapui5-versions)
   - [Installation](#installation)
+    - [TypeScript](#typescript)
   - [Local Start](#local-start)
     - [Known Issues](#known-issues)
 
@@ -108,11 +109,8 @@ Add `"ui5.antares": {}` to the `"sap.ui5"."dependencies"."libs"` section of your
         ...
         "ui5.antares": {}
       }
-      ...
     }
-    ...
   }
-  ...
 }
 ```
 
@@ -126,9 +124,7 @@ Add `"ui5.antares": "./resources/ui5/antares"` to the `"sap.ui5"."resourceRoots"
     "resourceRoots": {
       "ui5.antares": "./resources/ui5/antares"
     }
-    ...
   }
-  ...
 }
 ```
 
@@ -142,7 +138,6 @@ Add the `--all` argument to the `build` script in your application's **package.j
   "scripts": {
     "build": "ui5 build --all --config=ui5.yaml --clean-dest --dest dist"
   }
-  ...
 }
 ```
 
@@ -161,6 +156,23 @@ ui5 tree
 ```
 
 ![UI5 Tree](https://github.com/hasanciftci26/ui5-antares/blob/media/installation/ui5_tree.png?raw=true)
+
+### TypeScript
+
+If you are developing your SAPUI5/Fiori Elements application with TypeScript, you need to add **"./node_modules/ui5-antares"** to the `compilerOptions.typeRoots` array in your application's **tsconfig.json** file. This configuration is required to use UI5 Antares type declarations.
+
+```json
+{
+  "compilerOptions": {
+    "typeRoots": [
+      ...
+      "./node_modules/ui5-antares"
+    ]
+  }
+}
+```
+
+![tsconfig.json](https://github.com/hasanciftci26/ui5-antares/blob/media/installation/tsconfig.png?raw=true)
 
 ## Local Start
 
