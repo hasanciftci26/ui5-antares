@@ -5,6 +5,8 @@ import EntryDeleteCL from "ui5/antares/entry/v2/EntryDeleteCL";
 import { IProducts } from "../types/create";
 import { FormTypes } from "ui5/antares/types/entry/enums";
 import ValueHelpCL from "ui5/antares/ui/ValueHelpCL";
+import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
+import { ValidationOperator } from "ui5/antares/types/ui/enums";
 
 /**
  * @namespace test.ui5.antares.controller
@@ -57,6 +59,17 @@ export default class Homepage extends BaseController {
         });
 
         entry.deleteEntry();
+    }
+
+    public async onCreateCustomer(): Promise<void> {
+        const entry = new EntryCreateCL(this, "Customers");
+        // entry.setFormType(FormTypes.SIMPLE);
+        entry.addValidationLogic(new ValidationLogicCL({
+            propertyName: "BirthDate",
+            operator: ValidationOperator.GT,
+            value1: new Date("2025-01-01")
+        }));
+        entry.createNewEntry();
     }
 
     /* ======================================================================================================================= */

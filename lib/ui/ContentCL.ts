@@ -18,6 +18,7 @@ import UIComponent from "sap/ui/core/UIComponent";
 import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 import CustomData from "sap/ui/core/CustomData";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
+import { PropertyBindingInfo } from "sap/ui/base/ManagedObject";
 
 /**
  * @namespace ui5.antares.ui
@@ -242,7 +243,11 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                 this.addCheckBox(property, keyField);
                 break;
             case "Edm.DateTime":
-                this.addDatePicker(property, keyField);
+                if (property.displayFormat === "Date") {
+                    this.addDatePicker(property, keyField);
+                } else {
+                    this.addDateTimePicker(property, keyField);
+                }
                 break;
             case "Edm.DateTimeOffset":
                 this.addDateTimePicker(property, keyField);
@@ -254,9 +259,11 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
     }
 
     private addCheckBox(property: IEntityType, keyField: boolean) {
-        const selected = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
+        const selectedPath = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
         const checkbox = new CheckBox({
-            selected: `{${selected}}`
+            selected: {
+                path: selectedPath
+            }
         });
 
         if ((this.method === ODataMethods.UPDATE && keyField) || this.method === ODataMethods.DELETE || this.method === ODataMethods.READ) {
@@ -275,10 +282,17 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
     }
 
     private addDatePicker(property: IEntityType, keyField: boolean) {
-        const value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
+        const valuePath = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
+        const dateValue: PropertyBindingInfo = {
+            path: valuePath,
+            type: "sap.ui.model.odata.type.DateTime",
+            constraints: {
+                displayFormat: "Date"
+            }
+        };
 
         const datePicker = new DatePicker({
-            value: `{constraints : {displayFormat : 'Date'}, path : '${value}', type : 'sap.ui.model.odata.type.DateTime'}`
+            dateValue: dateValue
         });
 
         datePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
@@ -300,10 +314,13 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
     }
 
     private addDateTimePicker(property: IEntityType, keyField: boolean) {
-        const value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
+        const valuePath = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
 
         const dateTimePicker = new DateTimePicker({
-            value: `path : '${value}', type : 'sap.ui.model.odata.type.DateTimeOffset'`
+            dateValue: {
+                path: valuePath,
+                type: "sap.ui.model.odata.type.DateTimeOffset"
+            }
         });
 
         dateTimePicker.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));
@@ -326,26 +343,34 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
 
     private addInput(property: IEntityType, keyField: boolean) {
         const valueHelp = this.entry.getValueHelp(property.propertyName);
-        let value = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
+        const valuePath = this.getModelName() ? `${this.getModelName()}>${property.propertyName}` : property.propertyName;
+        const inputValue: PropertyBindingInfo = {
+            path: valuePath
+        };
 
         if (this.numberTypes.includes(property.propertyType)) {
-            value = `path : '${value}', type : 'sap.ui.model.odata.type.${property.propertyType.slice(4)}'`;
+            inputValue.type = `sap.ui.model.odata.type.${property.propertyType.slice(4)}`;
 
             switch (property.propertyType) {
                 case "Edm.Decimal":
                     if (property.precision && property.scale) {
-                        value = value + `, constraints : {precision : ${property.precision}, scale : ${property.scale}}`;
+                        inputValue.constraints = {
+                            precision: property.precision,
+                            scale: property.scale
+                        };
                     }
                     break;
                 default:
                     const groupingEnabled = property.propertyType === "Edm.Double";
-                    value = value + `, formatOptions : {groupingEnabled : ${groupingEnabled}}`;
+                    inputValue.formatOptions = {
+                        groupingEnabled: groupingEnabled
+                    };
                     break;
             }
         }
 
         const input = new Input({
-            value: `{${value}}`
+            value: inputValue
         });
 
         input.addCustomData(new CustomData({ key: "UI5AntaresStandardControlName", value: property.propertyName }));

@@ -205,6 +205,13 @@ export default class ValidationLogicCL extends BaseObject {
             return;
         }
 
+        const correctedDate = new Date(correctedValues.originalValue);
+
+        if (!isNaN(correctedDate.getTime())) {
+            correctedValues.originalValue = correctedDate;
+            return;
+        }
+
         this.showErrorMessageBox();
         throw new Error(`Invalid date for property: ${this.propertyName}`);
     }
