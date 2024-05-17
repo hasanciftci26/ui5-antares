@@ -20,6 +20,12 @@ import FilterBar, { FilterBar$SearchEvent } from "sap/ui/comp/filterbar/FilterBa
 import FilterGroupItem from "sap/ui/comp/filterbar/FilterGroupItem";
 import Control from "sap/ui/core/Control";
 import SearchField from "sap/m/SearchField";
+import { IEntityType } from "ui5/antares/types/entity/type";
+import DatePicker from "sap/m/DatePicker";
+import DateTimePicker from "sap/m/DateTimePicker";
+import CheckBox from "sap/m/CheckBox";
+import JSONModel from "sap/ui/model/json/JSONModel";
+import { PropertyBindingInfo } from "sap/ui/base/ManagedObject";
 
 /**
  * @namespace ui5.antares.ui
@@ -30,14 +36,22 @@ export default class ValueHelpCL extends ModelCL {
     private entityPath: string;
     private valueHelpProperty: string;
     private readonlyProperties: string[];
+    private excludedFilterProperties: string[];
     private title: string;
     private searchPlaceholder: string;
     private namingStrategy: NamingStrategies;
     private resourceBundlePrefix: string;
+    private useMetadataLabels: boolean;
     private sourceControl: Input;
     private valueHelpDialog: ValueHelpDialog;
     private searchField: SearchField;
     private filterBar: FilterBar;
+    private entityTypeProperties: IEntityType[];
+    private readonly numberTypes: string[] = [
+        "Edm.Decimal", "Edm.Double", "Edm.Int16", "Edm.Int32", "Edm.Int64"
+    ];
+    private filterModelName: string;
+    private filterModel: JSONModel;
 
     constructor(controller: Controller | UIComponent, settings: IValueHelpSettings, modelName?: string) {
         super(controller, modelName);
@@ -48,8 +62,11 @@ export default class ValueHelpCL extends ModelCL {
         this.title = settings.title || `${this.valueHelpEntity}`;
         this.searchPlaceholder = settings.searchPlaceholder || `Search ${this.valueHelpEntity}`;
         this.readonlyProperties = settings.readonlyProperties || [];
+        this.excludedFilterProperties = settings.excludedFilterProperties || [];
         this.namingStrategy = settings.namingStrategy || NamingStrategies.CAMEL_CASE;
         this.resourceBundlePrefix = settings.resourceBundlePrefix || "antaresVH";
+        this.useMetadataLabels = settings.useMetadataLabels === undefined ? false : settings.useMetadataLabels;
+        this.filterModelName = settings.filterModelName || "UI5AntaresVHFilterModel";
     }
 
     public openValueHelpDialog(event: Input$ValueHelpRequestEvent) {
@@ -64,6 +81,8 @@ export default class ValueHelpCL extends ModelCL {
     }
 
     private async getValueHelpDialog(): Promise<ValueHelpDialog> {
+        const entity = new EntityCL(this.getSourceController(), this.valueHelpEntity, this.resourceBundlePrefix, this.namingStrategy, this.getModelName());
+
         this.valueHelpDialog = new ValueHelpDialog({
             title: this.title,
             supportRanges: false,
@@ -74,6 +93,7 @@ export default class ValueHelpCL extends ModelCL {
             key: this.valueHelpProperty
         });
 
+        this.entityTypeProperties = await entity.getEntityTypeProperties();
         this.addFilterBar(this.valueHelpDialog);
         this.addSearchField(this.valueHelpDialog);
         const table = await this.valueHelpDialog.getTableAsync();
@@ -109,47 +129,157 @@ export default class ValueHelpCL extends ModelCL {
     }
 
     private addFilterBar(valueHelpDialog: ValueHelpDialog) {
+        const filterGroupItems = this.getFilterGroupItems();
+
         this.filterBar = new FilterBar({
             advancedMode: true,
             isRunningInValueHelpDialog: true,
             search: this.onFilterBarSearch.bind(this),
-            filterGroupItems: this.getFilterGroupItems()
+            filterGroupItems: filterGroupItems
         });
 
+        this.createFilterModel();
+        this.filterBar.setModel(this.filterModel, this.filterModelName);
         valueHelpDialog.setFilterBar(this.filterBar);
     }
 
     private getFilterGroupItems(): FilterGroupItem[] {
         const entity = new EntityCL(this.getSourceController(), this.valueHelpEntity, this.resourceBundlePrefix, this.namingStrategy, this.getModelName());
+        const keyProperty = this.entityTypeProperties.find(prop => prop.propertyName === this.valueHelpProperty);
+
+        if (!keyProperty) {
+            throw new Error(`Property ${this.valueHelpProperty} does not exist on entity ${this.valueHelpEntity}!`);
+        }
+
+        let keyPropertyLabel = entity.getEntityTypePropLabel(this.valueHelpProperty);
+
+        if (this.useMetadataLabels) {
+            keyPropertyLabel = keyProperty.annotationLabel || entity.getEntityTypePropLabel(this.valueHelpProperty);
+        }
+
         const groupItems: FilterGroupItem[] = [new FilterGroupItem({
             groupName: "__$INTERNAL$",
             name: this.valueHelpProperty,
-            label: entity.getEntityTypePropLabel(this.valueHelpProperty),
+            label: keyPropertyLabel,
             visibleInFilterBar: true,
-            control: new Input({
-                name: this.valueHelpProperty,
-                submit: () => {
-                    this.filterBar.search();
-                }
-            })
+            control: this.getFilterControl(keyProperty)
         })];
 
-        this.readonlyProperties.forEach((property) => {
+        for (const property of this.readonlyProperties) {
+            const readonlyProperty = this.entityTypeProperties.find(prop => prop.propertyName === property);
+
+            if (!readonlyProperty) {
+                throw new Error(`Property ${property} does not exist on entity ${this.valueHelpEntity}!`);
+            }
+
+            if (this.excludedFilterProperties.includes(property)) {
+                continue;
+            }
+
+            let readonlyPropertyLabel = entity.getEntityTypePropLabel(property);
+
+            if (this.useMetadataLabels) {
+                readonlyPropertyLabel = readonlyProperty.annotationLabel || entity.getEntityTypePropLabel(property);
+            }
+
             groupItems.push(new FilterGroupItem({
                 groupName: "__$INTERNAL$",
                 name: property,
-                label: entity.getEntityTypePropLabel(property),
+                label: readonlyPropertyLabel,
                 visibleInFilterBar: true,
-                control: new Input({
-                    name: property,
-                    submit: () => {
-                        this.filterBar.search();
-                    }
-                })
+                control: this.getFilterControl(readonlyProperty)
             }));
-        });
+        }
 
         return groupItems;
+    }
+
+    private getFilterControl(property: IEntityType): Control {
+        switch (property.propertyType) {
+            case "Edm.DateTime":
+                return this.getDatePickerControl(property);
+            case "Edm.DateTimeOffset":
+                return this.getDateTimePickerControl(property);
+            case "Edm.Boolean":
+                return this.getCheckBoxControl(property);
+            default:
+                return this.getInputControl(property);
+        }
+    }
+
+    private getInputControl(property: IEntityType): Input {
+        const inputValue: PropertyBindingInfo = {
+            path: `${this.filterModelName}>/${property.propertyName}`
+        };
+
+        if (this.numberTypes.includes(property.propertyType)) {
+            inputValue.type = `sap.ui.model.odata.type.${property.propertyType.slice(4)}`;
+
+            switch (property.propertyType) {
+                case "Edm.Decimal":
+                    if (property.precision && property.scale) {
+                        inputValue.constraints = {
+                            precision: property.precision,
+                            scale: property.scale
+                        };
+                    }
+                    break;
+                default:
+                    const groupingEnabled = property.propertyType === "Edm.Double";
+                    inputValue.formatOptions = {
+                        groupingEnabled: groupingEnabled
+                    };
+                    break;
+            }
+        }
+
+        const input = new Input({
+            name: property.propertyName,
+            value: inputValue,
+            submit: () => {
+                this.filterBar.search();
+            }
+        });
+
+        return input;
+    }
+
+    private getDatePickerControl(property: IEntityType): DatePicker {
+        const datePicker = new DatePicker({
+            name: property.propertyName,
+            dateValue: {
+                path: `${this.filterModelName}>/${property.propertyName}`,
+                constraints: {
+                    displayFormat: "Date"
+                },
+                type: "sap.ui.model.odata.type.DateTime"
+            }
+        });
+
+        return datePicker;
+    }
+
+    private getDateTimePickerControl(property: IEntityType): DateTimePicker {
+        const dateTimePicker = new DateTimePicker({
+            name: property.propertyName,
+            dateValue: {
+                path: `${this.filterModelName}>/${property.propertyName}`,
+                type: "sap.ui.model.odata.type.DateTimeOffset"
+            }
+        });
+
+        return dateTimePicker;
+    }
+
+    private getCheckBoxControl(property: IEntityType): CheckBox {
+        const checkbox = new CheckBox({
+            name: property.propertyName,
+            selected: {
+                path: `${this.filterModelName}>/${property.propertyName}`
+            }
+        });
+
+        return checkbox;
     }
 
     private bindUITable(table: UITable, valueHelpDialog: ValueHelpDialog) {
@@ -170,23 +300,47 @@ export default class ValueHelpCL extends ModelCL {
 
     private addUITableColumns(table: UITable) {
         const entity = new EntityCL(this.getSourceController(), this.valueHelpEntity, this.resourceBundlePrefix, this.namingStrategy, this.getModelName());
+        const keyProperty = this.entityTypeProperties.find(prop => prop.propertyName === this.valueHelpProperty);
+
+        if (!keyProperty) {
+            throw new Error(`Property ${this.valueHelpProperty} does not exist on entity ${this.valueHelpEntity}!`);
+        }
+
+        let keyPropertyLabel = entity.getEntityTypePropLabel(this.valueHelpProperty);
+
+        if (this.useMetadataLabels) {
+            keyPropertyLabel = keyProperty.annotationLabel || entity.getEntityTypePropLabel(this.valueHelpProperty);
+        }
+
         const keyPropertyColumn = new UIColumn({
-            label: new Label({ text: entity.getEntityTypePropLabel(this.valueHelpProperty) }),
+            label: new Label({ text: keyPropertyLabel }),
             template: new Text({ text: `{${this.valueHelpProperty}}` })
         });
 
         keyPropertyColumn.data({ fieldName: this.valueHelpProperty });
         table.addColumn(keyPropertyColumn);
 
-        this.readonlyProperties.forEach((property) => {
+        for (const property of this.readonlyProperties) {
+            const readonlyProperty = this.entityTypeProperties.find(prop => prop.propertyName === property);
+
+            if (!readonlyProperty) {
+                throw new Error(`Property ${property} does not exist on entity ${this.valueHelpEntity}!`);
+            }
+
+            let readonlyPropertyLabel = entity.getEntityTypePropLabel(property);
+
+            if (this.useMetadataLabels) {
+                readonlyPropertyLabel = readonlyProperty.annotationLabel || entity.getEntityTypePropLabel(property);
+            }
+
             const readonlyColumn = new UIColumn({
-                label: new Label({ text: entity.getEntityTypePropLabel(property) }),
+                label: new Label({ text: readonlyPropertyLabel }),
                 template: new Text({ text: `{${property}}` })
             });
 
             readonlyColumn.data({ fieldName: property });
             table.addColumn(readonlyColumn);
-        });
+        }
     }
 
     private bindTable(table: Table, valueHelpDialog: ValueHelpDialog) {
@@ -223,39 +377,75 @@ export default class ValueHelpCL extends ModelCL {
 
     private addTableColumns(table: Table) {
         const entity = new EntityCL(this.getSourceController(), this.valueHelpEntity, this.resourceBundlePrefix, this.namingStrategy, this.getModelName());
-        table.addColumn(new Column({ header: new Label({ text: entity.getEntityTypePropLabel(this.valueHelpProperty) }) }));
+        const keyProperty = this.entityTypeProperties.find(prop => prop.propertyName === this.valueHelpProperty);
 
-        this.readonlyProperties.forEach((property) => {
-            table.addColumn(new Column({ header: new Label({ text: entity.getEntityTypePropLabel(property) }) }));
-        });
+        if (!keyProperty) {
+            throw new Error(`Property ${this.valueHelpProperty} does not exist on entity ${this.valueHelpEntity}!`);
+        }
+
+        let keyPropertyLabel = entity.getEntityTypePropLabel(this.valueHelpProperty);
+
+        if (this.useMetadataLabels) {
+            keyPropertyLabel = keyProperty.annotationLabel || entity.getEntityTypePropLabel(this.valueHelpProperty);
+        }
+
+        table.addColumn(new Column({ header: new Label({ text: keyPropertyLabel }) }));
+
+        for (const property of this.readonlyProperties) {
+            const readonlyProperty = this.entityTypeProperties.find(prop => prop.propertyName === property);
+
+            if (!readonlyProperty) {
+                throw new Error(`Property ${property} does not exist on entity ${this.valueHelpEntity}!`);
+            }
+
+            let readonlyPropertyLabel = entity.getEntityTypePropLabel(property);
+
+            if (this.useMetadataLabels) {
+                readonlyPropertyLabel = readonlyProperty.annotationLabel || entity.getEntityTypePropLabel(property);
+            }
+
+            table.addColumn(new Column({ header: new Label({ text: readonlyPropertyLabel }) }));
+        }
     }
 
     private async onFilterBarSearch(event: FilterBar$SearchEvent) {
-        const selectionSet = event.getParameter("selectionSet");
-        const searchQuery = this.searchField.getValue();
+        const filterData = this.filterModel.getData() as object;
+        const filterProperties = Object.keys(filterData).filter(key => key !== "VHSearchFieldValue");
+        const filters: Filter[] = [];
 
-        if (!selectionSet) {
-            return;
-        }
+        for (const property of filterProperties) {
+            const filterValue = filterData[property as keyof typeof filterData];
 
-        const defaultFilters: Filter[] = [];
-
-        const filters = selectionSet.reduce(function (result: Filter[], control: Control) {
-            if ((control as Input).getValue()) {
-                result.push(new Filter({
-                    path: (control as Input).getName(),
-                    operator: FilterOperator.Contains,
-                    value1: (control as Input).getValue()
-                }));
+            if (filterValue === undefined || filterValue === null || filterValue === "") {
+                continue;
             }
 
-            return result;
-        }, defaultFilters);
+            const entityTypeProperty = this.entityTypeProperties.find(prop => prop.propertyName === property);
 
-        filters.push(new Filter({
-            filters: this.getSearchFieldFilters(searchQuery),
-            and: false
-        }));
+            if (entityTypeProperty?.propertyType === "Edm.String") {
+                filters.push(new Filter({
+                    path: property,
+                    operator: FilterOperator.Contains,
+                    caseSensitive: false,
+                    value1: filterValue
+                }));
+            } else {
+                filters.push(new Filter({
+                    path: property,
+                    operator: FilterOperator.EQ,
+                    value1: filterValue
+                }));
+            }
+        }
+
+        const searchFieldFilters = this.getSearchFieldFilters();
+
+        if (searchFieldFilters.length) {
+            filters.push(new Filter({
+                filters: this.getSearchFieldFilters(),
+                and: false
+            }));
+        }
 
         const table = await this.valueHelpDialog.getTableAsync();
 
@@ -281,21 +471,62 @@ export default class ValueHelpCL extends ModelCL {
     }
 
     private addSearchField(valueHelpDialog: ValueHelpDialog) {
-        this.searchField = new SearchField({ placeholder: this.searchPlaceholder });
+        this.searchField = new SearchField({
+            placeholder: this.searchPlaceholder,
+            value: {
+                path: `${this.filterModelName}>/VHSearchFieldValue`
+            }
+        });
         const filterbar = valueHelpDialog.getFilterBar();
+
         filterbar.setBasicSearch(this.searchField);
         this.searchField.attachSearch(() => {
             filterbar.search();
         });
     }
 
-    private getSearchFieldFilters(searchQuery: string): Filter[] {
-        const filters: Filter[] = [new Filter(this.valueHelpProperty, FilterOperator.Contains, searchQuery)];
+    private getSearchFieldFilters(): Filter[] {
+        const searchFieldValue: string | undefined = this.filterModel.getProperty("/VHSearchFieldValue");
+        const filters: Filter[] = [];
+        const keyProperty = this.entityTypeProperties.find(prop => prop.propertyName === this.valueHelpProperty);
 
-        this.readonlyProperties.forEach((property) => {
-            filters.push(new Filter(property, FilterOperator.Contains, searchQuery));
-        });
+        if (!searchFieldValue) {
+            return filters;
+        }
+
+        if (keyProperty?.propertyType === "Edm.String") {
+            filters.push(new Filter({
+                path: this.valueHelpProperty,
+                operator: FilterOperator.Contains,
+                value1: searchFieldValue,
+                caseSensitive: false
+            }));
+        }
+
+        for (const property of this.readonlyProperties) {
+            if (this.excludedFilterProperties.includes(property)) {
+                continue;
+            }
+
+            const readonlyProperty = this.entityTypeProperties.find(prop => prop.propertyName === property);
+
+            if (readonlyProperty?.propertyType === "Edm.String") {
+                filters.push(new Filter({
+                    path: property,
+                    operator: FilterOperator.Contains,
+                    value1: searchFieldValue,
+                    caseSensitive: false
+                }));
+            }
+
+        }
 
         return filters;
+    }
+
+    private createFilterModel() {
+        const filterModel = new JSONModel();
+        filterModel.setDefaultBindingMode("TwoWay");
+        this.filterModel = filterModel;
     }
 }

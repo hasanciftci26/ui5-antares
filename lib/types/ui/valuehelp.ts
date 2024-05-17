@@ -5,8 +5,11 @@ export interface IValueHelpSettings {
     valueHelpEntity: string;
     valueHelpProperty: string;
     readonlyProperties?: string[];
+    excludedFilterProperties?: string[];
     title?: string;
     searchPlaceholder?: string;
     namingStrategy?: NamingStrategies;
     resourceBundlePrefix?: string;
+    useMetadataLabels?: boolean;
+    filterModelName?: string;
 };
