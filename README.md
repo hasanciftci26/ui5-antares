@@ -302,7 +302,7 @@ You must initialize an object from EntryCreateCL in order to use it.
 
 | Parameter  | Type                            | Mandatory | Default Value | Description                                                                                                            | 
 | :--------- | :------------------------------ | :-------- | :------------ | :--------------------------------------------------------------------------------------------------------------------- |
-| controller | [sap.ui.core.mvc.Controller][1] | Yes       |               | The controller object (generally `this`)                                                                               |
+| controller | [sap.ui.core.mvc.Controller][1] | Yes       |               | The controller object (usually `this`)                                                                                 |
 | entityPath | string                          | Yes       |               | The name of the **EntitySet**. It can start with a **"/"**                                                             |
 | modelName? | string                          | No        | undefined     | The name of the OData V2 model which can be found on the manifest.json file. **Do not specify** if the model name = "" |
 
@@ -313,7 +313,6 @@ You must initialize an object from EntryCreateCL in order to use it.
 Also, it is used as the returning type of the **getResponse(): EntityT** method of the `ResponseCL` class whose object is passed as a parameter into the function attached by the **attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object)** method.
 
 ```ts
-...
 import Controller from "sap.ui.core.mvc.Controller";
 import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
 
