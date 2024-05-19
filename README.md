@@ -517,6 +517,8 @@ sap.ui.define([
 
 The generated form with default values will more or less look like the following. It will vary depending on the configurations and the `EntityType` properties of the `EntitySet`.
 
+![Generated Form](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/create_new_entry_default.png?raw=true)
+
 ### Label Generation
 
 ### Form Type
