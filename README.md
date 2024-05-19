@@ -46,6 +46,7 @@ ui5 -v
     - [Supported SAPUI5 Versions](#supported-sapui5-versions)
   - [Installation](#installation)
     - [TypeScript](#typescript)
+    - [Approuter](#approuter)
   - [Local Start](#local-start)
     - [Known Issues](#known-issues)
 
@@ -84,9 +85,9 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 
 To install the library, run the following command in the directory where the **package.json** file of your SAPUI5/Fiori Elements application is located. It is usually located in the root directory of a SAPUI5/Fiori Elements application.
 
-**Note:** In the command below, replace `version` with the UI5 Antares version that corresponds to the version of your SAPUI5/Fiori Elements application. For example, applications running with **SAPUI5 version 1.123.1** should run the following command: **npm install ui5-antares@1.123.1001**
+> **Note:** In the command below, replace `version` with the UI5 Antares version that corresponds to the version of your SAPUI5/Fiori Elements application. For example, applications running with **SAPUI5 version 1.123.1** should run the following command: **npm install ui5-antares@1.123.1001**
 
-**Note:** If you are using UI5 Tooling v3, you don't need to add ui5-antares to the `ui5.dependencies` in your application's **package.json** file.
+> **Note:** If you are using UI5 Tooling v3, you don't need to add ui5-antares to the `ui5.dependencies` in your application's **package.json** file.
 
 ```sh
 npm install ui5-antares@version
@@ -174,6 +175,52 @@ If you are developing your SAPUI5/Fiori Elements application with TypeScript, yo
 
 ![tsconfig.json](https://github.com/hasanciftci26/ui5-antares/blob/media/installation/tsconfig.png?raw=true)
 
+### Approuter
+
+If you are deploying your application with a Standalone or Managed Approuter, you must add the route below (first route) to your application's **xs-app.json** file.
+
+> **Note:** Standalone Approuter also has a **xs-app.json** file, but this configuration should be done on the SAPUI5/Fiori Elements application's **xs-app.json** file not on the Standalone Approuter's **xs-app.json** file.
+
+This route must be added before the route (automatically added by the application generator) with **"source": "^/resources/(.*)$"** and **"destination": "ui5"** to load the UI5 Antares from the HTML5 Application Repository instead of the UI5 CDN. 
+
+> The reason for this configuration is that both standard UI5 libraries and UI5 Antares use the **/resources** path to load the files.
+
+```json
+{
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "route",
+  "routes": [
+    ...
+    {
+      "source": "^/resources/ui5/antares/(.*)$",
+      "target": "/resources/ui5/antares/$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/resources/(.*)$",
+      "target": "/resources/$1",
+      "authenticationType": "none",
+      "destination": "ui5"
+    },
+    {
+      "source": "^/test-resources/(.*)$",
+      "target": "/test-resources/$1",
+      "authenticationType": "none",
+      "destination": "ui5"
+    },
+    {
+      "source": "^(.*)$",
+      "target": "$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa"
+    }    
+  ]
+}
+```
+
+![xs-app.json](https://github.com/hasanciftci26/ui5-antares/blob/media/installation/xs_app_json.png?raw=true)
+
 ## Local Start
 
 If you start your application with one of the following commands, UI5 Antares will be loaded automatically, since it's a dependency of your application.
@@ -206,7 +253,7 @@ Modify the `src` attribute of the `sap-ui-bootstrap` script in your application'
 
 ![Load from the CDN](https://github.com/hasanciftci26/ui5-antares/blob/media/local_run/proxy_issue_index_cdn.png?raw=true)
 
-**Note:** If you deploy your application to an ABAP repository, don't forget to change the `src` attribute to **"resources/sap-ui-core.js"** because the server may not have internet access. With this change, the standard UI5 library will be loaded directly from the server instead of from the CDN.
+> **Note:** If you deploy your application to an ABAP repository, don't forget to change the `src` attribute to **"resources/sap-ui-core.js"** because the server may not have internet access. With this change, the standard UI5 library will be loaded directly from the server instead of from the CDN.
 
 #### Solution 2
 
@@ -218,4 +265,4 @@ Modify the `src` attribute of the `sap-ui-bootstrap` script in your application'
 
 ![Load from the different path](https://github.com/hasanciftci26/ui5-antares/blob/media/local_run/proxy_issue_index_path.png?raw=true)
 
-**Note:** Do not forget to change the `src` attribute back to **"resources/sap-ui-core.js"** or **"https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"** before deploying your application.
+> **Note:** Do not forget to change the `src` attribute back to **"resources/sap-ui-core.js"** or **"https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"** before deploying your application.
