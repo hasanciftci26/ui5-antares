@@ -228,13 +228,13 @@ This route must be added before the route (automatically added by the applicatio
 
 If you start your application with one of the following commands, UI5 Antares will be loaded automatically, since it's a dependency of your application.
 
-**@ui5/cli**
+[@ui5/cli](https://www.npmjs.com/package/@ui5/cli)
 
 ```sh
 ui5 serve
 ```
 
-**@sap/ux-ui5-tooling**
+[@sap/ux-ui5-tooling](https://www.npmjs.com/package/@sap/ux-ui5-tooling)
 
 ```sh
 fiori run
@@ -242,7 +242,7 @@ fiori run
 
 ### Known Issues
 
-If you load the standard UI5 library on the **/resources** path using the `fiori-tools-proxy` middleware of the **@sap/ux-ui5-tooling** package while starting your application as below, UI5 Antares will not be loaded because it also uses the **/resources** path. 
+If you load the standard UI5 library on the **/resources** path using the `fiori-tools-proxy` middleware of the [@sap/ux-ui5-tooling](https://www.npmjs.com/package/@sap/ux-ui5-tooling) package while starting your application as below, UI5 Antares will not be loaded because it also uses the **/resources** path. 
 
 `fiori-tools-proxy` redirects all requests coming from the **/resources** path to the url defined in the `configuration.ui5.url` property.
 
