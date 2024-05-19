@@ -313,7 +313,7 @@ You must initialize an object from EntryCreateCL in order to use it.
 Also, it is used as the returning type of the **getResponse(): EntityT** method of the `ResponseCL` class whose object is passed as a parameter into the function attached by the **attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object)** method.
 
 ```ts
-import Controller from "sap.ui.core.mvc.Controller";
+import Controller from "sap/ui/core/mvc/Controller";
 import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
 
 /**
