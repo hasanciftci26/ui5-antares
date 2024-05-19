@@ -434,6 +434,8 @@ By default, random UUID value is generated for the **key** properties with **Edm
 
 <br/>
 
+**TypeScript**
+
 ```ts
 import Controller from "sap/ui/core/mvc/Controller";
 import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
