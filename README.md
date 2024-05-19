@@ -49,6 +49,9 @@ ui5 -v
     - [Approuter](#approuter)
   - [Local Start](#local-start)
     - [Known Issues](#known-issues)
+  - [Entry Create](#entry-create)
+    - [Use Case](#use-case)
+    - [Constructor](#constructor)
 
 ## Versioning
 
@@ -58,7 +61,7 @@ UI5 Antares and SAPUI5 versions are directly related. The SAPUI5 version used ca
 
 You can see examples of versioning below.
 
-**Note**: The versions shown in the example below may not exist.
+> **Note:** The versions shown in the example below may not exist.
 
 | UI5 Antares Version | SAPUI5 Version | Description                               |
 | :------------------ | :------------- | :---------------------------------------- |
@@ -266,3 +269,114 @@ Modify the `src` attribute of the `sap-ui-bootstrap` script in your application'
 ![Load from the different path](https://github.com/hasanciftci26/ui5-antares/blob/media/local_run/proxy_issue_index_path.png?raw=true)
 
 > **Note:** Do not forget to change the `src` attribute back to **"resources/sap-ui-core.js"** or **"https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"** before deploying your application.
+
+## Entry Create
+
+Entry Create (EntryCreateCL) is a class that manages the CREATE (POST) operation through the OData V2 model. It basically avoids developers having to deal with fragments, user input validations, Value Help creations while working on custom SAPUI5 applications or Fiori Elements extensions. Below you can see the features that Entry Create has.
+
+**Features:**
+- sap.m.Dialog generation with a SmartForm, SimpleForm or Custom content
+- User input validation via ValidationLogicCL class
+- Value Help Dialog generation via ValueHelpCL class
+- Property sorting, readonly properties, UUID generation for the properties with Edm.Guid type
+- Label generation for the SmartForm, SimpleForm elements
+- createEntry(), submitChanges(), and resetChanges() handling based on the user interaction
+- Call a fragment and bind the context in case you do not want to use the auto-generated dialog
+
+### Use Case
+
+Let's say that you have an EntitySet named `Products` and you want to let the end user to create an entity on a pop-up screen using the OData V2 service in your custom SAPUI5 application. Here are the steps you need to follow.
+
+1) You need to create a **.fragment.xml** file that contains a Dialog with a form content (Simple, Smart etc.) and call it from the controller or generate the dialog directly on the controller
+2) You have to write tons of Value Help code if you don't use [sap.ui.comp.smartfield.SmartField](https://sapui5.hana.ondemand.com/#/api/sap.ui.comp.smartfield.SmartField) with the OData Annotations
+3) You need to validate the user input, such as checking mandatory fields and ensuring that the values entered match your business logic
+4) You need to create a transient entity (createEntry) and either submit it or reset it based on the user interaction
+
+[EntryCreateCL](#entry-create) class basically handles all of the steps defined above.
+
+### Constructor
+
+[1]: https://sapui5.hana.ondemand.com/#/api/sap.ui.core.mvc.Controller
+
+You must initialize an object from EntryCreateCL in order to use it.
+
+| Parameter  | Type                            | Mandatory | Default Value | Description                                                                                                            | 
+| :--------- | :------------------------------ | :-------- | :------------ | :--------------------------------------------------------------------------------------------------------------------- |
+| controller | [sap.ui.core.mvc.Controller][1] | Yes       |               | The controller object (generally `this`)                                                                               |
+| entityPath | string                          | Yes       |               | The name of the **EntitySet**. It can start with a **"/"**                                                             |
+| modelName? | string                          | No        | undefined     | The name of the OData V2 model which can be found on the manifest.json file. **Do not specify** if the model name = "" |
+
+**TypeScript**
+
+**EntryCreateCL\<EntityT\>** is a generic class and can be initialized with a type that contains the properties of the EntitySet that is used as a parameter on the class constructor. `EntityT` is used as the type of the `data?` parameter of the **createNewEntry(data?: EntityT)** method. 
+
+Also, it is used as the returning type of the **getResponse(): EntityT** method of the `ResponseCL` class whose object is passed as a parameter into the function attached by the **attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object)** method.
+
+```ts
+...
+import Controller from "sap.ui.core.mvc.Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    // Initialize without a type
+    const entry = new EntryCreateCL(this, "Products"); 
+  }
+
+  public async onCreateCategory() {
+    // Initialize with a type
+    const entry = new EntryCreateCL<ICategory>(this, "Categories"); 
+  }
+
+  public async onCreateCustomer() {
+    // Initialize with a model name
+    const entry = new EntryCreateCL(this, "Customers", "myODataModelName"); 
+  }
+}
+
+interface ICategory {
+  ID?: string;
+  name: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function(Controller, EntryCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function() {
+
+        },
+
+        onCreateProduct: async function() {
+          // Initialize
+          const entry = new EntryCreateCL(this, "Products"); 
+        },
+
+        onCreateCategory: async function() {
+          // Initialize with a model name
+          const entry = new EntryCreateCL(this, "Categories", "myODataModelName");
+        }
+      });
+
+    });
+```
