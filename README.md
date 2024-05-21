@@ -1630,14 +1630,14 @@ sap.ui.define([
 
 > **Important:** Please note that if a random UUID is generated for a property and marked as visible, this field **cannot be edited** by the end user.
 
-| Name                        | Description for **setGenerateRandomGuid**                                                         |
+| Name                        | Description for `setGenerateRandomGuid`                                                           |
 | :-------------------------- | :------------------------------------------------------------------------------------------------ |
 | GuidStrategies.ALL          | Generate random UUID values for all the properties with `Edm.Guid` type                           |
 | GuidStrategies.ONLY_KEY     | Generate random UUID values only for the **key** properties with `Edm.Guid` type                  |
 | GuidStrategies.ONLY_NON_KEY | Generate random UUID values only for the properties that are **not key** and have `Edm.Guid` type |
 | GuidStrategies.NONE         | No random UUID generation                                                                         |
 
-| Name                        | Description for **setDisplayGuidProperties**                                               |
+| Name                        | Description for `setDisplayGuidProperties`                                                 |
 | :-------------------------- | :----------------------------------------------------------------------------------------- |
 | GuidStrategies.ALL          | The end user can display all the properties with `Edm.Guid` type                           |
 | GuidStrategies.ONLY_KEY     | The end user can display only the **key** properties with `Edm.Guid` type                  |
