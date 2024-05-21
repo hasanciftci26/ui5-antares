@@ -53,7 +53,12 @@ ui5 -v
     - [Use Case](#use-case)
     - [Constructor](#constructor)
     - [Create New Entry](#create-new-entry)
+      - [Method Parameters](#method-parameters)
+      - [Default Values](#default-values)
     - [Label Generation](#label-generation)
+      - [Resource Model](#resource-model-i18n)
+      - [Label Generation From The Technical Names](#label-generation-from-the-technical-names)
+      - [Use Metadata Labels](#use-metadata-labels)
     - [Form Type](#form-type)
     - [Form Title](#form-title)
     - [Begin Button Text](#begin-button-text)
@@ -522,6 +527,220 @@ The generated form with default values will more or less look like the following
 ![Generated Form](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/create_new_entry_default.png?raw=true)
 
 ### Label Generation
+
+By default, the [Entry Create](#entry-create) class generates labels for form elements within the auto-generated SmartForm/SimpleForm. Here are the steps that will be followed during the creation of the labels.
+
+> The Resource Model has first priority if the metadata labels are not used when creating the labels.
+
+#### Resource Model (i18n)
+
+If the application has a [Resource Model](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.resource.ResourceModel) named `i18n` in the application's **manifest.json** file, the [Entry Create](#entry-create) class looks for the texts for each property of the `EntityType` by assuming that the **key** of the i18n text is written in the format below.
+
+> **Default format of the i18n keys:** antares + [entityPath](#constructor) + propertyName
+
+Here `antares` is a default prefix and can be modified using the [setResourceBundlePrefix()](#resource-bundle-prefix) method. `entityPath` comes from the class constructor and the `propertyName` is the technical name of an `EntityType` property in the OData V2 metadata.
+
+**manifest.json:**
+
+```json
+{
+  "_version": "1.59.0",
+  "sap.app": {
+    ...
+    "i18n": "path/to/i18n.properties"
+  },
+  ...
+  "sap.ui5": {
+    ...
+    "models": {
+      "i18n": {
+          "type": "sap.ui.model.resource.ResourceModel",
+          "settings": {
+              "bundleName": "your.apps.namespace.i18n.i18n"
+          }
+      }      
+    }
+  }
+}
+```
+
+**Sample**
+
+Let's say that you have an `EntitySet` named **Products** and its `EntityType` has the properties shown in the metadata below. Your application's `i18n.properties` file will be checked for the following keys.
+
+**i18n.properties**
+
+```properties
+antaresProductsID=Label of the ID property
+antaresProductsname=Label of the name property
+antaresProductsdescription=Label of the description property
+...
+```
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata">
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="OnlineShopping" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityContainer Name="EntityContainer" m:IsDefaultEntityContainer="true">
+                <EntitySet Name="Products" EntityType="OnlineShopping.Product"/>
+            </EntityContainer>
+            <EntityType Name="Product">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="name" Type="Edm.String" MaxLength="50"/>
+                <Property Name="description" Type="Edm.String" MaxLength="255"/>
+                <Property Name="brand" Type="Edm.String" MaxLength="50"/>
+                <Property Name="price" Type="Edm.Decimal" Precision="13" Scale="2" Nullable="false"/>
+                <Property Name="currency" Type="Edm.String" MaxLength="5" Nullable="false"/>
+                <Property Name="quantityInStock" Type="Edm.Int32"/>
+                <Property Name="categoryID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="supplierID" Type="Edm.Guid" Nullable="false"/>
+            </EntityType>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>
+```
+
+> If the [Resource Model](#resource-model-i18n) does not exist or the text cannot be found in the `i18n.properties` file, the [Label Generation From The Technical Names](#label-generation-from-the-technical-names) takes place.
+
+#### Label Generation From The Technical Names
+
+If no label could be generated from the [Resource Model](#resource-model-i18n), the [Entry Create](#entry-create) class tries to split the technical property names of the `Entity Type` into **human-readable** words.
+
+By default, it's assumed that the naming convention for the `EntityType` properties is **camelCase**. However, if you have used a different naming convention when creating the `EntityType` properties, [setNamingStrategy()](#naming-strategy) can be used to change the default naming convention.
+
+**Sample**
+
+Here are some samples of how property names are broken down into **human-readable** words in different naming strategies. 
+
+**camelCase**
+
+| Technical Name | Generated Label |
+| :------------- | :-------------- |
+| productID      | Product ID      |
+| firstName      | First Name      |
+| lastName       | Last Name       |
+
+**PascalCase**
+
+> Uid, Id and Url words are accepted as special words and converted to upper case after splitting.
+
+| Technical Name | Generated Label |
+| :------------- | :-------------- |
+| ProductId      | Product ID      |
+| FirstName      | First Name      |
+| LastName       | Last Name       |
+
+**kebab-case**
+
+| Technical Name | Generated Label |
+| :------------- | :-------------- |
+| product-id     | Product Id      |
+| first-name     | First Name      |
+| last-name      | Last Name       |
+
+**CONSTANT_CASE**
+
+| Technical Name | Generated Label |
+| :------------- | :-------------- |
+| PRODUCT_ID     | Product Id      |
+| FIRST_NAME     | First Name      |
+| LAST_NAME      | Last Name       |
+
+**snake_case**
+
+| Technical Name | Generated Label |
+| :------------- | :-------------- |
+| product_id     | Product Id      |
+| first_name     | First Name      |
+| last_name      | Last Name       |
+
+#### Use Metadata Labels
+
+If you have **com.sap.vocabularies.Common.v1.Label** annotation or **sap:label** extension for your `EntityType` properties in the OData V2 metadata, you can use them as labels for the auto-generated form elements.
+
+> If you set the value to **true** using the setter method and the labels could not be found in the metadata, [Entry Create](#entry-create) class generates the labels as described in [Label Generation](#label-generation).
+
+**Setter (setUseMetadataLabels)**
+
+| Parameter         | Type    | Mandatory | Default Value | Description                                                                                                           | 
+| :-----------------| :------ | :-------- | :------------ | :-------------------------------------------------------------------------------------------------------------------- |
+| useMetadataLabels | boolean | Yes       |               | If the value is **true**, OData V2 metadata labels will be used when creating labels for auto-generated form elements |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getUseMetadataLabels)**
+
+| Returns           | Type    | Description                                                                                        |
+| :---------------- | :------ | :------------------------------------------------------------------------------------------------- |
+| useMetadataLabels | boolean | Returns the value that was set using **setUseMetadataLabels()** method. Default value is **false** |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL(this, "Products");
+
+    // The OData V2 metadata labels will be used for the form elements.
+    entry.setUseMetadataLabels(true);
+
+    entry.createNewEntry(); 
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function(Controller, EntryCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function() {
+
+        },
+
+        onCreateProduct: async function() {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // The OData V2 metadata labels will be used for the form elements.
+          entry.setUseMetadataLabels(true);
+
+          entry.createNewEntry(); 
+        }
+      });
+
+    });
+```
+
+### Resource Bundle Prefix
+
+### Naming Strategy
 
 ### Form Type
 
