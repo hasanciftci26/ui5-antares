@@ -163,7 +163,7 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
                 const mappedKeys = entityTypeKeys.map(key => key.propertyName);
 
                 for (const property of entityTypeProperties) {
-                    if (mappedKeys.includes(property.propertyName)) {
+                    if (mappedKeys.includes(property.propertyName) || property.propertyType !== "Edm.Guid") {
                         continue;
                     }
 
