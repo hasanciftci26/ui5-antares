@@ -686,7 +686,7 @@ If you have **com.sap.vocabularies.Common.v1.Label** annotation or **sap:label**
 **Setter (setUseMetadataLabels)**
 
 | Parameter         | Type    | Mandatory | Description                                                                                                           | 
-| :-----------------| :------ | :-------- | :-------------------------------------------------------------------------------------------------------------------- |
+| :---------------- | :------ | :-------- | :-------------------------------------------------------------------------------------------------------------------- |
 | useMetadataLabels | boolean | Yes       | If the value is **true**, OData V2 metadata labels will be used when creating labels for auto-generated form elements |
 
 | Returns | Description |
@@ -766,7 +766,7 @@ To change the default resource bundle prefix that is used in the text lookup des
 **Setter (setResourceBundlePrefix)**
 
 | Parameter | Type   | Mandatory | Description                                                                     | 
-| :---------| :----- | :-------- | :------------------------------------------------------------------------------ |
+| :-------- | :----- | :-------- | :------------------------------------------------------------------------------ |
 | prefix    | string | Yes       | The prefix that is used for text lookup in the **i18n** file of the application |
 
 | Returns | Description |
@@ -871,7 +871,7 @@ To change the default naming strategy that is used in the label generation as de
 **Setter (setNamingStrategy)**
 
 | Parameter | Type                                       | Mandatory | Description                                           | 
-| :---------| :----------------------------------------- | :-------- | :---------------------------------------------------- |
+| :-------- | :----------------------------------------- | :-------- | :---------------------------------------------------- |
 | strategy  | [NamingStrategies](#namingstrategies-enum) | Yes       | The naming strategy that is used for label generation |
 
 | Returns | Description |
@@ -995,7 +995,7 @@ To change the default form type, **setFormType()** method can be used.
 **Setter (setFormType)**
 
 | Parameter | Type                         | Mandatory | Description                     | 
-| :---------| :--------------------------- | :-------- | :------------------------------ |
+| :-------- | :--------------------------- | :-------- | :------------------------------ |
 | formType  | [FormTypes](#formtypes-enum) | Yes       | The form type that is generated |
 
 | Returns | Description |
@@ -1091,7 +1091,7 @@ To modify the default form title, please utilize the **setFormTitle()** method.
 **Setter (setFormTitle)**
 
 | Parameter | Type   | Mandatory | Description                | 
-| :---------| :----- | :-------- | :------------------------- |
+| :-------- | :----- | :-------- | :------------------------- |
 | title     | string | Yes       | The generated form's title |
 
 | Returns | Description |
@@ -1175,7 +1175,7 @@ Upon pressing the `Begin Button` by the end user, the [Entry Create](#entry-crea
 **Setter (setBeginButtonText)**
 
 | Parameter | Type   | Mandatory | Description                            | 
-| :---------| :----- | :-------- | :------------------------------------- |
+| :-------- | :----- | :-------- | :------------------------------------- |
 | text      | string | Yes       | The text displayed on the begin button |
 
 | Returns | Description |
@@ -1259,7 +1259,7 @@ The default type used on the `Begin Button` is [ButtonType.Success][7]. To modif
 **Setter (setBeginButtonType)**
 
 | Parameter | Type            | Mandatory | Description                  | 
-| :---------| :-------------- | :-------- | :--------------------------- |
+| :-------- | :-------------- | :-------- | :--------------------------- |
 | type      | [ButtonType][7] | Yes       | The type of the begin button |
 
 | Returns | Description |
@@ -1345,7 +1345,7 @@ Upon pressing the `End Button` by the end user, the [Entry Create](#entry-create
 **Setter (setEndButtonText)**
 
 | Parameter | Type   | Mandatory | Description                          | 
-| :---------| :----- | :-------- | :----------------------------------- |
+| :-------- | :----- | :-------- | :----------------------------------- |
 | text      | string | Yes       | The text displayed on the end button |
 
 | Returns | Description |
@@ -1429,7 +1429,7 @@ The default type used on the `End Button` is [ButtonType.Negative][7]. To modify
 **Setter (setEndButtonType)**
 
 | Parameter | Type            | Mandatory | Description                | 
-| :---------| :-------------- | :-------- | :------------------------- |
+| :-------- | :-------------- | :-------- | :------------------------- |
 | type      | [ButtonType][7] | Yes       | The type of the end button |
 
 | Returns | Description |
@@ -1509,6 +1509,137 @@ sap.ui.define([
 ![End Button Type](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/end_button_type.png?raw=true)
 
 ### Properties with Edm.Guid Type
+
+By default, [Entry Create](#entry-create) class generates random UUID values for the **key** properties (with `Edm.Guid` type) of the `EntityType` and makes them invisible on the form to the end user.
+
+To modify the default random UUID generation behavior, please utilize the **setGenerateRandomGuid()** method.
+
+**Setter (setGenerateRandomGuid)**
+
+| Parameter | Type                                   | Mandatory | Description                         | 
+| :-------- | :------------------------------------- | :-------- | :---------------------------------- |
+| strategy  | [GuidStrategies](#guidstrategies-enum) | Yes       | The random UUID generation strategy |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getGenerateRandomGuid)**
+
+| Returns                                | Description                                                                                            |
+| :------------------------------------- | :----------------------------------------------------------------------------------------------------- |
+| [GuidStrategies](#guidstrategies-enum) | Returns the value that was set using **setGenerateRandomGuid()** method. Default value is **ONLY_KEY** |
+
+---
+
+To modify the default visibility behavior of the properties with `Edm.Guid` type, please utilize the **setDisplayGuidProperties()** method.
+
+**Setter (setDisplayGuidProperties)**
+
+| Parameter | Type                                   | Mandatory | Description                                                     | 
+| :-------- | :------------------------------------- | :-------- | :-------------------------------------------------------------- |
+| strategy  | [GuidStrategies](#guidstrategies-enum) | Yes       | The visibility strategy for the properties with `Edm.Guid` type |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getDisplayGuidProperties)**
+
+| Returns                                | Description                                                                                                   |
+| :------------------------------------- | :------------------------------------------------------------------------------------------------------------ |
+| [GuidStrategies](#guidstrategies-enum) | Returns the value that was set using **setDisplayGuidProperties()** method. Default value is **ONLY_NON_KEY** |
+
+**Sample**
+
+Let us consider the following scenario: You have an `EntitySet` named **Products** with `ID`, `categoryID`, and `supplierID`, all of which have the `Edm.Guid` type. You would like to allow the end user to view all `Edm.Guid` properties and have the library generate random UUID values only for the **non-key** properties.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import { GuidStrategies } from "ui5/antares/types/entry/enums"; // Import the GuidStrategies enum
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL(this, "Products");
+
+    // Let the end user to display all the properties with Edm.Guid type
+    entry.setDisplayGuidProperties(GuidStrategies.ALL);
+
+    // Have the library generate random UUID values only for the non-key properties
+    entry.setGenerateRandomGuid(GuidStrategies.ONLY_NON_KEY);
+
+    entry.createNewEntry(); 
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "ui5/antares/types/entry/enums" // Import the enums
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function(Controller, EntryCreateCL, EntryEnums) {
+      "use strict";
+
+      // Destructure the object to retrieve the GuidStrategies enum
+      const { GuidStrategies } = EntryEnums;
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function() {
+
+        },
+
+        onCreateProduct: async function() {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Let the end user to display all the properties with Edm.Guid type
+          entry.setDisplayGuidProperties(GuidStrategies.ALL);
+
+          // Have the library generate random UUID values only for the non-key properties
+          entry.setGenerateRandomGuid(GuidStrategies.ONLY_NON_KEY);
+
+          entry.createNewEntry(); 
+        }
+      });
+
+    });
+```
+
+#### GuidStrategies Enum
+
+> **Important:** Please note that if a random UUID is generated for a property and marked as visible, this field **cannot be edited** by the end user.
+
+| Name                        | Description for **setGenerateRandomGuid**                                                         |
+| :-------------------------- | :------------------------------------------------------------------------------------------------ |
+| GuidStrategies.ALL          | Generate random UUID values for all the properties with `Edm.Guid` type                           |
+| GuidStrategies.ONLY_KEY     | Generate random UUID values only for the **key** properties with `Edm.Guid` type                  |
+| GuidStrategies.ONLY_NON_KEY | Generate random UUID values only for the properties that are **not key** and have `Edm.Guid` type |
+| GuidStrategies.NONE         | No random UUID generation                                                                         |
+
+| Name                        | Description for **setDisplayGuidProperties**                                               |
+| :-------------------------- | :----------------------------------------------------------------------------------------- |
+| GuidStrategies.ALL          | The end user can display all the properties with `Edm.Guid` type                           |
+| GuidStrategies.ONLY_KEY     | The end user can display only the **key** properties with `Edm.Guid` type                  |
+| GuidStrategies.ONLY_NON_KEY | The end user can display only the properties that are **not key** and have `Edm.Guid` type |
+| GuidStrategies.NONE         | No property with `Edm.Guid` is visible to the end user                                     |
 
 ### Form Property Order
 
