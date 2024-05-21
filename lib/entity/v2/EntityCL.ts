@@ -110,6 +110,11 @@ export default class EntityCL extends ModelCL {
                 if (displayFormat) {
                     property.displayFormat = displayFormat.value;
                 }
+            } else {
+                if (prop.hasOwnProperty("com.sap.vocabularies.Common.v1.Label")) {
+                    const label = prop["com.sap.vocabularies.Common.v1.Label" as keyof typeof prop] as object;
+                    property.annotationLabel = label["String" as keyof typeof label];
+                }
             }
 
             return property;
