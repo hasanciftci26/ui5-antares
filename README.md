@@ -417,6 +417,8 @@ By default, **createNewEntry()** method uses the [ODataMetaModel](https://sapui5
 
 All **key** properties are marked as mandatory/required and the labels are generated assuming that the naming convention of the `EntityType` is **camelCase**. Please see [Label Generation](#label-generation)
 
+> **Important:** Please be advised that the **createNewEntry()** method must be called after any configurations have been made through the public method of the [Entry Create](#entry-create) class. Any configurations (form title, mandatory properties, etc.) made after the **createNewEntry()** method will not be reflected. Basically, **createNewEntry()** method should be called at the end of your code block.
+
 By default, random UUID value is generated for the **key** properties with **Edm.Guid** type and these fields are not visible on the generated form. However, this behaviour can be modified using the [setGenerateRandomGuid()](#properties-with-edmguid-type) and [setDisplayGuidProperties()](#properties-with-edmguid-type) methods.
 
 #### Method Parameters
