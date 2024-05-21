@@ -70,6 +70,7 @@ ui5 -v
     - [End Button Text](#end-button-text)
     - [End Button Type](#end-button-type)
     - [Properties with Edm.Guid Type](#properties-with-edmguid-type)
+      - [GuidStrategies Enum](#guidstrategies-enum)
     - [Form Property Order](#form-property-order)
     - [Excluded Properties](#excluded-properties)
     - [Mandatory Properties](#mandatory-properties)
@@ -1622,6 +1623,8 @@ sap.ui.define([
 
     });
 ```
+
+![Guid Strategy](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/guid_strategy.png?raw=true)
 
 #### GuidStrategies Enum
 
