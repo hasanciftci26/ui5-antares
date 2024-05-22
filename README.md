@@ -80,6 +80,9 @@ ui5 -v
     - [Attach Submit Failed](#attach-submit-failed)
     - [Response Class](#response-class)
     - [Value Help](#value-help)
+      - [Constructor](#constructor-1)
+      - [Label Generation](#label-generation-1)
+      - [Standalone Usage](#standalone-usage)
     - [Validation Logic](#validation-logic)
     - [Custom Control](#custom-control)
     - [Custom Content](#custom-content)
@@ -2397,6 +2400,287 @@ The class has 2 public methods that can be used to retrieve information once the
 | string or undefined | Returns the status code of the HTTP Request |
 
 ### Value Help
+
+[99]: https://sapui5.hana.ondemand.com/#/api/sap.ui.comp.valuehelpdialog.ValueHelpDialog
+
+[Entry Create](#entry-create) class can create a [Value Help Dialog][99] for the properties that are rendered as [sap.m.Input][101] on the auto-generated form. Please find below a list of the features that the Value Help class offers.
+
+> **Important:** Please be advised that the Value Help feature is only available for the **SIMPLE** Form. Should you require further information, please refer to the [Form Type](#form-type) section.
+
+1) Generates a [Value Help Dialog][99] with a table and filterbar consisting of the `EntitySet` properties defined in the class constructor
+2) Handles the filterbar and search field
+3) Handles the selection
+
+#### Constructor
+
+You must initialize an object from **ValueHelpCL** in order to use it.
+
+| Parameter   	                  | Type                            | Mandatory | Default Value             | Description                                                                                    | 
+| :------------------------------ | :------------------------------ | :-------- | :------------------------ | :--------------------------------------------------------------------------------------------- |
+| controller                      | [sap.ui.core.mvc.Controller][1] | Yes       |                           | The controller object (usually `this`)                                                         |
+| settings                        | object                          | Yes       |                           |                                                                                                |
+| &emsp;propertyName              | string                          | Yes       |                           | The property of the entity for which the Value Help is being created                           |
+| &emsp;valueHelpEntity           | string                          | Yes       |                           | The `EntitySet` name that will be bound to the table in the value help dialog                  |
+| &emsp;valueHelpProperty         | string                          | Yes       | | The property of the `valueHelpEntity` whose value will be set to `propertyName` after the selection is made in the table |
+| &emsp;readonlyProperties?       | string[]                        | No        | []                        | The properties of the `valueHelpEntity` that are displayed in the columns of the table         |
+| &emsp;excludedFilterProperties? | string[]                        | No        | []                        | The properties of the `valueHelpEntity` that are excluded from the filterbar                   |
+| &emsp;title?                    | string                          | No        | `valueHelpEntity`         | The title of the Value Help Dialog                                                             |
+| &emsp;searchPlaceholder?        | string                          | No        | Search `valueHelpEntity`  | The placeholder in the search field of the Value Help Dialog                                   |
+| &emsp;namingStrategy?           | [NamingStrategies][12]          | No        | CAMEL_CASE                | The naming strategy that is used to generate the labels for filterbar and table column headers |
+| &emsp;resourceBundlePrefix?     | string                          | No        | antaresVH                 | The resource bundle prefix that is used for the i18n text lookup                               |
+| &emsp;useMetadataLabels?        | boolean                         | No        | false                     | Indicates if the labels in metadata should be used for the filterbar and table column headers  |
+| &emsp;filterModelName?          | string                          | No        | UI5AntaresVHFilterModel   | The JSONModel name of the filterbar which is needed by the ValueHelpCL                         |
+| modelName?                      | string                          | No        | undefined                 | The name of the OData V2 model. **Do not specify** if the model name = ""                      |
+
+---
+
+Here are the steps that **ValueHelpCL** follows when creating the Value Help Dialog.
+
+1) Creates a table and makes the `settings.valueHelpProperty` the first column of the table
+2) Adds all the properties specified in the `settings.readonlyProperties` array as columns to the table next to the first column
+3) Binds the `EntitySet` specified in the `settings.valueHelpEntity` to the created table
+4) Creates a filterbar and UI Controls (Input, DatePicker etc.) for the `settings.valueHelpProperty` and `settings.readonlyProperties` if they don't exist in the `settings.excludedFilterProperties` array
+5) Creates a JSON Model for handling the filterbar
+6) Creates a search field
+7) Uses internal functions to handle the selection and filterbar search
+
+> **Important:** By default, all properties defined in the **readonlyProperties** parameter are included in the filterbar. To exclude properties from the filter bar, use the **excludedFilterProperties** parameter. Properties excluded from the filter bar will still be visible in the table of the Value Help Dialog. Please be advised that the **key** property defined in the **valueHelpProperty** parameter **cannot be excluded** from the filter bar.
+
+#### Label Generation
+
+The **ValueHelpCL** class uses the same methodology as that defined in [Label Generation](#label-generation) for the generation of labels for table column headers and filter bar elements. Please find below a list of the settings that can be applied in different label generation scenarios.
+
+**Scenario 1:** In order to utilise the labels defined in the OData metadata, please set the [settings.useMetadataLabels](#constructor-1) parameter to true.
+
+**Scenario 2:** In order to use i18n labels on the label generation, please either use the default format (antaresVH + `valueHelpEntity` + propertyName) for the text keys or modify the prefix by setting the [settings.resourceBundlePrefix](#constructor-1) parameter.
+
+**Scenario 3:** In order for the library to generate labels from the technical property names of the `EntitySet` that is defined, it is necessary to set the correct value for the [settings.namingStrategy](#constructor-1) parameter.
+
+**Sample**
+
+Let us consider the following scenario: You have an `EntitySet` named **Products** with the following properties: `ID`, `name`, `categoryID`, and `supplierID`. You also have other `EntitySet`s named **Suppliers** and **Categories**, which you would like to use as a Value Help for the **Products-supplierID** and **Products-categoryID** properties.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import ValueHelpCL from "ui5/antares/ui/ValueHelpCL"; // Import the Value Help class
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL(this, "Products");
+
+    // Create an object from the ValueHelpCL class
+    const categoryVH = new ValueHelpCL(this, {
+        propertyName: "categoryID", // This is the property of the Products entity
+        valueHelpEntity: "Categories", // This is the entity set that brings data
+        valueHelpProperty: "ID", // This is the property of the entity set that will be mapped to propertyName after the selection is made
+        readonlyProperties: ["name"] // These properties will be the columns of the table on the Value Help Dialog
+    });
+
+    // Create an object from the ValueHelpCL class
+    const supplierVH = new ValueHelpCL(this, {
+        propertyName: "supplierID", // This is the property of the Products entity
+        valueHelpEntity: "Suppliers", // This is the entity set that brings data
+        valueHelpProperty: "ID", // This is the property of the entity set that will be mapped to propertyName after the selection is made
+        readonlyProperties: [ // These properties will be the columns of the table on the Value Help Dialog
+          "companyName",
+          "contactName",
+          "contactTitle",
+          "country",
+          "city",
+          "paymentTerms"  
+        ],
+        excludedFilterProperties: ["contactName"] // These properties will be excluded from the filterbar
+    });    
+
+    // Set the form type to SIMPLE to be able to use Value Help feature
+    entry.setFormType(FormTypes.SIMPLE);
+
+    // Add the value help object for categoryID
+    entry.addValueHelp(categoryVH);
+
+    // Add the value help object for supplierID
+    entry.addValueHelp(supplierVH);
+
+    entry.createNewEntry(); 
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "ui5/antares/ui/ValueHelpCL" // Import the Value Help class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function(Controller, EntryCreateCL, ValueHelpCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function() {
+
+        },
+
+        onCreateProduct: async function() {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Create an object from the ValueHelpCL class
+          const categoryVH = new ValueHelpCL(this, {
+              propertyName: "categoryID", // This is the property of the Products entity
+              valueHelpEntity: "Categories", // This is the entity set that brings data
+              valueHelpProperty: "ID", // This is the property of the entity set that will be mapped to propertyName after the selection is made
+              readonlyProperties: ["name"] // These properties will be the columns of the table on the Value Help Dialog
+          });
+
+          // Create an object from the ValueHelpCL class
+          const supplierVH = new ValueHelpCL(this, {
+              propertyName: "supplierID", // This is the property of the Products entity
+              valueHelpEntity: "Suppliers", // This is the entity set that brings data
+              valueHelpProperty: "ID", // This is the property of the entity set that will be mapped to propertyName after the selection is made
+              readonlyProperties: [ // These properties will be the columns of the table on the Value Help Dialog
+                "companyName",
+                "contactName",
+                "contactTitle",
+                "country",
+                "city",
+                "paymentTerms"  
+              ],
+              excludedFilterProperties: ["contactName"] // These properties will be excluded from the filterbar
+          });    
+
+          // Set the form type to SIMPLE to be able to use Value Help feature
+          entry.setFormType(FormTypes.SIMPLE);
+
+          // Add the value help object for categoryID
+          entry.addValueHelp(categoryVH);
+
+          // Add the value help object for supplierID
+          entry.addValueHelp(supplierVH);
+
+          entry.createNewEntry(); 
+        }
+      });
+
+    });
+```
+
+![Value Help](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/value_help_1.png?raw=true)
+
+[207]: https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/value_help_2.png?raw=true
+[208]: https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/value_help_3.png?raw=true
+
+| categoryID         | supplierID         |
+| :----------------: | :----------------: |
+| ![Value Help][207] | ![Value Help][208] |
+
+#### Standalone Usage
+
+The **ValueHelpCL** class can also be utilized as a standalone solution with the [sap.m.Input][101] control.
+
+**Sample**
+
+Let us consider a scenario in which a [sap.m.Input][101] is present on an XML View. The objective is to create a [Value Help Dialog][99] when the **valueHelpRequest** event is triggered by the end user.
+
+![Value Help](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/value_help_4.png?raw=true)
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ValueHelpCL from "ui5/antares/ui/ValueHelpCL"; // Import the Value Help class
+import { Input$ValueHelpRequestEvent } from "sap/m/Input"; // Import the Value Help Request event type
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  // The parameter type should be Input$ValueHelpRequestEvent
+  public async onValueHelpRequest(event: Input$ValueHelpRequestEvent) {
+
+    // Create an object from the ValueHelpCL class
+    const supplierVH = new ValueHelpCL(this, {
+        propertyName: "STANDALONE", // Since this is a mandatory param and not relevant for the standalone usage, you can set anything
+        valueHelpEntity: "Suppliers", // This is the entity set that brings data
+        valueHelpProperty: "ID", // This is the property of the entity set whose value will be set to the input
+        readonlyProperties: [ // These properties will be the columns of the table on the Value Help Dialog
+          "companyName",
+          "contactName",
+          "contactTitle",
+          "country",
+          "city",
+          "paymentTerms"  
+        ],
+        excludedFilterProperties: ["contactName"] // These properties will be excluded from the filterbar
+    });    
+
+    // Pass the Input$ValueHelpRequestEvent to the public openValueHelpDialog method.
+    supplierVH.openValueHelpDialog(event);
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/ValueHelpCL" // Import the Value Help class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function(Controller, ValueHelpCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function() {
+
+        },
+
+        onValueHelpRequest: async function(event) {
+          // Create an object from the ValueHelpCL class
+          const supplierVH = new ValueHelpCL(this, {
+              propertyName: "STANDALONE", // Since this is a mandatory param and not relevant for the standalone usage, you can set anything
+              valueHelpEntity: "Suppliers", // This is the entity set that brings data
+              valueHelpProperty: "ID", // This is the property of the entity set whose value will be set to the input
+              readonlyProperties: [ // These properties will be the columns of the table on the Value Help Dialog
+                "companyName",
+                "contactName",
+                "contactTitle",
+                "country",
+                "city",
+                "paymentTerms"  
+              ],
+              excludedFilterProperties: ["contactName"] // These properties will be excluded from the filterbar
+          });    
+
+          // Pass the event to the public openValueHelpDialog method.
+          supplierVH.openValueHelpDialog(event);
+        }
+      });
+
+    });
+```
 
 ### Validation Logic
 
