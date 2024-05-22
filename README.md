@@ -76,6 +76,9 @@ ui5 -v
     - [Mandatory Properties](#mandatory-properties)
       - [Mandatory Error Message](#mandatory-error-message)
     - [Readonly Properties](#readonly-properties)
+    - [Attach Submit Completed](#attach-submit-completed)
+    - [Attach Submit Failed](#attach-submit-failed)
+    - [Response Class](#response-class)
     - [Value Help](#value-help)
     - [Validation Logic](#validation-logic)
     - [Custom Control](#custom-control)
@@ -2125,6 +2128,150 @@ sap.ui.define([
 ```
 
 ![Readonly Properties](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/readonly_properties.png?raw=true)
+
+### Attach Submit Completed
+
+Once the transient entity has been successfully submitted, [Entry Create](#entry-create) class can then call a function with a specific signature. The result of the submission is then passed to the attached function.
+
+To attach a function, **attachSubmitCompleted()** method can be utilized.
+
+[301]: #constructor
+
+**Setter (attachSubmitCompleted)**
+
+| Parameter       | Type                                                                    | Mandatory | Description                                                        | 
+| :-------------- | :---------------------------------------------------------------------- | :-------- | :----------------------------------------------------------------- |
+| submitCompleted | (response: [ResponseCL\<ResponseT = object\>](#response-class)) => void | Yes       | The function that will be called after the successful submit       |
+| listener?       | object                                                                  | No        | The default listener is the **controller** from [constructor][301] |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Sample**
+
+Once the submission is successful, you would like to receive a response and take the necessary actions.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import ResponseCL from "ui5/antares/entry/v2/ResponseCL"; // Import the ResponseCL class
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // Attach the submit completed function
+    entry.attachSubmitCompleted(this.productSubmitCompleted, this);
+
+    entry.createNewEntry();
+  }
+
+  // Please use the same type for the ResponseCL generic as you did for EntryCreateCL
+  private productSubmitCompleted(response: ResponseCL<IProducts>): void {
+    // Get the status code. Please be aware, it may also be undefined
+    const statusCode = response.getStatusCode();
+
+    // Get the data that was submitted. Please be aware, it may also be undefined
+    const submittedData = response.getResponse();
+
+    if (submittedData) {
+      // Some operations
+      const createdProductID = submittedData.ID;
+    }
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function(Controller, EntryCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function() {
+
+        },
+
+        onCreateProduct: async function() {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Attach the submit completed function
+          entry.attachSubmitCompleted(this._productSubmitCompleted, this);
+
+          entry.createNewEntry();
+        },
+
+        _productSubmitCompleted: function (response) {
+          // Get the status code. Please be aware, it may also be undefined
+          const statusCode = response.getStatusCode();
+
+          // Get the data that was submitted. Please be aware, it may also be undefined
+          const submittedData = response.getResponse();
+
+          if (submittedData) {
+            // Some operations
+            const createdProductID = submittedData.ID;
+          }          
+        }
+      });
+
+    });
+```
+
+### Attach Submit Failed
+
+### Response Class
+
+Once the transient entity has been submitted, the generic **ResponseCL\<ResponseT = object\>** object is instantiated and passed to the functions attached using the [attachSubmitCompleted()](#attach-submit-completed) or [attachSubmitFailed()](#attach-submit-failed) methods.
+
+The class has 2 public methods that can be used to retrieve information once the submit has been completed. The return type of the **getResponse()** method is dependent on the response type (success or failure).
+
+**Submit Completed (getResponse)**
+
+| Returns                          | Description                                                                                             |
+| :------------------------------- | :------------------------------------------------------------------------------------------------------ |
+| ResponseT or object or undefined | Returns the data that was submitted successfully through the OData V2 Model. It may also be `undefined` |
+
+**Submit Failed (getResponse)**
+
+| Returns                     | Description                                                     |
+| --------------------------- | --------------------------------------------------------------- |
+| object                      |                                                                 |
+| &emsp;statusCode?: `string` | The status code of the HTTP request. It may also be `undefined` |
+| &emsp;body?: `string`       | The HTTP response body. It may also be `undefined`              |
+| &emsp;statusText?: `string` | The HTTP status text. It may also be `undefined`                |
+| &emsp;headers?: `object`    | The HTTP response headers. It may also be `undefined`           |
 
 ### Value Help
 
