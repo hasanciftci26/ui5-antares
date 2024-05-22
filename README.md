@@ -84,6 +84,10 @@ ui5 -v
       - [Label Generation](#label-generation-1)
       - [Standalone Usage](#standalone-usage)
     - [Validation Logic](#validation-logic)
+      - [Constructor](#constructor-2)
+      - [Validation with Operator](#validation-with-operator)
+      - [Validation with Validator Function](#validation-with-validator-function)
+      - [ValidationOperator Enum](#validationoperator-enum)
     - [Custom Control](#custom-control)
     - [Custom Content](#custom-content)
     - [Custom Fragment](#custom-fragment)
@@ -2683,6 +2687,35 @@ sap.ui.define([
 ```
 
 ### Validation Logic
+
+[501]: #validationoperator-enum
+
+The UI5 Antares classes includes a built-in validation mechanism to ensure that the input provided by the end user is accurate and complete before submission through the OData V2 Model.
+
+In the event of a validation failure, the end user is promptly informed via an [sap.m.MessageBox.error](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) and the submission remains in a pending status until the validation is successfully completed.
+
+#### Constructor
+
+You must initialize an object from **ValidationLogicCL** in order to use it.
+
+| Parameter   	             | Type                                        | Mandatory | Default Value             | Description                                                                                    | 
+| :------------------------- | :------------------------------------------ | :-------- | :------------------------ | :--------------------------------------------------------------------------------------------- |
+| settings                   | object                                      | Yes       |                           |                                                                                                |
+| &emsp;propertyName         | string                                      | Yes       |                  | The property of the entity set in the [constructor](#constructor) for which the validation will be done |
+| &emsp;validator?           | (value: ValidatorValueParameter) => boolean | No        |                           | The validator function                                                                         |
+| &emsp;listener?            | object                                      | No        |                           | The object that is bind to the validator function                                              |
+| &emsp;value1?              | string \| number \| Date \| UI5Date         | No        |                           | First value to use with the given operator                                                     |
+| &emsp;value2?              | string \| number \| Date \| UI5Date         | No        |                           | Second value to use with the given operator, used only for the **BT** and **NB** operators     |
+| &emsp;operator?            | [ValidationOperator][501]                   | No        |                           | Operator used for the validation                                                               |
+| &emsp;message?             | string                                      | No        | Validation failed for `propertyName` | The message that is displayed when the validation fails                             |
+| &emsp;showMessageBox?      | boolean                                     | No        | true                      | Indicates if the message box should be displayed by the end user                               |
+| &emsp;invalidValueMessage? | string                                      | No        | Invalid value for `propertyName` | The message that is displayed when the end user types in a invalid value. For instance: when the end user enters a string to the number field |
+
+#### Validation with Operator
+
+#### Validation with Validator Function 
+
+#### ValidationOperator Enum
 
 ### Custom Control
 
