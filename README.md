@@ -2251,6 +2251,121 @@ sap.ui.define([
 
 ### Attach Submit Failed
 
+In the event that the submission of the transient entity is unsuccessful, [Entry Create](#entry-create) class can then call a function with a specific signature. The result of the submission will then be passed to the attached function.
+
+To attach a function, **attachSubmitFailed()** method can be utilized.
+
+**Setter (attachSubmitFailed)**
+
+| Parameter    | Type                                                                 | Mandatory | Description                                                        | 
+| :----------- | :------------------------------------------------------------------- | :-------- | :----------------------------------------------------------------- |
+| submitFailed | (response: [ResponseCL\<ISubmitResponse\>](#response-class)) => void | Yes       | The function that will be called after the submission fail         |
+| listener?    | object                                                               | No        | The default listener is the **controller** from [constructor][301] |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import MessageBox from "sap/m/MessageBox";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import ResponseCL from "ui5/antares/entry/v2/ResponseCL"; // Import the ResponseCL class
+import { ISubmitResponse } from "ui5/antares/types/entry/submit"; // Import the error type
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // Attach the submit failed function
+    entry.attachSubmitFailed(this.productSubmitFailed, this);
+
+    entry.createNewEntry();
+  }
+
+  // Please use the ISubmitResponse type for the ResponseCL generic
+  private productSubmitFailed(response: ResponseCL<ISubmitResponse>): void {
+    // Get the status code. Please be aware, it may also be undefined
+    const statusCode = response.getStatusCode();
+
+    // Get the response. Please be aware, it may also be undefined
+    const reason = response.getResponse();
+
+    // Get the statusText
+    if (reason) {
+      MessageBox.error(reason.statusText || "The product was not created!");
+    }
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "sap/m/MessageBox",
+    "ui5/antares/entry/v2/EntryCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function(Controller, MessageBox, EntryCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function() {
+
+        },
+
+        onCreateProduct: async function() {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Attach the submit failed function
+          entry.attachSubmitFailed(this._productSubmitFailed, this);
+      
+          entry.createNewEntry();
+        },
+
+        _productSubmitFailed: function (response) {
+          // Get the status code. Please be aware, it may also be undefined
+          const statusCode = response.getStatusCode();
+
+          // Get the response. Please be aware, it may also be undefined
+          const reason = response.getResponse();
+
+          // Get the statusText
+          if (reason) {
+            MessageBox.error(reason.statusText || "The product was not created!");
+          }     
+        }
+      });
+
+    });
+```
+
 ### Response Class
 
 Once the transient entity has been submitted, the generic **ResponseCL\<ResponseT = object\>** object is instantiated and passed to the functions attached using the [attachSubmitCompleted()](#attach-submit-completed) or [attachSubmitFailed()](#attach-submit-failed) methods.
@@ -2259,19 +2374,27 @@ The class has 2 public methods that can be used to retrieve information once the
 
 **Submit Completed (getResponse)**
 
-| Returns                          | Description                                                                                             |
-| :------------------------------- | :------------------------------------------------------------------------------------------------------ |
-| ResponseT or object or undefined | Returns the data that was submitted successfully through the OData V2 Model. It may also be `undefined` |
+| Returns                          | Description                                                                  |
+| :------------------------------- | :--------------------------------------------------------------------------- |
+| ResponseT or object or undefined | Returns the data that was submitted successfully through the OData V2 Model. |
 
 **Submit Failed (getResponse)**
 
-| Returns                     | Description                                                     |
-| --------------------------- | --------------------------------------------------------------- |
-| object                      |                                                                 |
-| &emsp;statusCode?: `string` | The status code of the HTTP request. It may also be `undefined` |
-| &emsp;body?: `string`       | The HTTP response body. It may also be `undefined`              |
-| &emsp;statusText?: `string` | The HTTP status text. It may also be `undefined`                |
-| &emsp;headers?: `object`    | The HTTP response headers. It may also be `undefined`           |
+| Returns                                    | Description                           |
+| ------------------------------------------ | ------------------------------------- |
+| object                                     |                                       |
+| &emsp;statusCode?: `string` \| `undefined` | The status code of the HTTP request.  |
+| &emsp;body?: `string` \| `undefined`       | The HTTP response body.               |
+| &emsp;statusText?: `string` \| `undefined` | The HTTP status text.                 |
+| &emsp;headers?: `object` \| `undefined`    | The HTTP response headers.            |
+
+---
+
+**Submit Completed and Failed (getStatusCode)**
+
+| Returns             | Description                                 |
+| :------------------ | :------------------------------------------ |
+| string or undefined | Returns the status code of the HTTP Request |
 
 ### Value Help
 
