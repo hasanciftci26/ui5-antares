@@ -2419,12 +2419,6 @@ The class has 2 public methods that can be used to retrieve information once the
 
 You must initialize an object from **ValueHelpCL** in order to use it.
 
-<style>
-  .objectIndent {
-    padding-left: 2em;
-  }
-</style>
-
 <table>
   <thead>
     <tr>
@@ -2451,77 +2445,77 @@ You must initialize an object from **ValueHelpCL** in order to use it.
       <td></td>
     </tr>
     <tr>
-      <td class="objectIndent">propertyName</td>
+      <td style="padding-left: 2em;">propertyName</td>
       <td>string</td>
       <td>Yes</td>
       <td></td>
       <td>The property of the entity for which the Value Help is being created</td>
     </tr>
     <tr>
-      <td class="objectIndent">valueHelpEntity</td>
+      <td style="padding-left: 2em;">valueHelpEntity</td>
       <td>string</td>
       <td>Yes</td>
       <td></td>
       <td>The <code>EntitySet</code> name that will be bound to the table in the value help dialog</td>
     </tr>
     <tr>
-      <td class="objectIndent">valueHelpProperty</td>
+      <td style="padding-left: 2em;">valueHelpProperty</td>
       <td>string</td>
       <td>Yes</td>
       <td></td>
       <td>The property of the <code>valueHelpEntity</code> whose value will be set to <code>propertyName</code> after the selection is made in the table</td>
     </tr>
     <tr>
-      <td class="objectIndent">readonlyProperties?</td>
+      <td style="padding-left: 2em;">readonlyProperties?</td>
       <td>string[]</td>
       <td>No</td>
       <td>[]</td>
       <td>The properties of the <code>valueHelpEntity</code> that are displayed in the columns of the table</td>
     </tr>
     <tr>
-      <td class="objectIndent">excludedFilterProperties?</td>
+      <td style="padding-left: 2em;">excludedFilterProperties?</td>
       <td>string[]</td>
       <td>No</td>
       <td>[]</td>
       <td>The properties of the <code>valueHelpEntity</code> that are excluded from the filterbar</td>
     </tr>
     <tr>
-      <td class="objectIndent">title?</td>
+      <td style="padding-left: 2em;">title?</td>
       <td>string</td>
       <td>No</td>
       <td><code>valueHelpEntity</code></td>
       <td>The title of the Value Help Dialog</td>
     </tr>
     <tr>
-      <td class="objectIndent">searchPlaceholder?</td>
+      <td style="padding-left: 2em;">searchPlaceholder?</td>
       <td>string</td>
       <td>No</td>
       <td>Search <code>valueHelpEntity</code></td>
       <td>The placeholder in the search field of the Value Help Dialog</td>
     </tr>
     <tr>
-      <td class="objectIndent">namingStrategy?</td>
+      <td style="padding-left: 2em;">namingStrategy?</td>
       <td><a href="#namingstrategies-enum">NamingStrategies</a></td>
       <td>No</td>
       <td>CAMEL_CASE</td>
       <td>The naming strategy that is used to generate the labels for filterbar and table column headers</td>
     </tr>
     <tr>
-      <td class="objectIndent">resourceBundlePrefix?</td>
+      <td style="padding-left: 2em;">resourceBundlePrefix?</td>
       <td>string</td>
       <td>No</td>
       <td>antaresVH</td>
       <td>The resource bundle prefix that is used for the i18n text lookup</td>
     </tr>
     <tr>
-      <td class="objectIndent">useMetadataLabels?</td>
+      <td style="padding-left: 2em;">useMetadataLabels?</td>
       <td>boolean</td>
       <td>No</td>
       <td>false</td>
       <td>Indicates if the labels in metadata should be used for the filterbar and table column headers</td>
     </tr>
     <tr>
-      <td class="objectIndent">filterModelName?</td>
+      <td style="padding-left: 2em;">filterModelName?</td>
       <td>string</td>
       <td>No</td>
       <td>UI5AntaresVHFilterModel</td>
@@ -2824,63 +2818,63 @@ You must initialize an object from **ValidationLogicCL** in order to use it.
       <td></td>
     </tr>
     <tr>
-      <td class="objectIndent">propertyName</td>
+      <td style="padding-left: 2em;">propertyName</td>
       <td>string</td>
       <td>Yes</td>
       <td></td>
       <td>The property of the entity set in the <a href="#constructor">constructor</a> for which the validation will be done</td>
     </tr>
     <tr>
-      <td class="objectIndent">validator?</td>
+      <td style="padding-left: 2em;">validator?</td>
       <td>(value: <a href="#validation-with-validator-function">ValidatorValueParameter</a>) => boolean</td>
       <td>No</td>
       <td></td>
       <td>The validator function</td>
     </tr>
     <tr>
-      <td class="objectIndent">listener?</td>
+      <td style="padding-left: 2em;">listener?</td>
       <td>object</td>
       <td>No</td>
       <td></td>
       <td>The object that is bind to the validator function</td>
     </tr>
     <tr>
-      <td class="objectIndent">value1?</td>
+      <td style="padding-left: 2em;">value1?</td>
       <td>string | number | Date | <a href="https://sapui5.hana.ondemand.com/#/api/module:sap/ui/core/date/UI5Date">UI5 Date</a></td>
       <td>No</td>
       <td></td>
       <td>First value to use with the given operator</td>
     </tr>
     <tr>
-      <td class="objectIndent">value2?</td>
+      <td style="padding-left: 2em;">value2?</td>
       <td>string | number | Date | <a href="https://sapui5.hana.ondemand.com/#/api/module:sap/ui/core/date/UI5Date">UI5 Date</a></td>
       <td>No</td>
       <td></td>
       <td>Second value to use with the given operator, used only for the <strong>BT</strong> and <strong>NB</strong> operators</td>
     </tr>
     <tr>
-      <td class="objectIndent">operator?</td>
+      <td style="padding-left: 2em;">operator?</td>
       <td><a href="#validationoperator-enum">ValidationOperator</a></td>
       <td>No</td>
       <td></td>
       <td>Operator used for the validation</td>
     </tr>
     <tr>
-      <td class="objectIndent">message?</td>
+      <td style="padding-left: 2em;">message?</td>
       <td>string</td>
       <td>No</td>
       <td>Validation failed for <code>propertyName</code></td>
       <td>The message that is displayed when the validation fails</td>
     </tr>
     <tr>
-      <td class="objectIndent">showMessageBox?</td>
+      <td style="padding-left: 2em;">showMessageBox?</td>
       <td>boolean</td>
       <td>No</td>
       <td>true</td>
       <td>Indicates if the message box should be displayed by the end user</td>
     </tr>
     <tr>
-      <td class="objectIndent">invalidValueMessage?</td>
+      <td style="padding-left: 2em;">invalidValueMessage?</td>
       <td>string</td>
       <td>No</td>
       <td>Invalid value for <code>propertyName</code></td>
