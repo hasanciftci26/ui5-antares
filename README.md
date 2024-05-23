@@ -89,7 +89,11 @@ ui5 -v
       - [Validation with Validator Function](#validation-with-validator-function)
       - [ValidationOperator Enum](#validationoperator-enum)
     - [Custom Control](#custom-control)
+      - [Constructor](#constructor-3)
+      - [Validation](#validation)
+      - [Custom Control From Fragment](#custom-control-from-fragment)
     - [Custom Content](#custom-content)
+      - [Custom Content From Fragment](#custom-content-from-fragment)
     - [Custom Fragment](#custom-fragment)
 
 ## Versioning
@@ -2885,7 +2889,7 @@ You must initialize an object from **ValidationLogicCL** in order to use it.
 
 #### Validation with Operator
 
-If there are specific values that should be used for user validation, they can be defined easily on the [constructor](#constructor-2).
+If there are specific values that should be used for user input validation, they can be defined easily on the [constructor](#constructor-2).
 
 > **Important:** Please note that **value1** and **value2** determine the type of the property. For example, if the property type is `Edm.DateTime` or `Edm.DateTimeOffset`, then value1 and value2 must be either JavaScript Date or [UI5 Date](https://sapui5.hana.ondemand.com/#/api/module:sap/ui/core/date/UI5Date).
 
@@ -3023,7 +3027,7 @@ sap.ui.define([
 
 If the validation logic is more complex than simply checking specific values, a custom function can be used for the validation.
 
-The function that will be used for the function must have a parameter to retrieve the value entered by the end user. UI5 Antares passes the user's input or the [Custom Control](#custom-control) to the validator function as a parameter.
+The function that will be used for the validation must have a parameter to retrieve the value entered by the end user. UI5 Antares passes the user's input or the [Custom Control](#custom-control) to the validator function as a parameter.
 
 > **Important:** The value can be of the following types: string, number, boolean, Date, [UI5 Date](https://sapui5.hana.ondemand.com/#/api/module:sap/ui/core/date/UI5Date), or [Control](https://sapui5.hana.ondemand.com/#/api/sap.ui.core.Control).
 
@@ -3168,6 +3172,318 @@ sap.ui.define([
 
 ### Custom Control
 
+By default, UI5 Antares creates [sap.ui.comp.smartfield.SmartField][106] when the [form type](#form-type) is **SMART** or [sap.m.Input][101], [sap.m.DatePicker][102], [sap.m.DateTimePicker][103], [sap.m.CheckBox][104] depending on the `Edm Type` of the properties when the [form type](#form-type) is **SIMPLE**.
+
+The **Custom Control** class enables the addition of various UI controls (e.g., [sap.m.Slider](https://sapui5.hana.ondemand.com/#/api/sap.m.Slider)) to the properties of the `EntityType` of the `EntitySet`, as defined in the [constructor](#constructor).
+
+> **Important:** Please note that a custom control can only be added for the properties of an `EntitySet` that have been defined in the [constructor](#constructor).
+
+When generating the form, UI5 Antares first checks to see if there is a corresponding custom control for the property. If one is found, it is added to the form. Otherwise, another UI Control will be generated.
+
+#### Constructor
+
+You must initialize an object from **CustomControlCL** in order to use it.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Default Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>control</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.core.Control">Control</a></td>
+      <td>Yes</td>
+      <td></td>
+      <td>The UI Control to add into the auto-generated form</td>
+    </tr>
+    <tr>
+      <td>propertyName</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td></td>
+      <td>The property of the entity set in the <a href="#constructor">constructor</a> for which the custom control be added</td>
+    </tr>
+    <tr>
+      <td>validator?</td>
+      <td><a href="#validation-logic">ValidationLogicCL</a></td>
+      <td>No</td>
+      <td></td>
+      <td>The validation object</td>
+    </tr>
+  </tbody>
+</table>
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products** with the following properties: `ID`, `name`, `description`, `price`, and `currency`. We wish to add a [sap.m.ComboBox](https://sapui5.hana.ondemand.com/#/api/sap.m.ComboBox) with some predefined items for the `currency` property.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import CustomControlCL from "ui5/antares/ui/CustomControlCL"; // Import the Custom Control Class
+import ComboBox from "sap/m/ComboBox"; // Import the ComboBox
+import Item from "sap/ui/core/Item"; // Import the Item for ComboBox items
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // Create a custom control which is ComboBox in this sample
+    const currencyComboBox = new ComboBox({
+        selectedKey: "{currency}", // Do not forget to add the path of the property
+        items: [
+            new Item({ key: "EUR", text: "Euro" }),
+            new Item({ key: "USD", text: "US Dollar" }),
+            new Item({ key: "TRY", text: "Turkish Lira" }),
+        ]
+    });
+
+    // Create an object from the CustomControlCL class with the UI Control and property name
+    const currencyControl = new CustomControlCL(currencyComboBox, "currency");
+
+    // Add the custom control
+    entry.addCustomControl(currencyControl);
+
+    entry.createNewEntry();
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "ui5/antares/ui/CustomControlCL", // Import the Custom Control Class
+    "sap/m/ComboBox", // Import the ComboBox
+    "sap/ui/core/Item" // Import the Item for ComboBox items
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, CustomControlCL, ComboBox, Item) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Create a custom control which is ComboBox in this sample
+          const currencyComboBox = new ComboBox({
+              selectedKey: "{currency}", // Do not forget to add the path of the property
+              items: [
+                  new Item({ key: "EUR", text: "Euro" }),
+                  new Item({ key: "USD", text: "US Dollar" }),
+                  new Item({ key: "TRY", text: "Turkish Lira" }),
+              ]
+          });
+
+          // Create an object from the CustomControlCL class with the UI Control and property name
+          const currencyControl = new CustomControlCL(currencyComboBox, "currency");
+
+          // Add the custom control
+          entry.addCustomControl(currencyControl);
+
+          entry.createNewEntry();
+        }
+      });
+
+    });
+```
+
+![Custom Control](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/custom_control_1.png?raw=true)
+
+#### Validation
+
+Furthermore, the custom controls can be configured to execute a [Validation Logic](#validation-logic) before the transient entity is submitted.
+
+**Important:** Since the custom UI control added to the form cannot be predicted by the library, validation and mandatory check can only be performed using the [Validator Function](#validation-with-validator-function).
+
+UI5 Antares, passes the custom UI control as a parameter to the validator function.
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products** with the following properties: `ID`, `name`, `description`, `price`, and `currency`. We wish to add a [sap.m.ComboBox](https://sapui5.hana.ondemand.com/#/api/sap.m.ComboBox) with some predefined items for the `currency` property. 
+
+We also want to validate that the end user cannot leave the `currency` field blank, but must make a selection.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import CustomControlCL from "ui5/antares/ui/CustomControlCL"; // Import the Custom Control Class
+import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL"; // Import the ValidationLogicCL class
+import { ValidatorValueParameter } from "ui5/antares/types/ui/validation"; // Import the validator function parameter type
+import ComboBox from "sap/m/ComboBox"; // Import the ComboBox
+import Item from "sap/ui/core/Item"; // Import the Item for ComboBox items
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // Create a custom control which is ComboBox in this sample
+    const currencyComboBox = new ComboBox({
+        selectedKey: "{currency}", // Do not forget to add the path of the property
+        items: [
+            new Item({ key: "EUR", text: "Euro" }),
+            new Item({ key: "USD", text: "US Dollar" }),
+            new Item({ key: "TRY", text: "Turkish Lira" }),
+        ]
+    });
+
+    // Create the validation object for the custom control
+    const currencyValidation = new ValidationLogicCL({
+      propertyName: "currency", // Currency property of the Products
+      validator: this.validateCurrency,
+      listener: this,
+      message: "The currency field is mandatory"        
+    });
+
+    // Create an object from the CustomControlCL class with the UI Control, property name and validation object
+    const currencyControl = new CustomControlCL(currencyComboBox, "currency", currencyValidation);
+
+    // Add the custom control
+    entry.addCustomControl(currencyControl);
+
+    entry.createNewEntry();
+  }
+
+  // UI5 Antares will pass the added combobox back to the validator function
+  public validateCurrency (control: ValidatorValueParameter): boolean {
+    if (!(control as ComboBox).getSelectedKey()) {
+      return false; // Validation is unsuccessful
+    }
+
+    return true; // Validation is successful
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "ui5/antares/ui/CustomControlCL", // Import the Custom Control Class
+    "ui5/antares/ui/ValidationLogicCL", // Import the ValidationLogicCL class
+    "sap/m/ComboBox", // Import the ComboBox
+    "sap/ui/core/Item" // Import the Item for ComboBox items
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, CustomControlCL, ValidationLogicCL, ComboBox, Item) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Create a custom control which is ComboBox in this sample
+          const currencyComboBox = new ComboBox({
+              selectedKey: "{currency}", // Do not forget to add the path of the property
+              items: [
+                  new Item({ key: "EUR", text: "Euro" }),
+                  new Item({ key: "USD", text: "US Dollar" }),
+                  new Item({ key: "TRY", text: "Turkish Lira" }),
+              ]
+          });
+
+          // Create the validation object for the custom control
+          const currencyValidation = new ValidationLogicCL({
+            propertyName: "currency", // Currency property of the Products
+            validator: this._validateCurrency,
+            listener: this,
+            message: "The currency field is mandatory"        
+          });
+
+          // Create an object from the CustomControlCL class with the UI Control, property name and validation object
+          const currencyControl = new CustomControlCL(currencyComboBox, "currency", currencyValidation);
+
+          // Add the custom control
+          entry.addCustomControl(currencyControl);
+
+          entry.createNewEntry();
+        },
+
+        // UI5 Antares will pass the added combobox back to the validator function
+        _validateCurrency: function (control) {
+          if (!control.getSelectedKey()) {
+            return false; // Validation is unsuccessful
+          }
+
+          return true; // Validation is successful          
+        }
+      });
+
+    });
+```
+
+#### Custom Control From Fragment
+
 ### Custom Content
+
+#### Custom Content From Fragment
 
 ### Custom Fragment
