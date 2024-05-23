@@ -3539,7 +3539,7 @@ Firstly, a file with `.fragment.xml` extension should be created in the applicat
 
 Secondly, an object from the [FragmentCL](#fragment-class) should be instantiated with the controller and fragment path parameters.
 
-> **Information:** Please be aware that this function is **asynchronous** and must be awaited.
+> **Information:** Please be aware that **addControlFromFragment()** function is **asynchronous** and must be awaited.
 
 **TypeScript**
 
