@@ -3482,8 +3482,149 @@ sap.ui.define([
 
 #### Custom Control From Fragment
 
+Another way to add custom controls to the auto-generated form is to load the UI controls from a custom fragment created in the application files.
+
+> **Advantage:** It's possible to add multiple controls at once with this approach. It also avoids having to create UI controls in the controller. The custom controls can be organized in the `.fragment.xml` files.
+
+**Important:** It is mandatory to add a [custom data](https://sapui5.hana.ondemand.com/#/api/sap.ui.core.CustomData) with **UI5AntaresEntityPropertyName** key to the each UI control in the fragment. The value of the **UI5AntaresEntityPropertyName** key should be the **property name** that the control is added for. Otherwise, UI5 Antares will be unable to understand for which property the UI control will be added.
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products** with the following properties: `ID`, `name`, `description`, `price`, and `currency`. We wish to add a [sap.m.ComboBox](https://sapui5.hana.ondemand.com/#/api/sap.m.ComboBox) with some predefined items for the `currency` property and a [sap.m.Slider](https://sapui5.hana.ondemand.com/#/api/sap.m.Slider) for the `price` property.
+
+Firstly, a file with `.fragment.xml` extension should be created in the application files. The UI controls will be placed into this file.
+
+```xml
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+>
+    <ComboBox
+        app:UI5AntaresEntityPropertyName="currency"
+        selectedKey="{currency}"
+    >
+        <items>
+            <core:Item
+                key="EUR"
+                text="Euro"
+            />
+            <core:Item
+                key="USD"
+                text="US Dollar"
+            />
+            <core:Item
+                key="TRY"
+                text="Turkish Lira"
+            />
+        </items>
+    </ComboBox>
+    <Slider
+        app:UI5AntaresEntityPropertyName="price"
+        width="100%"
+        min="1000"
+        max="100000"
+        showAdvancedTooltip="true"
+        showHandleTooltip="true"
+        inputsAsTooltips="true"
+        enableTickmarks="true"
+        step="1000"
+        class="sapUiMediumMarginBottom"
+        value="{price}"
+    />
+</core:FragmentDefinition>
+```
+
+![Custom Control From Fragment](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/custom_control_fragment_1.png?raw=true)
+
+Secondly, an object from the [FragmentCL](#fragment-class) should be instantiated with the controller and fragment path parameters.
+
+> **Information:** Please be aware that this function is **asynchronous** and must be awaited.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import FragmentCL from "ui5/antares/ui/FragmentCL"; // Import the Fragment class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // Create an object from the FragmentCL class with the controller and fragment path parameters.
+    const fragment = new FragmentCL(this, "your.apps.namespace.path.to.FragmentFileName");
+
+    // Add the controls from the fragment. It is an asynchronous method and must be awaited.
+    await entry.addControlFromFragment(fragment);
+
+    entry.createNewEntry();
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "ui5/antares/ui/FragmentCL" // Import the Fragment class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, FragmentCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Create an object from the FragmentCL class with the controller and fragment path parameters.
+          const fragment = new FragmentCL(this, "your.apps.namespace.path.to.FragmentFileName");
+
+          // Add the controls from the fragment. It is an asynchronous method and must be awaited.
+          await entry.addControlFromFragment(fragment);
+
+          entry.createNewEntry();
+        }
+      });
+
+    });
+```
+
+![Custom Control From Fragment](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/custom_control_fragment_2.png?raw=true)
+
 ### Custom Content
 
 #### Custom Content From Fragment
 
 ### Custom Fragment
+
+## Fragment Class
