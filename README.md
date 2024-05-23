@@ -92,6 +92,7 @@ ui5 -v
       - [Constructor](#constructor-3)
       - [Validation](#validation)
       - [Custom Control From Fragment](#custom-control-from-fragment)
+        - [Validation](#validation-1)
     - [Custom Content](#custom-content)
       - [Custom Content From Fragment](#custom-content-from-fragment)
     - [Custom Fragment](#custom-fragment)
@@ -3625,6 +3626,192 @@ sap.ui.define([
 ```
 
 ![Custom Control From Fragment](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/custom_control_fragment_2.png?raw=true)
+
+#### Validation
+
+Furthermore, the custom controls loaded from a fragment can be configured to execute a [Validation Logic](#validation-logic) before the transient entity is submitted.
+
+**Important:** Since the custom UI control added to the form cannot be predicted by the library, validation and mandatory check can only be performed using the [Validator Function](#validation-with-validator-function).
+
+UI5 Antares, passes the custom UI control as a parameter to the validator function.
+
+To implement validation logic for controls loaded from a fragment, a [custom data](https://sapui5.hana.ondemand.com/#/api/sap.ui.core.CustomData) with the **UI5AntaresValidationLogic** key must be added to the control. The value of the **UI5AntaresValidationLogic** key should be the **name** of the [validator function](#validation-with-validator-function) in the controller.
+
+Additionally, the default message displayed by the end user when the validation fails can be modified by setting a [custom data](https://sapui5.hana.ondemand.com/#/api/sap.ui.core.CustomData) with the key **UI5AntaresValidationMessage**. The value of the **UI5AntaresValidationMessage** can be either the message itself or the i18n binding.
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products** with the following properties: `ID`, `name`, `description`, `price`, and `currency`. We wish to add a [sap.m.ComboBox](https://sapui5.hana.ondemand.com/#/api/sap.m.ComboBox) with some predefined items for the `currency` property and a [sap.m.Slider](https://sapui5.hana.ondemand.com/#/api/sap.m.Slider) for the `price` property Furthermore, we would like to include a validation and validation messages.
+
+Firstly, a file with `.fragment.xml` extension should be created in the application files. The UI controls will be placed into this file.
+
+```xml
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+>
+    <ComboBox
+        app:UI5AntaresEntityPropertyName="currency"
+        app:UI5AntaresValidationLogic="onValidateCurrency"
+        app:UI5AntaresValidationMessage="{i18n>currencyValidationFailed}"
+        selectedKey="{currency}"
+    >
+        <items>
+            <core:Item
+                key="EUR"
+                text="Euro"
+            />
+            <core:Item
+                key="USD"
+                text="US Dollar"
+            />
+            <core:Item
+                key="TRY"
+                text="Turkish Lira"
+            />
+        </items>
+    </ComboBox>
+    <Slider
+        app:UI5AntaresEntityPropertyName="price"
+        app:UI5AntaresValidationLogic="onValidatePrice"
+        app:UI5AntaresValidationMessage="The price must be bigger than 15000"
+        width="100%"
+        min="1000"
+        max="100000"
+        showAdvancedTooltip="true"
+        showHandleTooltip="true"
+        inputsAsTooltips="true"
+        enableTickmarks="true"
+        step="1000"
+        class="sapUiMediumMarginBottom"
+        value="{price}"
+    />
+</core:FragmentDefinition>
+```
+
+![Custom Control From Fragment](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/custom_control_fragment_3.png?raw=true)
+
+Secondly, an object from the [FragmentCL](#fragment-class) should be instantiated with the controller and fragment path parameters.
+
+> **Information:** Please be aware that **addControlFromFragment()** function is **asynchronous** and must be awaited.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import FragmentCL from "ui5/antares/ui/FragmentCL"; // Import the Fragment class
+import { ValidatorValueParameter } from "ui5/antares/types/ui/validation"; // Import the validator function parameter type
+import ComboBox from "sap/m/ComboBox";
+import Slider from "sap/m/Slider";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // Create an object from the FragmentCL class with the controller and fragment path parameters.
+    const fragment = new FragmentCL(this, "your.apps.namespace.path.to.FragmentFileName");
+
+    // Add the controls from the fragment. It is an asynchronous method and must be awaited.
+    await entry.addControlFromFragment(fragment);
+
+    entry.createNewEntry();
+  }
+
+  // The name of the validator function must match to the custom data UI5AntaresValidationLogic defined in the .fragment.xml file
+  public onValidateCurrency (control: ValidatorValueParameter): boolean {
+    if (!(control as ComboBox).getSelectedKey()) {
+      return false; // Validation is unsuccessful
+    }
+
+    return true; // Validation is successful
+  }
+
+  // The name of the validator function must match to the custom data UI5AntaresValidationLogic defined in the .fragment.xml file
+  public onValidatePrice (control: ValidatorValueParameter): boolean {
+    if ((control as Slider).getValue() <= 15000) {
+      return false; // Validation is unsuccessful
+    }
+
+    return true; // Validation is successful
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "ui5/antares/ui/FragmentCL" // Import the Fragment class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, FragmentCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Create an object from the FragmentCL class with the controller and fragment path parameters.
+          const fragment = new FragmentCL(this, "your.apps.namespace.path.to.FragmentFileName");
+
+          // Add the controls from the fragment. It is an asynchronous method and must be awaited.
+          await entry.addControlFromFragment(fragment);
+
+          entry.createNewEntry();
+        },
+
+        // The name of the validator function must match to the custom data UI5AntaresValidationLogic defined in the .fragment.xml file
+        onValidateCurrency: function (control) {
+          if (!control.getSelectedKey()) {
+            return false; // Validation is unsuccessful
+          }
+
+          return true; // Validation is successful
+        },
+
+        // The name of the validator function must match to the custom data UI5AntaresValidationLogic defined in the .fragment.xml file
+        onValidatePrice: function (control) {
+          if (control.getValue() <= 15000) {
+            return false; // Validation is unsuccessful
+          }
+
+          return true; // Validation is successful
+        }        
+      });
+
+    });
+```
 
 ### Custom Content
 
