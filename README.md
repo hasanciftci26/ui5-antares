@@ -397,20 +397,20 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           // Initialize
           const entry = new EntryCreateCL(this, "Products"); 
         },
 
-        onCreateCategory: async function() {
+        onCreateCategory: async function () {
           // Initialize with a model name
           const entry = new EntryCreateCL(this, "Categories", "myODataModelName");
         }
@@ -526,15 +526,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           // Initialize
           const entry = new EntryCreateCL(this, "Products"); 
 
@@ -542,7 +542,7 @@ sap.ui.define([
           entry.createNewEntry();
         },
 
-        onCreateCategory: async function() {
+        onCreateCategory: async function () {
           // Initialize
           const entry = new EntryCreateCL(this, "Categories"); 
 
@@ -752,15 +752,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // The OData V2 metadata labels will be used for the form elements.
@@ -850,15 +850,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // New i18n text lookup format will be => myPrefix + entityPath + propertyName
@@ -867,7 +867,7 @@ sap.ui.define([
           entry.createNewEntry(); 
         },
 
-        onCreateCategory: async function() {
+        onCreateCategory: async function () {
           const entry = new EntryCreateCL(this, "Categories");
 
           // New i18n text lookup format will be => entityPath + propertyName
@@ -943,18 +943,18 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL, EntryEnums) {
+    function (Controller, EntryCreateCL, EntryEnums) {
       "use strict";
 
       // Destructure the object to retrieve the NamingStrategies enum
       const { NamingStrategies } = EntryEnums;
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the naming strategy to snake_case
@@ -1067,18 +1067,18 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL, EntryEnums) {
+    function (Controller, EntryCreateCL, EntryEnums) {
       "use strict";
 
       // Destructure the object to retrieve the FormTypes enum
       const { FormTypes } = EntryEnums;
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the form type to SIMPLE
@@ -1161,15 +1161,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the form title
@@ -1245,15 +1245,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the begin button text
@@ -1331,15 +1331,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL, ButtonType) {
+    function (Controller, EntryCreateCL, ButtonType) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the begin button type
@@ -1415,15 +1415,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the end button text
@@ -1501,15 +1501,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL, ButtonType) {
+    function (Controller, EntryCreateCL, ButtonType) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the end button type
@@ -1612,18 +1612,18 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL, EntryEnums) {
+    function (Controller, EntryCreateCL, EntryEnums) {
       "use strict";
 
       // Destructure the object to retrieve the GuidStrategies enum
       const { GuidStrategies } = EntryEnums;
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Let the end user to display all the properties with Edm.Guid type
@@ -1733,15 +1733,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the property order and bring all the properties
@@ -1750,7 +1750,7 @@ sap.ui.define([
           entry.createNewEntry(); 
         },
 
-        onCreateCustomer: async function() {
+        onCreateCustomer: async function () {
           const entry = new EntryCreateCL(this, "Customers");
 
           // Set the property order and exclude the other properties
@@ -1834,15 +1834,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the excluded properties
@@ -1926,15 +1926,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the mandatory properties
@@ -2018,15 +2018,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the mandatory error message
@@ -2110,15 +2110,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Set the read-only properties
@@ -2222,15 +2222,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL) {
+    function (Controller, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Attach the submit completed function
@@ -2339,15 +2339,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, MessageBox, EntryCreateCL) {
+    function (Controller, MessageBox, EntryCreateCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Attach the submit failed function
@@ -2419,22 +2419,124 @@ The class has 2 public methods that can be used to retrieve information once the
 
 You must initialize an object from **ValueHelpCL** in order to use it.
 
-| Parameter   	                  | Type                            | Mandatory | Default Value             | Description                                                                                    | 
-| :------------------------------ | :------------------------------ | :-------- | :------------------------ | :--------------------------------------------------------------------------------------------- |
-| controller                      | [sap.ui.core.mvc.Controller][1] | Yes       |                           | The controller object (usually `this`)                                                         |
-| settings                        | object                          | Yes       |                           |                                                                                                |
-| &emsp;propertyName              | string                          | Yes       |                           | The property of the entity for which the Value Help is being created                           |
-| &emsp;valueHelpEntity           | string                          | Yes       |                           | The `EntitySet` name that will be bound to the table in the value help dialog                  |
-| &emsp;valueHelpProperty         | string                          | Yes       | | The property of the `valueHelpEntity` whose value will be set to `propertyName` after the selection is made in the table |
-| &emsp;readonlyProperties?       | string[]                        | No        | []                        | The properties of the `valueHelpEntity` that are displayed in the columns of the table         |
-| &emsp;excludedFilterProperties? | string[]                        | No        | []                        | The properties of the `valueHelpEntity` that are excluded from the filterbar                   |
-| &emsp;title?                    | string                          | No        | `valueHelpEntity`         | The title of the Value Help Dialog                                                             |
-| &emsp;searchPlaceholder?        | string                          | No        | Search `valueHelpEntity`  | The placeholder in the search field of the Value Help Dialog                                   |
-| &emsp;namingStrategy?           | [NamingStrategies][12]          | No        | CAMEL_CASE                | The naming strategy that is used to generate the labels for filterbar and table column headers |
-| &emsp;resourceBundlePrefix?     | string                          | No        | antaresVH                 | The resource bundle prefix that is used for the i18n text lookup                               |
-| &emsp;useMetadataLabels?        | boolean                         | No        | false                     | Indicates if the labels in metadata should be used for the filterbar and table column headers  |
-| &emsp;filterModelName?          | string                          | No        | UI5AntaresVHFilterModel   | The JSONModel name of the filterbar which is needed by the ValueHelpCL                         |
-| modelName?                      | string                          | No        | undefined                 | The name of the OData V2 model. **Do not specify** if the model name = ""                      |
+<style>
+  .objectIndent {
+    padding-left: 2em;
+  }
+</style>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Default Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>controller</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.core.mvc.Controller">sap.ui.core.mvc.Controller</a></td>
+      <td>Yes</td>
+      <td></td>
+      <td>The controller object (usually <code>this</code>)</td>
+    </tr>
+    <tr>
+      <td>settings</td>
+      <td>object</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td class="objectIndent">propertyName</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td></td>
+      <td>The property of the entity for which the Value Help is being created</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">valueHelpEntity</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td></td>
+      <td>The <code>EntitySet</code> name that will be bound to the table in the value help dialog</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">valueHelpProperty</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td></td>
+      <td>The property of the <code>valueHelpEntity</code> whose value will be set to <code>propertyName</code> after the selection is made in the table</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">readonlyProperties?</td>
+      <td>string[]</td>
+      <td>No</td>
+      <td>[]</td>
+      <td>The properties of the <code>valueHelpEntity</code> that are displayed in the columns of the table</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">excludedFilterProperties?</td>
+      <td>string[]</td>
+      <td>No</td>
+      <td>[]</td>
+      <td>The properties of the <code>valueHelpEntity</code> that are excluded from the filterbar</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">title?</td>
+      <td>string</td>
+      <td>No</td>
+      <td><code>valueHelpEntity</code></td>
+      <td>The title of the Value Help Dialog</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">searchPlaceholder?</td>
+      <td>string</td>
+      <td>No</td>
+      <td>Search <code>valueHelpEntity</code></td>
+      <td>The placeholder in the search field of the Value Help Dialog</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">namingStrategy?</td>
+      <td><a href="#namingstrategies-enum">NamingStrategies</a></td>
+      <td>No</td>
+      <td>CAMEL_CASE</td>
+      <td>The naming strategy that is used to generate the labels for filterbar and table column headers</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">resourceBundlePrefix?</td>
+      <td>string</td>
+      <td>No</td>
+      <td>antaresVH</td>
+      <td>The resource bundle prefix that is used for the i18n text lookup</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">useMetadataLabels?</td>
+      <td>boolean</td>
+      <td>No</td>
+      <td>false</td>
+      <td>Indicates if the labels in metadata should be used for the filterbar and table column headers</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">filterModelName?</td>
+      <td>string</td>
+      <td>No</td>
+      <td>UI5AntaresVHFilterModel</td>
+      <td>The JSONModel name of the filterbar which is needed by the ValueHelpCL</td>
+    </tr>
+    <tr>
+      <td>modelName?</td>
+      <td>string</td>
+      <td>No</td>
+      <td>undefined</td>
+      <td>The name of the OData V2 model. <strong>Do not specify</strong> if the model name = ""</td>
+    </tr>
+  </tbody>
+</table>
+
 
 ---
 
@@ -2532,15 +2634,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, EntryCreateCL, ValueHelpCL) {
+    function (Controller, EntryCreateCL, ValueHelpCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onCreateProduct: async function() {
+        onCreateProduct: async function () {
           const entry = new EntryCreateCL(this, "Products");
 
           // Create an object from the ValueHelpCL class
@@ -2653,15 +2755,15 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function(Controller, ValueHelpCL) {
+    function (Controller, ValueHelpCL) {
       "use strict";
 
       return Controller.extend("your.apps.namespace.YourController", {
-        onInit: function() {
+        onInit: function () {
 
         },
 
-        onValueHelpRequest: async function(event) {
+        onValueHelpRequest: async function (event) {
           // Create an object from the ValueHelpCL class
           const supplierVH = new ValueHelpCL(this, {
               propertyName: "STANDALONE", // Since this is a mandatory param and not relevant for the standalone usage, you can set anything
@@ -2694,28 +2796,381 @@ The UI5 Antares classes includes a built-in validation mechanism to ensure that 
 
 In the event of a validation failure, the end user is promptly informed via an [sap.m.MessageBox.error](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) and the submission remains in a pending status until the validation is successfully completed.
 
+There are 2 possible approaches to user input validation.
+
+1) [Validation with Operator](#validation-with-operator)
+2) [Validation with Validator Function](#validation-with-validator-function)
+
 #### Constructor
 
 You must initialize an object from **ValidationLogicCL** in order to use it.
 
-| Parameter   	             | Type                                        | Mandatory | Default Value             | Description                                                                                    | 
-| :------------------------- | :------------------------------------------ | :-------- | :------------------------ | :--------------------------------------------------------------------------------------------- |
-| settings                   | object                                      | Yes       |                           |                                                                                                |
-| &emsp;propertyName         | string                                      | Yes       |                  | The property of the entity set in the [constructor](#constructor) for which the validation will be done |
-| &emsp;validator?           | (value: ValidatorValueParameter) => boolean | No        |                           | The validator function                                                                         |
-| &emsp;listener?            | object                                      | No        |                           | The object that is bind to the validator function                                              |
-| &emsp;value1?              | string \| number \| Date \| UI5Date         | No        |                           | First value to use with the given operator                                                     |
-| &emsp;value2?              | string \| number \| Date \| UI5Date         | No        |                           | Second value to use with the given operator, used only for the **BT** and **NB** operators     |
-| &emsp;operator?            | [ValidationOperator][501]                   | No        |                           | Operator used for the validation                                                               |
-| &emsp;message?             | string                                      | No        | Validation failed for `propertyName` | The message that is displayed when the validation fails                             |
-| &emsp;showMessageBox?      | boolean                                     | No        | true                      | Indicates if the message box should be displayed by the end user                               |
-| &emsp;invalidValueMessage? | string                                      | No        | Invalid value for `propertyName` | The message that is displayed when the end user types in a invalid value. For instance: when the end user enters a string to the number field |
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Default Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>settings</td>
+      <td>object</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td class="objectIndent">propertyName</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td></td>
+      <td>The property of the entity set in the <a href="#constructor">constructor</a> for which the validation will be done</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">validator?</td>
+      <td>(value: <a href="#validation-with-validator-function">ValidatorValueParameter</a>) => boolean</td>
+      <td>No</td>
+      <td></td>
+      <td>The validator function</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">listener?</td>
+      <td>object</td>
+      <td>No</td>
+      <td></td>
+      <td>The object that is bind to the validator function</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">value1?</td>
+      <td>string | number | Date | <a href="https://sapui5.hana.ondemand.com/#/api/module:sap/ui/core/date/UI5Date">UI5 Date</a></td>
+      <td>No</td>
+      <td></td>
+      <td>First value to use with the given operator</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">value2?</td>
+      <td>string | number | Date | <a href="https://sapui5.hana.ondemand.com/#/api/module:sap/ui/core/date/UI5Date">UI5 Date</a></td>
+      <td>No</td>
+      <td></td>
+      <td>Second value to use with the given operator, used only for the <strong>BT</strong> and <strong>NB</strong> operators</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">operator?</td>
+      <td><a href="#validationoperator-enum">ValidationOperator</a></td>
+      <td>No</td>
+      <td></td>
+      <td>Operator used for the validation</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">message?</td>
+      <td>string</td>
+      <td>No</td>
+      <td>Validation failed for <code>propertyName</code></td>
+      <td>The message that is displayed when the validation fails</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">showMessageBox?</td>
+      <td>boolean</td>
+      <td>No</td>
+      <td>true</td>
+      <td>Indicates if the message box should be displayed by the end user</td>
+    </tr>
+    <tr>
+      <td class="objectIndent">invalidValueMessage?</td>
+      <td>string</td>
+      <td>No</td>
+      <td>Invalid value for <code>propertyName</code></td>
+      <td>Displayed message when the end user types in an invalid value. For instance: string to a number field</td>
+    </tr>
+  </tbody>
+</table>
 
 #### Validation with Operator
 
-#### Validation with Validator Function 
+If there are specific values that should be used for user validation, they can be defined easily on the [constructor](#constructor-2).
+
+> **Important:** Please note that **value1** and **value2** determine the type of the property. For example, if the property type is `Edm.DateTime` or `Edm.DateTimeOffset`, then value1 and value2 must be either JavaScript Date or [UI5 Date](https://sapui5.hana.ondemand.com/#/api/module:sap/ui/core/date/UI5Date).
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products** with the following properties: `ID`, `name`, `description`, `price`, and `currency`. We wish to implement a logic that allows the **price** to be between 1500 and 2500, and that the **currency** is limited to EUR.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL"; // Import the ValidationLogicCL class
+import { ValidationOperator } from "ui5/antares/types/ui/enums"; // Import the ValidationOperator enum
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // Create an object from the Validation Logic class for the price validation
+    const priceValidation = new ValidationLogicCL({
+      propertyName: "price", // price property of the Products
+      operator: ValidationOperator.BT,
+      value1: 1500,
+      value2: 2500,
+      message: "The price must be between 1500 and 2500",
+      invalidValueMessage: "Please only type number for the price field"      
+    });
+
+    // Create an object from the Validation Logic class for the currency validation
+    const currencyValidation = new ValidationLogicCL({
+      propertyName: "currency", // Currency property of the Products
+      operator: ValidationOperator.EQ,
+      value1: "EUR",
+      message: "Only EUR currency can be used"  
+    });
+
+    // Add the price validation object
+    entry.addValidationLogic(priceValidation);
+
+    // Add the currency validation object
+    entry.addValidationLogic(currencyValidation);
+
+    entry.createNewEntry();
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "ui5/antares/ui/ValidationLogicCL", // Import the ValidationLogicCL class
+    "ui5/antares/types/ui/enums" // Import the enums
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, ValidationLogicCL, UIEnums) {
+      "use strict";
+
+      // Destructure the object to retrieve the ValidationOperator enum
+      const { ValidationOperator } = UIEnums;
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Create an object from the Validation Logic class for the price validation
+          const priceValidation = new ValidationLogicCL({
+            propertyName: "price", // price property of the Products
+            operator: ValidationOperator.BT,
+            value1: 1500,
+            value2: 2500,
+            message: "The price must be between 1500 and 2500",
+            invalidValueMessage: "Please only type number for the price field"      
+          });
+
+          // Create an object from the Validation Logic class for the currency validation
+          const currencyValidation = new ValidationLogicCL({
+            propertyName: "currency", // Currency property of the Products
+            operator: ValidationOperator.EQ,
+            value1: "EUR",
+            message: "Only EUR currency can be used"  
+          });
+
+          // Add the price validation object
+          entry.addValidationLogic(priceValidation);
+
+          // Add the currency validation object
+          entry.addValidationLogic(currencyValidation);
+
+          entry.createNewEntry();
+        }
+      });
+
+    });
+```
+
+[601]: https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/validation_logic_1.png?raw=true
+[602]: https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/validation_logic_2.png?raw=true
+
+| Validation Failed         | Invalid Value         |
+| :-----------------------: | :-------------------: |
+| ![Validation Failed][601] | ![Invalid Value][602] |
+
+#### Validation with Validator Function
+
+If the validation logic is more complex than simply checking specific values, a custom function can be used for the validation.
+
+The function that will be used for the function must have a parameter to retrieve the value entered by the end user. UI5 Antares passes the user's input or the [Custom Control](#custom-control) to the validator function as a parameter.
+
+> **Important:** The value can be of the following types: string, number, boolean, Date, [UI5 Date](https://sapui5.hana.ondemand.com/#/api/module:sap/ui/core/date/UI5Date), or [Control](https://sapui5.hana.ondemand.com/#/api/sap.ui.core.Control).
+
+> **Important:** If the validator function is utilized for the purpose of validating a [Custom Control](#custom-control), the type of the parameter will be the control that is added. To illustrate, if a [sap.m.ComboBox](https://sapui5.hana.ondemand.com/#/api/sap.m.ComboBox) is added as a custom control, the [sap.m.ComboBox](https://sapui5.hana.ondemand.com/#/api/sap.m.ComboBox) class object will be passed back to the validator function. 
+
+> **Important:** Please note that for auto-generated form elements, the value can only be one of the following types: string, number, boolean, Date, or [UI5 Date](https://sapui5.hana.ondemand.com/#/api/module:sap/ui/core/date/UI5Date)
+
+The validator function should return a **boolean** value indicating whether the validation was successful or not.
+
+| Return Value | Description                  |
+| :----------- | :--------------------------- |
+| true         | Validation is successful     |
+| false        | Validation is not successful |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL"; // Import the ValidationLogicCL class
+import { ValidatorValueParameter } from "ui5/antares/types/ui/validation"; // Import the validator function parameter type
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // Create an object from the Validation Logic class for the currency validation
+    const currencyValidation = new ValidationLogicCL({
+      propertyName: "currency", // Currency property of the Products
+      validator: this.validateCurrency,
+      listener: this,
+      message: "Only EUR currency can be used"  
+    });
+
+    // Add the currency validation object
+    entry.addValidationLogic(currencyValidation);
+
+    entry.createNewEntry();
+  }
+
+  public validateCurrency(value: ValidatorValueParameter): boolean {
+    // Here you can write your own validation logic
+
+    if ((value as string) !== "EUR") {
+      return false; // Validation is not successful
+    }
+
+    return true; // Validation is successful
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "ui5/antares/ui/ValidationLogicCL" // Import the ValidationLogicCL class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, ValidationLogicCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Create an object from the Validation Logic class for the currency validation
+          const currencyValidation = new ValidationLogicCL({
+            propertyName: "currency", // Currency property of the Products
+            validator: this._validateCurrency,
+            listener: this,
+            message: "Only EUR currency can be used"  
+          });
+
+          // Add the currency validation object
+          entry.addValidationLogic(currencyValidation);
+
+          entry.createNewEntry();
+        },
+
+        _validateCurrency: function (value) {
+          // Here you can write your own validation logic
+
+          if (value !== "EUR") {
+            return false; // Validation is not successful
+          }
+
+          return true; // Validation is successful
+        }
+      });
+
+    });
+```
 
 #### ValidationOperator Enum
+
+| Name                             | Description                                             |
+| :------------------------------- | :------------------------------------------------------ |
+| ValidationOperator.BT            | Between. Boundries are included                         |
+| ValidationOperator.Contains      | Contains. It can only be used with `string` type        |
+| ValidationOperator.EndsWith      | Ends with. It can only be used with `string` type       |
+| ValidationOperator.EQ            | Equals                                                  |
+| ValidationOperator.GE            | Greater than or equals                                  |
+| ValidationOperator.GT            | Greater than                                            |
+| ValidationOperator.LE            | Little than or equals                                   |
+| ValidationOperator.LT            | Little than                                             |
+| ValidationOperator.NB            | Not between. Boundries are included                     |
+| ValidationOperator.NE            | Not equals                                              |
+| ValidationOperator.NotContains   | Not contains. It can only be used with `string` type    |
+| ValidationOperator.NotEndsWith   | Not ends with. It can only be used with `string` type   |
+| ValidationOperator.NotStartsWith | Not starts with. It can only be used with `string` type |
+| ValidationOperator.StartsWith    | Starts with. It can only be used with `string` type     |
 
 ### Custom Control
 
