@@ -2570,6 +2570,7 @@ Let us consider the following scenario: You have an `EntitySet` named **Products
 import Controller from "sap/ui/core/mvc/Controller";
 import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
 import ValueHelpCL from "ui5/antares/ui/ValueHelpCL"; // Import the Value Help class
+import { FormTypes } from "ui5/antares/types/entry/enums"; // Import the FormTypes enum
 /**
  * @namespace your.apps.namespace
  */
@@ -2627,13 +2628,17 @@ export default class YourController extends Controller {
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "ui5/antares/entry/v2/EntryCreateCL", // Import the class
-    "ui5/antares/ui/ValueHelpCL" // Import the Value Help class
+    "ui5/antares/ui/ValueHelpCL", // Import the Value Help class
+    "ui5/antares/types/entry/enums" // Import the enums
 ], 
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, EntryCreateCL, ValueHelpCL) {
+    function (Controller, EntryCreateCL, ValueHelpCL, EntryEnums) {
       "use strict";
+
+      // Destructure the object to retrieve the FormTypes enum
+      const { FormTypes } = EntryEnums;
 
       return Controller.extend("your.apps.namespace.YourController", {
         onInit: function () {
