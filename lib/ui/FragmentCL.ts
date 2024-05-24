@@ -87,7 +87,9 @@ export default class FragmentCL extends BaseObject {
         }
 
         if (this.fragment instanceof Dialog || this.fragment instanceof Popover) {
-            this.fragment.close();
+            if (this.fragment.isOpen()) {
+                this.fragment.close();
+            }
         } else {
             this.destroyFragmentContent();
             throw new Error("close() method can only be used with fragments that contain Dialog or Popover.");
@@ -101,10 +103,14 @@ export default class FragmentCL extends BaseObject {
 
         if (Array.isArray(this.fragment)) {
             this.fragment.forEach((control) => {
-                control.destroy();
+                if (!control.isDestroyed()) {
+                    control.destroy();
+                }
             });
         } else {
-            this.fragment.destroy();
+            if (!this.fragment.isDestroyed()) {
+                this.fragment.destroy();
+            }
         }
     }
 
