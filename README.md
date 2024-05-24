@@ -4547,7 +4547,7 @@ export default class YourController extends Controller {
     // Initialize without a type and with the table id
     const entry = new EntryUpdateCL(this, {
       entityPath: "Categories",
-      initializer: "tblCategories" // sap.m.table id       
+      initializer: "tblCategories" // table id       
     }); 
   }
 
@@ -4555,7 +4555,7 @@ export default class YourController extends Controller {
     // Initialize with a type and the table id
     const entry = new EntryUpdateCL<IProducts, IProductKeys>(this, {
       entityPath: "Products",
-      initializer: "tblProducts" // sap.m.table id       
+      initializer: "tblProducts" // table id       
     }); 
   }
 
@@ -4563,7 +4563,7 @@ export default class YourController extends Controller {
     // Initialize with a model name and the table id
     const entry = new EntryUpdateCL(this, {
       entityPath: "Customers",
-      initializer: "tblCustomers" // sap.m.table id      
+      initializer: "tblCustomers" // table id      
     }, "myODataModelName"); 
   }
 }
@@ -4609,7 +4609,7 @@ sap.ui.define([
           // Initialize with the table id
           const entry = new EntryUpdateCL(this, {
             entityPath: "Products",
-            initializer: "tblProducts" // sap.m.table id                
+            initializer: "tblProducts" // table id                
           }); 
         },
 
@@ -4617,7 +4617,7 @@ sap.ui.define([
           // Initialize with a model name
           const entry = new EntryUpdateCL(this, {
             entityPath: "Categories",
-            initializer: "tblCategories" // sap.m.table id                 
+            initializer: "tblCategories" // table id                 
           }, "myODataModelName");
         }
       });
