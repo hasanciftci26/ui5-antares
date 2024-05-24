@@ -98,7 +98,7 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
     }
 
     private async loadDialog(data?: EntityT) {
-        await this.addMandatoryKeyProperties();
+        await this.addNonNullableProperties();
 
         // Create Dialog
         this.createEntryDialog();
