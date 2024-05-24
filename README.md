@@ -14,6 +14,7 @@ UI5 Antares is a custom SAPUI5 library consisting of some useful classes and met
 **Main Classes**
 
 - [Entry Create](#entry-create)
+- [Entry Update](#entry-update)
 
 ## Prerequisites
 
@@ -101,6 +102,12 @@ ui5 -v
       - [Custom Content From Fragment](#custom-content-from-fragment)
     - [Custom Fragment](#custom-fragment)
       - [Auto Mandatory Check](#auto-mandatory-check)
+  - [Entry Update](#entry-update)
+    - [Use Case](#use-case-1)
+    - [Constructor](#constructor-4)
+      - [Constructor with a Table ID](#constructor-with-a-table-id)
+      - [Constructor with a Context Binding](#constructor-with-a-context-binding)
+      - [Constructor with Entity Keys](#constructor-with-entity-keys)
 
 ## Versioning
 
@@ -4394,5 +4401,117 @@ By default, UI5 Antares performs a mandatory check for the properties with **Nul
 | Returns | Description                                                                                        |
 | :------ | :------------------------------------------------------------------------------------------------- |
 | boolean | Returns the value that was set using **setAutoMandatoryCheck()** method. Default value is **true** |
+
+## Entry Update
+
+Entry Update (EntryUpdateCL) is a class that manages the UPDATE (PATCH/MERGE/PUT) operation through the OData V2 model. It basically avoids developers having to deal with fragments, user input validations, Value Help creations while working on custom SAPUI5 applications or Fiori Elements extensions. Below you can see the features that Entry Update has.
+
+**Features:**
+- sap.m.Dialog generation with a SmartForm, SimpleForm or Custom content
+- User input validation via ValidationLogicCL class
+- Value Help Dialog generation via ValueHelpCL class
+- Property sorting, readonly properties
+- Label generation for the SmartForm, SimpleForm elements
+- submitChanges(), and resetChanges() handling based on the user interaction
+- Call a fragment and bind the context in case you do not want to use the auto-generated dialog
+
+### Use Case
+
+Let's say that you have an EntitySet named `Products` which is bound to a table and you want to let the end user select a line from the table and edit the selected entity on a pop-up screen using the OData V2 service in your custom SAPUI5 application. Here are the steps you need to follow.
+
+1) You need to create a **.fragment.xml** file that contains a Dialog with a form content (Simple, Smart etc.) and call it from the controller or generate the dialog directly on the controller
+2) You have to write tons of Value Help code if you don't use [sap.ui.comp.smartfield.SmartField](https://sapui5.hana.ondemand.com/#/api/sap.ui.comp.smartfield.SmartField) with the OData Annotations
+3) You need to validate the user input, such as checking mandatory fields and ensuring that the values entered match your business logic
+4) You need to handle the table selection and the binding of the selected entity to the dialog or form
+
+[EntryUpdateCL](#entry-update) class basically handles all of the steps defined above.
+
+### Constructor
+
+You must initialize an object from EntryUpdateCL in order to use it.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Default Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>controller</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.core.mvc.Controller">sap.ui.core.mvc.Controller</a></td>
+      <td>Yes</td>
+      <td></td>
+      <td>The controller object (usually <code>this</code>)</td>
+    </tr>
+    <tr>
+      <td>settings</td>
+      <td>object</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>&emsp;entityPath</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td></td>
+      <td>The name of the <strong>EntitySet</strong>. It can start with a <strong>"/"</strong></td>
+    </tr>
+    <tr>
+      <td>&emsp;initializer?</td>
+      <td>string | <a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.model.Context">sap.ui.model.Context</a></td>
+      <td>No</td>
+      <td></td>
+      <td>The ID of the table or the context binding</td>
+    </tr>
+    <tr>
+      <td>modelName?</td>
+      <td>string</td>
+      <td>No</td>
+      <td>undefined</td>
+      <td>The name of the OData V2 model which can be found on the manifest.json file. <strong>Do not specify</strong> if the model name = ""</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+There are three distinct methods for constructing an object from the [Entry Update](#entry-update) class.
+
+### Constructor with a Table ID
+
+The most straightforward method for utilizing the capabilities of the [Entry Update](#entry-update) class is to construct an object with the ID of a table that you have on your XML view. This method offers several advantages.
+
+1) The table row selected by the end user is automatically detected by the [Entry Update](#entry-update) class, and the context binding of the selected row is bound to the auto-generated dialog.
+2) If no table row is selected by the end user, a default message is displayed in the [sap.m.MessageBox.error](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) to the end user.
+
+> **Important:** This method supports only the table types and selection modes listed below. If the selection mode of the table whose ID is being used for object construction is not supported, the library throws an error.
+
+**Supported Table Types**
+
+[801]: https://sapui5.hana.ondemand.com/#/api/sap.m.Table
+[802]: https://sapui5.hana.ondemand.com/#/api/sap.ui.table.Table
+[803]: https://sapui5.hana.ondemand.com/#/api/sap.ui.comp.smarttable.SmartTable
+[804]: https://sapui5.hana.ondemand.com/#/api/sap.ui.table.AnalyticalTable
+[805]: https://sapui5.hana.ondemand.com/#/api/sap.ui.table.TreeTable
+[806]: https://sapui5.hana.ondemand.com/#/api/sap.m.ListMode
+[807]: https://sapui5.hana.ondemand.com/#/api/sap.ui.table.SelectionMode
+
+| Table Type                               | Selection Mode                                                              |
+| :--------------------------------------- | :-------------------------------------------------------------------------- |
+| [sap.m.Table][801]                       | [SingleSelect][806] \| [SingleSelectLeft][806] \| [SingleSelectMaster][806] |
+| [sap.ui.table.Table][802]                | [Single][807]                                                               |
+| [sap.ui.comp.smarttable.SmartTable][803] | [Single][807]                                                               |
+| [sap.ui.table.AnalyticalTable][804]      | [Single][807]                                                               |
+| [sap.ui.table.TreeTable][805]            | [Single][807]                                                               |
+
+### Constructor with a Context Binding
+
+### Constructor with Entity Keys
 
 ## Fragment Class
