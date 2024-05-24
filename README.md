@@ -4518,7 +4518,7 @@ The most straightforward method for utilizing the capabilities of the [Entry Upd
 
 Let us consider an EntitySet named Products, which is bound to an [sap.m.Table][801] on the XML view. Our objective is to add a [sap.m.Button](https://sapui5.hana.ondemand.com/#/api/sap.m.Button) to the header toolbar of the table. When the user selects a row from the table and presses the **Update Product** button, we will open a dialog so the end user can modify the entity.
 
-![Update Constructor Sample]()
+![Update Constructor Sample](https://github.com/hasanciftci26/ui5-antares/blob/media/update_entry/update_constructor_1.png?raw=true)
 
 **TypeScript**
 
