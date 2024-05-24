@@ -98,6 +98,7 @@ export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT 
 
     private async loadDialog() {
         await this.initializeContext(this.settings.initializer);
+        await this.addNonNullableProperties();
 
         this.createEntryDialog();
         const fragment = this.getEntryDialog() as FragmentCL;

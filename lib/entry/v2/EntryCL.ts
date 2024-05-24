@@ -381,13 +381,19 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         }
     }
 
-    protected async addMandatoryKeyProperties() {
+    protected async addNonNullableProperties() {
         const entity = new EntityCL(this.getSourceController(), this.entityName, this.getResourceBundlePrefix(), this.namingStrategy, this.getModelName());
-        const entityTypeKeys = await entity.getEntityTypeKeys();
+        const entityTypeProperties = await entity.getEntityTypeProperties();
 
-        entityTypeKeys.forEach((key) => {
-            this.mandatoryProperties.push(key.propertyName);
-        });
+        for (const property of entityTypeProperties) {
+            if (this.mandatoryProperties.includes(property.propertyName)) {
+                continue;
+            }
+
+            if (property.nullable === "false") {
+                this.mandatoryProperties.push(property.propertyName);
+            }
+        }
     }
 
     public attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object) {
