@@ -3815,7 +3815,227 @@ sap.ui.define([
 
 ### Custom Content
 
+It is possible to add any UI control to the dialog below the auto-generated form. The distinction between [Custom Control](#custom-control) and **Custom Content** is that the custom control can only be added for the properties of the `EntitySet` specified in the [constructor](#constructor), whereas the custom content is a UI control that is required on the dialog but is not included in the transient entity.
+
+> **Important:** Custom contents are not included into the [Validation Logic](#validation-logic) process. The UI5 Antares is designed just to add custom contents to the dialog. However, it is important to note that the custom content must be managed manually.
+
+For example, a custom content could be a [sap.m.Image](https://sapui5.hana.ondemand.com/#/api/sap.m.Image), [sap.m.upload.UploadSet](https://sapui5.hana.ondemand.com/#/api/sap.m.upload.UploadSet), or any other UI control that is required on the dialog.
+
+[701]: https://sapui5.hana.ondemand.com/#/api/sap.ui.core.Control
+
+To add a custom content to the dialog, **addCustomContent()** method can be utilized.
+
+**Setter (addCustomContent)**
+
+| Parameter | Type           | Mandatory | Description                           | 
+| :-------- | :------------- | :-------- | :------------------------------------ |
+| content   | [Control][701] | Yes       | The UI control to add into the dialog |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getCustomContents)**
+
+| Returns          | Description                                                                                              |
+| :--------------- | :------------------------------------------------------------------------------------------------------- |
+| [Control[]][701] | Returns all the UI controls that were added using **addCustomContent()** method. Default value is **[]** |
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products** and we wish to add an [sap.m.upload.UploadSet](https://sapui5.hana.ondemand.com/#/api/sap.m.upload.UploadSet) to the dialog that UI5 Antares will generate.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import UploadSet from "sap/m/upload/UploadSet"; // Import the Upload Set
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL(this, "Products");
+
+    // Create the custom content
+    const upload = new UploadSet();
+    upload.addStyleClass("sapUiSmallMargin");
+
+    // Add the custom content
+    entry.addCustomContent(upload);
+
+    entry.createNewEntry(); 
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "sap/m/upload/UploadSet" // Import the Upload Set
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, UploadSet) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Create the custom content
+          const upload = new UploadSet();
+          upload.addStyleClass("sapUiSmallMargin");
+
+          // Add the custom content
+          entry.addCustomContent(upload);
+
+          entry.createNewEntry(); 
+        }
+      });
+
+    });
+```
+
+![Custom Content](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/custom_content_1.png?raw=true)
+
 #### Custom Content From Fragment
+
+Another way to add custom contents to the dialog is to load the UI controls from a custom fragment created in the application files.
+
+> **Advantage:** It's possible to add multiple contents at once with this approach. It also avoids having to create UI controls in the controller. The custom contents can be organized in the `.fragment.xml` files.
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products** and we wish to add an [sap.m.Image](https://sapui5.hana.ondemand.com/#/api/sap.m.Image) and an [sap.m.RadioButtonGroup](https://sapui5.hana.ondemand.com/#/api/sap.m.RadioButtonGroup) loaded from a fragment to the dialog that UI5 Antares will generate.
+
+Firstly, a file with `.fragment.xml` extension should be created in the application files. The UI controls will be placed into this file.
+
+```xml
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <VBox>
+        <FlexBox justifyContent="Center">
+            <Image
+                class="sapUiSmallMargin"
+                src="./img/antares.jpg"
+                width="10rem"
+            />
+        </FlexBox>
+        <RadioButtonGroup selectedIndex="0">
+            <buttons>
+                <RadioButton text="Option 1" />
+                <RadioButton text="Option 2" />
+                <RadioButton text="Option 3" />
+            </buttons>
+        </RadioButtonGroup>
+    </VBox>
+</core:FragmentDefinition>
+```
+
+![Custom Content From Fragment](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/custom_content_fragment_1.png?raw=true)
+
+Secondly, an object from the [FragmentCL](#fragment-class) should be instantiated with the controller and fragment path parameters.
+
+> **Information:** Please be aware that **addContentFromFragment()** function is **asynchronous** and must be awaited.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import FragmentCL from "ui5/antares/ui/FragmentCL"; // Import the Fragment class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // Create an object from the FragmentCL class with the controller and fragment path parameters.
+    const fragment = new FragmentCL(this, "your.apps.namespace.path.to.FragmentFileName");
+
+    // Add the controls from the fragment. It is an asynchronous method and must be awaited.
+    await entry.addContentFromFragment(fragment);
+
+    entry.createNewEntry();
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "ui5/antares/ui/FragmentCL" // Import the Fragment class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, FragmentCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          const entry = new EntryCreateCL(this, "Products");
+
+          // Create an object from the FragmentCL class with the controller and fragment path parameters.
+          const fragment = new FragmentCL(this, "your.apps.namespace.path.to.FragmentFileName");
+
+          // Add the controls from the fragment. It is an asynchronous method and must be awaited.
+          await entry.addContentFromFragment(fragment);
+
+          entry.createNewEntry();
+        }
+      });
+
+    });
+```
+
+![Custom Content From Fragment](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/custom_content_fragment_2.png?raw=true)
 
 ### Custom Fragment
 
