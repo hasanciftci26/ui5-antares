@@ -108,6 +108,8 @@ ui5 -v
       - [Constructor with a Table ID](#constructor-with-a-table-id)
       - [Constructor with a Context Binding](#constructor-with-a-context-binding)
       - [Constructor with Entity Keys](#constructor-with-entity-keys)
+    - [Select Row Message](#select-row-message)
+    - [Entity Keys](#entity-keys)
 
 ## Versioning
 
@@ -4492,6 +4494,8 @@ The most straightforward method for utilizing the capabilities of the [Entry Upd
 
 > **Important:** This method supports only the table types and selection modes listed below. If the selection mode of the table whose ID is being used for object construction is not supported, the library throws an error.
 
+> **Information:** The default message displayed when the end user has not selected a row from the table yet can be modified using [setSelectRowMessage()](#select-row-message) method.
+
 **Supported Table Types**
 
 [801]: https://sapui5.hana.ondemand.com/#/api/sap.m.Table
@@ -4510,8 +4514,123 @@ The most straightforward method for utilizing the capabilities of the [Entry Upd
 | [sap.ui.table.AnalyticalTable][804]      | [Single][807]                                                               |
 | [sap.ui.table.TreeTable][805]            | [Single][807]                                                               |
 
+**Sample**
+
+Let us consider an EntitySet named Products, which is bound to an [sap.m.Table][801] on the XML view. Our objective is to add a [sap.m.Button](https://sapui5.hana.ondemand.com/#/api/sap.m.Button) to the header toolbar of the table. When the user selects a row from the table and presses the **Update Product** button, we will open a dialog so the end user can modify the entity.
+
+![Update Constructor Sample]()
+
+**TypeScript**
+
+**EntryUpdateCL\<EntityT, EntityKeysT\>** is a generic class and can be initialized with 2 types. 
+
+- The `EntityT` type contains **all** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+- The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+
+`EntityT` is used as the returning type of the **getResponse(): EntityT** method of the `ResponseCL` class whose object is passed as a parameter into the function attached by the **attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object)** method.
+
+`EntityKeysT` is used as the type of the [setEntityKeys()](#entity-keys) method's parameter and as the returning type of the [getEntityKeys()](#entity-keys) method.
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryUpdateCL from "ui5/antares/entry/v2/EntryUpdateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onUpdateCategory() {
+    // Initialize without a type and with the table id
+    const entry = new EntryUpdateCL(this, {
+      entityPath: "Categories",
+      initializer: "tblCategories" // sap.m.table id       
+    }); 
+  }
+
+  public async onUpdateProduct() {
+    // Initialize with a type and the table id
+    const entry = new EntryUpdateCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: "tblProducts" // sap.m.table id       
+    }); 
+  }
+
+  public async onUpdateCustomer() {
+    // Initialize with a model name and the table id
+    const entry = new EntryUpdateCL(this, {
+      entityPath: "Customers",
+      initializer: "tblCustomers" // sap.m.table id      
+    }, "myODataModelName"); 
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryUpdateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryUpdateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onUpdateProduct: async function () {
+          // Initialize with the table id
+          const entry = new EntryUpdateCL(this, {
+            entityPath: "Products",
+            initializer: "tblProducts" // sap.m.table id                
+          }); 
+        },
+
+        onUpdateCategory: async function () {
+          // Initialize with a model name
+          const entry = new EntryUpdateCL(this, {
+            entityPath: "Categories",
+            initializer: "tblCategories" // sap.m.table id                 
+          }, "myODataModelName");
+        }
+      });
+
+    });
+```
+
 ### Constructor with a Context Binding
 
 ### Constructor with Entity Keys
+
+### Select Row Message
+
+### Entity Keys
 
 ## Fragment Class
