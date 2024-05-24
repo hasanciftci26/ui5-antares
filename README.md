@@ -100,6 +100,7 @@ ui5 -v
     - [Custom Content](#custom-content)
       - [Custom Content From Fragment](#custom-content-from-fragment)
     - [Custom Fragment](#custom-fragment)
+      - [Auto Mandatory Check](#auto-mandatory-check)
 
 ## Versioning
 
@@ -1891,8 +1892,8 @@ In order to include properties in the mandatory check mechanism, **setMandatoryP
 
 **Getter (getMandatoryProperties)**
 
-| Returns  | Description                                                                                      |
-| :------- | :----------------------------------------------------------------------------------------------- |
+| Returns  | Description                                                                                       |
+| :------- | :------------------------------------------------------------------------------------------------ |
 | string[] | Returns the value that was set using **setMandatoryProperties()** method. Default value is **[]** |
 
 **Sample**
@@ -4068,7 +4069,7 @@ Please be aware that there are some manual steps that must be taken when using a
   <tbody>
     <tr>
       <td><a href="#mandatory-properties">Mandatory Properties</a></td>
-      <td>By default, UI5 Antares performs a mandatory check for the key properties and the properties defined using <strong>setMandatoryProperties()</strong> method. However, this feature can be deactived using <a href="#auto-mandatory-check">setAutoMandatoryCheck()</a> method</td>
+      <td>By default, UI5 Antares performs a mandatory check for the properties with <strong>Nullable="false"</strong> attribute and the properties defined using <strong>setMandatoryProperties()</strong> method. However, this feature can be deactived using <a href="#auto-mandatory-check">setAutoMandatoryCheck()</a> method</td>
     </tr>
     <tr>
       <td><a href="#mandatory-error-message">Mandatory Error Message</a></td>
@@ -4375,5 +4376,23 @@ sap.ui.define([
 ![Custom Fragment](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/custom_fragment_2.png?raw=true)
 
 #### Auto Mandatory Check
+
+By default, UI5 Antares performs a mandatory check for the properties with **Nullable="false"** attribute and the properties defined using [setMandatoryProperties()](#mandatory-properties) method. However, this feature can be deactived using **setAutoMandatoryCheck()** method.
+
+**Setter (setAutoMandatoryCheck)**
+
+| Parameter          | Type     | Mandatory | Description                                         | 
+| :----------------- | :------- | :-------- | :-------------------------------------------------- |
+| autoMandatoryCheck | boolean  | Yes       | If set to **false**, mandatory check is deactivated |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getAutoMandatoryCheck)**
+
+| Returns | Description                                                                                        |
+| :------ | :------------------------------------------------------------------------------------------------- |
+| boolean | Returns the value that was set using **setAutoMandatoryCheck()** method. Default value is **true** |
 
 ## Fragment Class
