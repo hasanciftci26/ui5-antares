@@ -4050,6 +4050,8 @@ Please be aware that there are some manual steps that must be taken when using a
 1) [Entry Create](#entry-create) class provides a public method named **submit()** which must be called manually to submit the transient entity.
 2) [Entry Create](#entry-create) class provides a public method named **reset()** that must be called in the event that the transient entity will not be submitted and the dialog is closed and destroyed.
 
+> **Information:** The **submit(resetAllOnFail:boolean = false)** method accepts an optional parameter with a default value of false. This parameter indicates whether all transient entities in the OData V2 Model should be reset or only the current context. If you wish to **reset all** transient entities, please set this parameter to **true**. If you only wish to reset the current transient entity, there is no need to set this parameter. 
+
 > **Important:** Please be advised that the fragment to be loaded must contain a [sap.m.Dialog](https://sapui5.hana.ondemand.com/#/api/sap.m.Dialog) and that all UI controls must be placed as the content of the dialog.
 
 > **Important:** It should be noted that only a limited number of features of the UI5 Antares can be utilized with a custom fragment.
@@ -4069,12 +4071,20 @@ Please be aware that there are some manual steps that must be taken when using a
       <td>By default, UI5 Antares performs a mandatory check for the key properties and the properties defined using <strong>setMandatoryProperties()</strong> method. However, this feature can be deactived using <a href="#auto-mandatory-check">setAutoMandatoryCheck()</a> method</td>
     </tr>
     <tr>
+      <td><a href="#mandatory-error-message">Mandatory Error Message</a></td>
+      <td>The default message that is displayed when the mandatory check fails can be modified</td>
+    </tr>
+    <tr>
       <td><a href="#attach-submit-completed">Attach Submit Completed</a></td>
       <td>It is possible to create a function that will be called after the transient entity has been submitted successfully</td>
     </tr>
     <tr>
       <td><a href="#attach-submit-failed">Attach Submit Failed</a></td>
       <td>It is possible to create a function that will be called if the transient entity submission fails</td>
+    </tr>
+    <tr>
+      <td><a href="#properties-with-edmguid-type">Properties with Edm.Guid Type</a></td>
+      <td>By default, UI5 Antares generates random UUID for the <strong>key</strong> properties with Edm.Guid type</td>
     </tr>
   </tbody>
 </table>
@@ -4110,12 +4120,13 @@ Firstly, a file with `.fragment.xml` extension should be created in the applicat
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
 >
-    <Dialog>
+    <Dialog title="Create New Product">
         <form:SimpleForm>
             <form:content>
                 <Label text="Product ID" />
                 <MaskInput
                     mask="CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC"
+                    value="{ID}"
                     placeholderSymbol="_"
                 >
                     <rules>
@@ -4360,6 +4371,8 @@ sap.ui.define([
 
     });
 ```
+
+![Custom Fragment](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/custom_fragment_2.png?raw=true)
 
 #### Auto Mandatory Check
 
