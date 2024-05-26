@@ -16,9 +16,9 @@ import FragmentCL from "ui5/antares/ui/FragmentCL";
  * @namespace ui5.antares.entry.v2
  */
 export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT extends object = object> extends EntryCL<EntityT, EntityKeysT> {
-    private settings: IUpdateSettings;
+    private settings: IUpdateSettings<EntityKeysT>;
 
-    constructor(controller: Controller | UIComponent, settings: IUpdateSettings, modelName?: string) {
+    constructor(controller: Controller | UIComponent, settings: IUpdateSettings<EntityKeysT>, modelName?: string) {
         super(controller, settings.entityPath, ODataMethods.UPDATE, modelName);
         this.settings = settings;
     }

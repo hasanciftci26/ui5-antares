@@ -1,8 +1,8 @@
 import Context from "sap/ui/model/Context";
 
-export interface IDeleteSettings {
+export interface IDeleteSettings<EntityKeysT extends object> {
     entityPath: string;
-    initializer?: string | Context;
+    initializer: string | Context | EntityKeysT;
 }
 
 export interface IDeleteFailed {

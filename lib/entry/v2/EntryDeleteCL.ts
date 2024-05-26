@@ -19,7 +19,7 @@ import ResponseCL from "ui5/antares/entry/v2/ResponseCL";
  * @namespace ui5.antares.entry.v2
  */
 export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT extends object = object> extends EntryCL<EntityT, EntityKeysT> {
-    private settings: IDeleteSettings;
+    private settings: IDeleteSettings<EntityKeysT>;
     private confirmationText: string = "The selected line will be deleted. Do you confirm?"
     private confirmationTitle: string = "Confirm Delete";
     private deleteCompleted?: (data: EntityT) => void;
@@ -27,7 +27,7 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
     private deleteFailed?: (response: ResponseCL<IDeleteFailed>) => void;
     private failedListener?: object;
 
-    constructor(controller: Controller | UIComponent, settings: IDeleteSettings, modelName?: string) {
+    constructor(controller: Controller | UIComponent, settings: IDeleteSettings<EntityKeysT>, modelName?: string) {
         super(controller, settings.entityPath, ODataMethods.DELETE, modelName);
         this.settings = settings;
         this.setBeginButtonType(ButtonType.Reject);
