@@ -28,12 +28,12 @@ export default class FragmentCL extends BaseObject {
         }
     }
 
-    public async openAsync(): Promise<void> {
+    public async openAsync(): Promise<Dialog | Popover> {
         const fragment = await this.load();
 
         if (fragment instanceof Dialog) {
             fragment.open();
-            return;
+            return fragment;
         }
 
         if (fragment instanceof Popover) {
@@ -43,20 +43,20 @@ export default class FragmentCL extends BaseObject {
             }
 
             fragment.openBy(this.openByControl);
-            return;
+            return fragment;
         }
 
         throw new Error("openAsync() method can only be used with fragments that contain Dialog or Popover.");
     }
 
-    public open() {
+    public open(): Dialog | Popover {
         if (!this.fragment) {
             throw new Error("No fragment was found to open. Use load() method to initialize the fragment.");
         }
 
         if (this.fragment instanceof Dialog) {
             this.fragment.open();
-            return;
+            return this.fragment;
         }
 
         if (this.fragment instanceof Popover) {
@@ -66,7 +66,7 @@ export default class FragmentCL extends BaseObject {
             }
 
             this.fragment.openBy(this.openByControl);
-            return;
+            return this.fragment;
         }
 
         this.destroyFragmentContent();
