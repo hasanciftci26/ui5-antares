@@ -4516,7 +4516,7 @@ The most straightforward method for utilizing the capabilities of the [Entry Upd
 
 **Sample**
 
-Let us consider an EntitySet named Products, which is bound to an [sap.m.Table][801] on the XML view. Our objective is to add a [sap.m.Button](https://sapui5.hana.ondemand.com/#/api/sap.m.Button) to the header toolbar of the table. When the user selects a row from the table and presses the **Update Product** button, we will open a dialog so the end user can modify the entity.
+Let us consider an `EntitySet` named **Products**, which is bound to an [sap.m.Table][801] on the XML view. Our objective is to add a [sap.m.Button](https://sapui5.hana.ondemand.com/#/api/sap.m.Button) to the header toolbar of the table. When the user selects a row from the table and presses the **Update Product** button, we will open a dialog so the end user can modify the entity.
 
 ![Update Constructor Sample](https://github.com/hasanciftci26/ui5-antares/blob/media/update_entry/update_constructor_1.png?raw=true)
 
@@ -4627,7 +4627,330 @@ sap.ui.define([
 
 ### Constructor with a Context Binding
 
+An alternative approach to constructing an object from the [Entry Update](#entry-update) class is to utilise the [context](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.Context) of the entity that will be updated by the end user.
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products**, which is bound to an [sap.m.Table][801] on the XML view. Our objective is to add a [sap.m.Button](https://sapui5.hana.ondemand.com/#/api/sap.m.Button) to the header toolbar of the table. When the user selects a row from the table and presses the **Update Product** button, we will retrieve the context of the selected row and use to construct an object from the [Entry Update](#entry-update) class.
+
+![Update Constructor Sample](https://github.com/hasanciftci26/ui5-antares/blob/media/update_entry/update_constructor_1.png?raw=true)
+
+**TypeScript**
+
+**EntryUpdateCL\<EntityT, EntityKeysT\>** is a generic class and can be initialized with 2 types. 
+
+- The `EntityT` type contains **all** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+- The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+
+`EntityT` is used as the returning type of the **getResponse(): EntityT** method of the `ResponseCL` class whose object is passed as a parameter into the function attached by the **attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object)** method.
+
+`EntityKeysT` is used as the type of the [setEntityKeys()](#entity-keys) method's parameter and as the returning type of the [getEntityKeys()](#entity-keys) method.
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryUpdateCL from "ui5/antares/entry/v2/EntryUpdateCL"; // Import the class
+import MessageBox from "sap/m/MessageBox";
+import Table from "sap/m/Table";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onUpdateCategory() {
+    // Get the selected item and warn the end user if no row was selected
+    const selectedItem = (this.getView().byId("tblCategories") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    // Get the selected context
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize without a type and use the binding context
+    const entry = new EntryUpdateCL(this, {
+      entityPath: "Categories",
+      initializer: selectedContext // binding context
+    }); 
+  }
+
+  public async onUpdateProduct() {
+    // Get the selected item and warn the end user if no row was selected
+    const selectedItem = (this.getView().byId("tblProducts") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    // Get the selected context
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize with a type and use the binding context
+    const entry = new EntryUpdateCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: selectedContext // binding context
+    }); 
+  }
+
+  public async onUpdateCustomer() {
+    // Get the selected item and warn the end user if no row was selected
+    const selectedItem = (this.getView().byId("tblCustomers") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    // Get the selected context
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize with a model name and use the binding context
+    const entry = new EntryUpdateCL(this, {
+      entityPath: "Customers",
+      initializer: selectedContext // binding context   
+    }, "myODataModelName"); 
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryUpdateCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryUpdateCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onUpdateProduct: async function () {
+          // Get the selected item and warn the end user if no row was selected
+          const selectedItem = this.getView().byId("tblProducts").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          // Get the selected context
+          const selectedContext = selectedItem.getBindingContext();
+
+          // Initialize with the binding context
+          const entry = new EntryUpdateCL(this, {
+            entityPath: "Products",
+            initializer: selectedContext // binding context     
+          }); 
+        },
+
+        onUpdateCategory: async function () {
+          // Get the selected item and warn the end user if no row was selected
+          const selectedItem = this.getView().byId("tblCategories").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          // Get the selected context
+          const selectedContext = selectedItem.getBindingContext();
+
+          // Initialize with the binding context
+          const entry = new EntryUpdateCL(this, {
+            entityPath: "Categories",
+            initializer: selectedContext // binding context               
+          }, "myODataModelName");
+        }
+      });
+
+    });
+```
+
 ### Constructor with Entity Keys
+
+The final method for constructing an object from the [Entry Update](#entry-update) class is to utilize the key values of the entity that will be updated by the end user.
+
+**Sample**
+
+For the purposes of this example, let us consider an `EntitySet` named **Products** with a single **key** property named `ID`, whose type is `Edm.Guid`. We would like to allow the end user to edit a specific entity with the key value: **ID = "b2f0013e-418f-42aa-9a24-3770fe17ce18"**.
+
+> **Hint:** Please note that if the `EntitySet` is bound to a table, you can retrieve the values of the **key** properties of the selected row using the **getBindingContext().getObject()** method.
+
+> **Information:** The EntryUpdateCL class creates a binding context with the values of the specified **key** properties using the [setEntityKeys()](#entity-keys) method and subsequently binds the created context to the dialog.
+
+To set the key values of the entity set, [setEntityKeys()](#entity-keys) method can be utilized.
+
+**TypeScript**
+
+**EntryUpdateCL\<EntityT, EntityKeysT\>** is a generic class and can be initialized with 2 types. 
+
+- The `EntityT` type contains **all** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+- The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+
+`EntityT` is used as the returning type of the **getResponse(): EntityT** method of the `ResponseCL` class whose object is passed as a parameter into the function attached by the **attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object)** method.
+
+`EntityKeysT` is used as the type of the [setEntityKeys()](#entity-keys) method's parameter and as the returning type of the [getEntityKeys()](#entity-keys) method.
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryUpdateCL from "ui5/antares/entry/v2/EntryUpdateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onUpdateCategory() {
+    // Prepare the key values of a specific entity
+    const keyValues = {
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+    };
+
+    // Initialize without a type and do not use the initializer parameter
+    const entry = new EntryUpdateCL(this, {
+      entityPath: "Categories"
+    });
+    
+    // Set the entity keys
+    entry.setEntityKeys(keyValues);
+  }
+
+  public async onUpdateProduct() {
+    // Prepare the key values of a specific entity
+    const keyValues = {
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+    };
+
+    // Initialize with a type and do not use the initializer parameter
+    const entry = new EntryUpdateCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products"
+    });
+
+    // Set the entity keys
+    entry.setEntityKeys(keyValues);    
+  }
+
+  public async onUpdateCustomer() {
+    // Prepare the key values of a specific entity
+    const keyValues = {
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+    };
+
+    // Initialize with a model name and do not use the initializer parameter
+    const entry = new EntryUpdateCL(this, {
+      entityPath: "Customers"
+    }, "myODataModelName"); 
+
+    // Set the entity keys
+    entry.setEntityKeys(keyValues);    
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryUpdateCL"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryUpdateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onUpdateProduct: async function () {
+          // Prepare the key values of a specific entity
+          const keyValues = {
+            ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+          };
+
+          // Initialize with the entity set name but do not use the initializer parameter
+          const entry = new EntryUpdateCL(this, {
+            entityPath: "Products"   
+          });
+
+          // Set the entity keys
+          entry.setEntityKeys(keyValues);      
+        },
+
+        onUpdateCategory: async function () {
+          // Prepare the key values of a specific entity
+          const keyValues = {
+            ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+          };
+
+          // Initialize with the entity set name but do not use the initializer parameter
+          const entry = new EntryUpdateCL(this, {
+            entityPath: "Categories"          
+          }, "myODataModelName");
+
+          // Set the entity keys
+          entry.setEntityKeys(keyValues);              
+        }
+      });
+
+    });
+```
 
 ### Select Row Message
 
