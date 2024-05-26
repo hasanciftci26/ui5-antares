@@ -109,7 +109,6 @@ ui5 -v
       - [Constructor with a Context Binding](#constructor-with-a-context-binding)
       - [Constructor with Entity Keys](#constructor-with-entity-keys)
     - [Select Row Message](#select-row-message)
-    - [Entity Keys](#entity-keys)
 
 ## Versioning
 
@@ -4465,11 +4464,11 @@ You must initialize an object from EntryUpdateCL in order to use it.
       <td>The name of the <strong>EntitySet</strong>. It can start with a <strong>"/"</strong></td>
     </tr>
     <tr>
-      <td>&emsp;initializer?</td>
-      <td>string | <a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.model.Context">sap.ui.model.Context</a></td>
-      <td>No</td>
+      <td>&emsp;initializer</td>
+      <td>string | <a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.model.Context">sap.ui.model.Context</a> | EntityKeysT</td>
+      <td>Yes</td>
       <td></td>
-      <td>The ID of the table or the context binding</td>
+      <td>The ID of the table or the context binding or the key values of the entity that will be updated</td>
     </tr>
     <tr>
       <td>modelName?</td>
@@ -4529,7 +4528,7 @@ Let us consider an `EntitySet` named **Products**, which is bound to an [sap.m.T
 
 `EntityT` is used as the returning type of the **getResponse(): EntityT** method of the `ResponseCL` class whose object is passed as a parameter into the function attached by the **attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object)** method.
 
-`EntityKeysT` is used as the type of the [setEntityKeys()](#entity-keys) method's parameter and as the returning type of the [getEntityKeys()](#entity-keys) method.
+`EntityKeysT` is used as one of the types of the `initializer` parameter in the class [constructor](#constructor-4).
 
 ```ts
 import Controller from "sap/ui/core/mvc/Controller";
@@ -4644,7 +4643,7 @@ Let us consider an `EntitySet` named **Products**, which is bound to an [sap.m.T
 
 `EntityT` is used as the returning type of the **getResponse(): EntityT** method of the `ResponseCL` class whose object is passed as a parameter into the function attached by the **attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object)** method.
 
-`EntityKeysT` is used as the type of the [setEntityKeys()](#entity-keys) method's parameter and as the returning type of the [getEntityKeys()](#entity-keys) method.
+`EntityKeysT` is used as one of the types of the `initializer` parameter in the class [constructor](#constructor-4).
 
 ```ts
 import Controller from "sap/ui/core/mvc/Controller";
@@ -4808,9 +4807,7 @@ For the purposes of this example, let us consider an `EntitySet` named **Product
 
 > **Hint:** Please note that if the `EntitySet` is bound to a table, you can retrieve the values of the **key** properties of the selected row using the **getBindingContext().getObject()** method.
 
-> **Information:** The EntryUpdateCL class creates a binding context with the values of the specified **key** properties using the [setEntityKeys()](#entity-keys) method and subsequently binds the created context to the dialog.
-
-To set the key values of the entity set, [setEntityKeys()](#entity-keys) method can be utilized.
+> **Information:** The EntryUpdateCL class creates a binding context with the values of the specified **key** properties using the `initializer` parameter in the class [constructor](#constructor-4) and subsequently binds the created context to the dialog.
 
 **TypeScript**
 
@@ -4821,7 +4818,7 @@ To set the key values of the entity set, [setEntityKeys()](#entity-keys) method 
 
 `EntityT` is used as the returning type of the **getResponse(): EntityT** method of the `ResponseCL` class whose object is passed as a parameter into the function attached by the **attachSubmitCompleted(submitCompleted: (response: ResponseCL<EntityT>) => void, listener?: object)** method.
 
-`EntityKeysT` is used as the type of the [setEntityKeys()](#entity-keys) method's parameter and as the returning type of the [getEntityKeys()](#entity-keys) method.
+`EntityKeysT` is used as one of the types of the `initializer` parameter in the class [constructor](#constructor-4).
 
 ```ts
 import Controller from "sap/ui/core/mvc/Controller";
@@ -4841,13 +4838,11 @@ export default class YourController extends Controller {
       ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
     };
 
-    // Initialize without a type and do not use the initializer parameter
+    // Initialize without a type and use the key values as the initializer
     const entry = new EntryUpdateCL(this, {
-      entityPath: "Categories"
+      entityPath: "Categories",
+      initializer: keyValues // key values of the entity
     });
-    
-    // Set the entity keys
-    entry.setEntityKeys(keyValues);
   }
 
   public async onUpdateProduct() {
@@ -4856,13 +4851,11 @@ export default class YourController extends Controller {
       ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
     };
 
-    // Initialize with a type and do not use the initializer parameter
+    // Initialize with a type and use the key values as the initializer
     const entry = new EntryUpdateCL<IProducts, IProductKeys>(this, {
-      entityPath: "Products"
+      entityPath: "Products",
+      initializer: keyValues // key values of the entity
     });
-
-    // Set the entity keys
-    entry.setEntityKeys(keyValues);    
   }
 
   public async onUpdateCustomer() {
@@ -4871,13 +4864,11 @@ export default class YourController extends Controller {
       ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
     };
 
-    // Initialize with a model name and do not use the initializer parameter
+    // Initialize with a model name and use the key values as the initializer
     const entry = new EntryUpdateCL(this, {
-      entityPath: "Customers"
+      entityPath: "Customers",
+      initializer: keyValues // key values of the entity
     }, "myODataModelName"); 
-
-    // Set the entity keys
-    entry.setEntityKeys(keyValues);    
   }
 }
 
@@ -4924,13 +4915,11 @@ sap.ui.define([
             ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
           };
 
-          // Initialize with the entity set name but do not use the initializer parameter
+          // Initialize with the entity set name and use the key values as the initializer
           const entry = new EntryUpdateCL(this, {
-            entityPath: "Products"   
-          });
-
-          // Set the entity keys
-          entry.setEntityKeys(keyValues);      
+            entityPath: "Products",
+            initializer: keyValues // key values of the entity
+          });  
         },
 
         onUpdateCategory: async function () {
@@ -4939,13 +4928,11 @@ sap.ui.define([
             ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
           };
 
-          // Initialize with the entity set name but do not use the initializer parameter
+          // Initialize with the entity set name and use the key values as the initializer
           const entry = new EntryUpdateCL(this, {
-            entityPath: "Categories"          
-          }, "myODataModelName");
-
-          // Set the entity keys
-          entry.setEntityKeys(keyValues);              
+            entityPath: "Categories",
+            initializer: keyValues // key values of the entity        
+          }, "myODataModelName");          
         }
       });
 
@@ -4953,7 +4940,5 @@ sap.ui.define([
 ```
 
 ### Select Row Message
-
-### Entity Keys
 
 ## Fragment Class
