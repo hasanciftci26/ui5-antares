@@ -15,9 +15,9 @@ import FragmentCL from "ui5/antares/ui/FragmentCL";
  * @namespace ui5.antares.entry.v2
  */
 export default class EntryReadCL<EntityT extends object = object, EntityKeysT extends object = object> extends EntryCL<EntityT, EntityKeysT> {
-    private settings: IReadSettings;
+    private settings: IReadSettings<EntityKeysT>;
 
-    constructor(controller: Controller | UIComponent, settings: IReadSettings, modelName?: string) {
+    constructor(controller: Controller | UIComponent, settings: IReadSettings<EntityKeysT>, modelName?: string) {
         super(controller, settings.entityPath, ODataMethods.READ, modelName);
         this.settings = settings;
     }

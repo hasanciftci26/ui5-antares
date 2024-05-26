@@ -282,14 +282,6 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         return this.autoMandatoryCheck;
     }
 
-    public setEntityKeys(keys: EntityKeysT) {
-        this.entityKeys = keys;
-    }
-
-    public getEntityKeys(): EntityKeysT | undefined {
-        return this.entityKeys;
-    }
-
     public setSelectRowMessage(message: string) {
         this.selectRowMessage = message;
     }
@@ -582,23 +574,27 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         this.destroyEntryDialog();
     }
 
-    protected async initializeContext(initializer?: string | Context) {
-        if (initializer) {
-            this.setInitializer(initializer);
+    protected async initializeContext(initializer: string | Context | EntityKeysT) {
+        this.setInitializer(initializer);
 
-            if (this.tableId) {
-                this.initContextFromTable();
-            }
+        if (this.entryContext) {
+            return;
+        }
+
+        if (this.tableId) {
+            this.initContextFromTable();
         } else {
             await this.createBindingContext();
         }
     }
 
-    private setInitializer(initializer: string | Context) {
+    private setInitializer(initializer: string | Context | EntityKeysT) {
         if (initializer instanceof Context) {
             this.entryContext = initializer;
-        } else {
+        } else if (typeof initializer === "string") {
             this.tableId = initializer;
+        } else {
+            this.entityKeys = initializer;
         }
     }
 
@@ -682,10 +678,10 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
 
     private createBindingContext(): Promise<void> {
         return new Promise((resolve, reject) => {
-            const entityKeys = this.getEntityKeys();
+            const entityKeys = this.entityKeys;
 
             if (!entityKeys) {
-                throw new Error("Entity key values must be provided through setEntityKeys() method!");
+                throw new Error("Entity key values must be provided through the initializer parameter in the class constructor!");
             }
 
             const path = this.getODataModel().createKey(this.entityPath, entityKeys);
