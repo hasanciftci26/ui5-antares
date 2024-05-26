@@ -109,6 +109,10 @@ ui5 -v
       - [Constructor with a Context Binding](#constructor-with-a-context-binding)
       - [Constructor with Entity Keys](#constructor-with-entity-keys)
     - [Select Row Message](#select-row-message)
+    - [Update Entry](#update-entry)
+      - [Method Parameters](#method-parameters-1)
+      - [Default Values](#default-values-1)
+    - [Available Features](#available-features)
 
 ## Versioning
 
@@ -4940,5 +4944,68 @@ sap.ui.define([
 ```
 
 ### Select Row Message
+
+If the object from the [Entry Update](#entry-update) class is constructed using the [Constructor with a Table ID](#constructor-with-a-table-id) approach, a default error message is displayed in an [sap.m.MessageBox.error](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) to the end user when the user has not yet selected a row from the table.
+
+To change the default message, **setSelectRowMessage()** method can be utilized.
+
+**Setter (setSelectRowMessage)**
+
+| Parameter | Type   | Mandatory | Description                                                                           | 
+| :-------- | :----- | :-------- | :------------------------------------------------------------------------------------ |
+| message   | string | Yes       | The message that is displayed when the end user has not selected a row from the table |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getSelectRowMessage)**
+
+| Returns | Description                                                                                                                     |
+| :------ | :------------------------------------------------------------------------------------------------------------------------------ |
+| string  | Returns the value that was set using **setSelectRowMessage()** method. Default value is **Please select a row from the table.** |
+
+### Update Entry
+
+**updateEntry()** method binds the context, which is determined using the `initializer` parameter in the class [constructor](#constructor-4), to the dialog that is automatically generated or loaded from the fragment that is placed in the application files. Once the context is bound, the generated/loaded dialog is opened.
+
+By default, **updateEntry()** method uses the [ODataMetaModel](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.odata.ODataMetaModel) to determine the `EntityType` of the `EntitySet` that was set by the [constructor](#constructor-4) and brings all the properties in the same order as the OData metadata into the generated form. 
+
+All **key** properties are marked as mandatory/required and the labels are generated assuming that the naming convention of the `EntityType` is **camelCase**. Please see [Label Generation](#label-generation)
+
+> **Important:** It is not possible to modify any of the **key** properties of an `EntitySet` on the auto-generated dialog. This behaviour cannot be altered.
+
+> **Important:** Please be advised that the **updateEntry()** method must be called after any configurations have been made through the public method of the [Entry Update](#entry-update) class. Any configurations (form title, mandatory properties, etc.) made after the **updateEntry()** method will not be reflected. Basically, **updateEntry()** method should be called at the end of your code block.
+
+By default, the **key** properties with **Edm.Guid** type are not visible on the generated form. However, this behavior can be modified using the [setDisplayGuidProperties()](#properties-with-edmguid-type) method.
+
+> **Important:** Please be advised that the random UUID generation for properties with the `Edm.Guid` type is not available in the [Entry Update](#entry-update) class.
+
+#### Method Parameters
+
+| Returns         | Description                                                                                                                                                    |
+| :-------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Promise\<void\> | After the promise is resolved, the context can be retrieved by the **getEntryContext()** method using the object instantiated from the **EntryUpdateCL** class |
+
+> **updateEntry()** method uses the default configurations when creating the dialog. However, these configurations can be modified using the public setter methods.
+
+#### Default Values
+
+| Term                    | Default Value                       | Description                                               | Setter                           | Getter                           |
+| :---------------------- | :---------------------------------- | :-------------------------------------------------------- | :------------------------------- | :------------------------------- |
+| Naming Strategy         | [NamingStrategies.CAMEL_CASE][12]   | The default naming strategy is **CAMEL_CASE**             | [setNamingStrategy()][2]         | [getNamingStrategy()][2]         |
+| Resource Bundle Prefix  | antares                             | The default resource bundle prefix is **antares**         | [setResourceBundlePrefix()][10]  | [getResourceBundlePrefix()][10]  |
+| Use Metadata Labels     | false                               | The labels are not taken from the metadata but generated  | [setUseMetadataLabels()][11]     | [getUseMetadataLabels()][11]     |
+| Form Type               | [FormTypes.SMART][13]               | SmartForm with SmartFields is generated by default        | [setFormType()][3]               | [getFormType()][3]               |
+| Form Title              | Update + ${entityPath}              | entityPath from the [constructor](#constructor-4) is used | [setFormTitle()][4]              | [getFormTitle()][4]              |
+| Begin Button Text       | Update                              | The default begin button text is **Update**               | [setBeginButtonText()][5]        | [getBeginButtonText()][5]        |
+| Begin Button Type       | [ButtonType.Success][7]             | The default button type is **Success**                    | [setBeginButtonType()][6]        | [getBeginButtonType()][6]        |
+| End Button Text         | Close                               | The default end button text is **Close**                  | [setEndButtonText()][8]          | [getEndButtonText()][8]          |
+| End Button Type         | [ButtonType.Negative][7]            | The default button type is **Negative**                   | [setEndButtonType()][9]          | [getEndButtonType()][9]          |
+| Mandatory Error Message | Please fill in all required fields. | The displayed message when the mandatory check fails      | [setMandatoryErrorMessage()][14] | [getMandatoryErrorMessage()][14] |
+
+<br/>
+
+### Available Features
 
 ## Fragment Class
