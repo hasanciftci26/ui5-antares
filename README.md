@@ -5006,6 +5006,316 @@ By default, the **key** properties with **Edm.Guid** type are not visible on the
 
 <br/>
 
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryUpdateCL from "ui5/antares/entry/v2/EntryUpdateCL"; // Import the class
+import Table from "sap/m/Table";
+import MessageBox from "sap/m/MessageBox";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onUpdateProduct() {
+    // Initialize without a type and with a table id
+    const entry = new EntryUpdateCL(this, {
+      entityPath: "Products",
+      initializer: "tblProducts"
+    });
+
+    // Call 
+    entry.updateEntry(); 
+  }
+
+  public async onUpdateCategory() {
+    const selectedItem = (this.getView().byId("tblCategories") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize with a type and a binding context
+    const entry = new EntryUpdateCL<ICategory>(this, {
+      entityPath: "Categories",
+      initializer: selectedContext
+    }); 
+
+    // Call with the initial values
+    entry.updateEntry();
+  }
+
+  public async onUpdateCustomer () {
+    const selectedItem = (this.getView().byId("tblCustomers") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    };
+
+    const customerKeys = {
+      ID: selectedItem.getBindingContext().getObject().ID
+    };
+
+    // Initialize without a type and with the key values
+    const entry = new EntryUpdateCL(this, {
+      entityPath: "Customers",
+      initializer: customerKeys
+    });
+
+    entry.updateEntry();
+  }
+}
+
+interface ICategory {
+  ID: string;
+  name?: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryUpdateCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryUpdateCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onUpdateProduct: async function () {
+          // Initialize with a table id
+          const entry = new EntryUpdateCL(this, {
+            entityPath: "Products",
+            initializer: "tblProducts"
+          }); 
+
+          // Call
+          entry.updateEntry();
+        },
+
+        onUpdateCategory: async function () {
+          const selectedItem = this.getView().byId("tblCategories").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          const selectedContext = selectedItem.getBindingContext();
+
+          // Initialize with a binding context
+          const entry = new EntryUpdateCL(this, {
+            entityPath: "Categories",
+            initializer: selectedContext
+          }); 
+
+          // Call
+          entry.updateEntry();
+        },
+
+        onUpdateCustomer: async function () {
+          const selectedItem = this.getView().byId("tblCustomers").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          const customerKeys = {
+            ID: selectedItem.getBindingContext().getObject().ID
+          };
+
+          // Initialize with the key values
+          const entry = new EntryUpdateCL(this, {
+            entityPath: "Customers",
+            initializer: customerKeys
+          }); 
+
+          // Call
+          entry.updateEntry();          
+        }
+      });
+
+    });
+```
+
+The generated form with default values will more or less look like the following. It will vary depending on the configurations and the `EntityType` properties of the `EntitySet`.
+
+![Update Entry](https://github.com/hasanciftci26/ui5-antares/blob/media/update_entry/update_entry.png?raw=true)
+
 ### Available Features
+
+The [EntryUpdateCL](#entry-update) class is derived from the same abstract class as the [EntryCreateCL](#entry-create) class and contains the same methods. However, some of these functions are not applicable to the [EntryUpdateCL](#entry-update) class. 
+
+> **Important:** Please note that the default values for the available functions may differ.
+
+The features listed below are identical to those available in [EntryCreateCL](#entry-create). Methods can be accessed through the object constructed from the [EntryUpdateCL](#entry-update) class.
+
+> **Hint**: To access the documentation for a particular feature, please click on the name of the feature.
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Availability</th>
+      <th>Default Value</th>
+      <th>Remarks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#label-generation">Label Generation</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#resource-bundle-prefix">Resource Bundle Prefix</a></td>
+      <td align="center">&#x2714;</td>
+      <td>antares</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#naming-strategy">Naming Strategy</a></td>
+      <td align="center">&#x2714;</td>
+      <td>CAMEL_CASE</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#form-type">Form Type</a></td>
+      <td align="center">&#x2714;</td>
+      <td>SMART</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#form-title">Form Title</a></td>
+      <td align="center">&#x2714;</td>
+      <td>Update <code>${entityPath}</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#begin-button-text">Begin Button Text</a></td>
+      <td align="center">&#x2714;</td>
+      <td>Update</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#begin-button-type">Begin Button Type</a></td>
+      <td align="center">&#x2714;</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.m.ButtonType">ButtonType.Success</a></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#end-button-text">End Button Text</a></td>
+      <td align="center">&#x2714;</td>
+      <td>Close</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#end-button-type">End Button Type</a></td>
+      <td align="center">&#x2714;</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.m.ButtonType">ButtonType.Negative</a></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#properties-with-edmguid-type">Properties with Edm.Guid Type</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td>The random UUID generation is not available. You can only modify the visibilities of the properties with <code>Edm.Guid</code> type</td>
+    </tr>
+    <tr>
+      <td><a href="#form-property-order">Form Property Order</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#excluded-properties">Excluded Properties</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#mandatory-properties">Mandatory Properties</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#readonly-properties">Readonly Properties</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[keys]</td>
+      <td>By default, the <strong>key</strong> properties are readonly and cannot be changed, but additional readonly properties can be added</td>
+    </tr>    
+    <tr>
+      <td><a href="#attach-submit-completed">Attach Submit Completed</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#attach-submit-failed">Attach Submit Failed</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#response-class">Response Class</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#value-help">Value Help</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#validation-logic">Validation Logic</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#custom-control">Custom Control</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#custom-content">Custom Content</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#custom-fragment">Custom Fragment</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+  </tbody>
+</table>
 
 ## Fragment Class
