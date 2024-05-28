@@ -15,6 +15,7 @@ UI5 Antares is a custom SAPUI5 library consisting of some useful classes and met
 
 - [Entry Create](#entry-create)
 - [Entry Update](#entry-update)
+- [Entry Delete](#entry-delete)
 
 ## Prerequisites
 
@@ -113,6 +114,7 @@ ui5 -v
       - [Method Parameters](#method-parameters-1)
       - [Default Values](#default-values-1)
     - [Available Features](#available-features)
+  - [Entry Delete](#entry-delete)
 
 ## Versioning
 
@@ -5317,5 +5319,225 @@ The features listed below are identical to those available in [EntryCreateCL](#e
     </tr>    
   </tbody>
 </table>
+
+## Entry Delete
+
+Entry Delete (EntryDeleteCL) is a class that manages the DELETE operation through the OData V2 model. It basically avoids developers having to deal with fragments (review before the deletion), row selection while working on custom SAPUI5 applications or Fiori Elements extensions. Below you can see the features that Entry Delete has.
+
+**Features:**
+- sap.m.Dialog generation with a SmartForm, SimpleForm or Custom content
+- Property sorting
+- Label generation for the SmartForm, SimpleForm elements
+- delete() handling based on the user interaction
+- Call a fragment and bind the context in case you do not want to use the auto-generated dialog
+
+### Use Case
+
+Let's say that you have an EntitySet named `Products` which is bound to a table. The objective is to enable the end user to select a row from the table and delete it from the database through the OData V2 Model. The following steps outline the process.
+
+1) If you wish for the user to view the data of the selected entity on a pop-up screen, you must create a **.fragment.xml** file that contains a dialog with form content (Simple, Smart, etc.) and call it from the controller or generate the dialog directly on the controller
+2) You need to handle the table selection and the binding of the selected entity to the dialog or form
+3) You need to handle the delete through the OData V2 Model
+
+[EntryDeleteCL](#entry-delete) class basically handles all of the steps defined above.
+
+### Constructor
+
+You must initialize an object from EntryDeleteCL in order to use it.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Default Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>controller</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.core.mvc.Controller">sap.ui.core.mvc.Controller</a></td>
+      <td>Yes</td>
+      <td></td>
+      <td>The controller object (usually <code>this</code>)</td>
+    </tr>
+    <tr>
+      <td>settings</td>
+      <td>object</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>&emsp;entityPath</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td></td>
+      <td>The name of the <strong>EntitySet</strong>. It can start with a <strong>"/"</strong></td>
+    </tr>
+    <tr>
+      <td>&emsp;initializer</td>
+      <td>string | <a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.model.Context">sap.ui.model.Context</a> | EntityKeysT</td>
+      <td>Yes</td>
+      <td></td>
+      <td>The ID of the table or the context binding or the key values of the entity that will be deleted</td>
+    </tr>
+    <tr>
+      <td>modelName?</td>
+      <td>string</td>
+      <td>No</td>
+      <td>undefined</td>
+      <td>The name of the OData V2 model which can be found on the manifest.json file. <strong>Do not specify</strong> if the model name = ""</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+There are three distinct methods for constructing an object from the [Entry Delete](#entry-delete) class.
+
+### Constructor with a Table ID
+
+The most straightforward method for utilizing the capabilities of the [Entry Delete](#entry-delete) class is to construct an object with the ID of a table that you have on your XML view. This method offers several advantages.
+
+1) The table row selected by the end user is automatically detected by the [Entry Delete](#entry-delete) class, and the context binding of the selected row is bound to the auto-generated dialog.
+2) If no table row is selected by the end user, a default message is displayed in the [sap.m.MessageBox.error](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) to the end user.
+
+> **Important:** This method supports only the table types and selection modes listed below. If the selection mode of the table whose ID is being used for object construction is not supported, the library throws an error.
+
+> **Information:** The default message displayed when the end user has not selected a row from the table yet can be modified using [setSelectRowMessage()](#select-row-message) method.
+
+**Supported Table Types**
+
+[801]: https://sapui5.hana.ondemand.com/#/api/sap.m.Table
+[802]: https://sapui5.hana.ondemand.com/#/api/sap.ui.table.Table
+[803]: https://sapui5.hana.ondemand.com/#/api/sap.ui.comp.smarttable.SmartTable
+[804]: https://sapui5.hana.ondemand.com/#/api/sap.ui.table.AnalyticalTable
+[805]: https://sapui5.hana.ondemand.com/#/api/sap.ui.table.TreeTable
+[806]: https://sapui5.hana.ondemand.com/#/api/sap.m.ListMode
+[807]: https://sapui5.hana.ondemand.com/#/api/sap.ui.table.SelectionMode
+
+| Table Type                               | Selection Mode                                                              |
+| :--------------------------------------- | :-------------------------------------------------------------------------- |
+| [sap.m.Table][801]                       | [SingleSelect][806] \| [SingleSelectLeft][806] \| [SingleSelectMaster][806] |
+| [sap.ui.table.Table][802]                | [Single][807]                                                               |
+| [sap.ui.comp.smarttable.SmartTable][803] | [Single][807]                                                               |
+| [sap.ui.table.AnalyticalTable][804]      | [Single][807]                                                               |
+| [sap.ui.table.TreeTable][805]            | [Single][807]                                                               |
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products**, which is bound to an [sap.m.Table][801] on the XML view. Our objective is to add a [sap.m.Button](https://sapui5.hana.ondemand.com/#/api/sap.m.Button) to the header toolbar of the table. When the user selects a row from the table and presses the **Delete Product** button, we will open a dialog with a **Delete** button so the user can display the data before the deletion.
+
+![Delete Constructor Sample](https://github.com/hasanciftci26/ui5-antares/blob/media/update_entry/update_constructor_1.png?raw=true)
+
+**TypeScript**
+
+**EntryDeleteCL\<EntityT, EntityKeysT\>** is a generic class and can be initialized with 2 types. 
+
+- The `EntityT` type contains **all** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+- The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+
+`EntityT` type is used for the parameter of the function that is attached using the [attachDeleteCompleted()](#attach-delete-completed) method. This allows the data of the deleted entity to be retrieved after the successful deletion.
+
+`EntityKeysT` is used as one of the types of the `initializer` parameter in the class [constructor](#constructor-4).
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryDeleteCL from "ui5/antares/entry/v2/EntryDeleteCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteCategory() {
+    // Initialize without a type and with the table id
+    const entry = new EntryDeleteCL(this, {
+      entityPath: "Categories",
+      initializer: "tblCategories" // table id       
+    }); 
+  }
+
+  public async onDeleteProduct() {
+    // Initialize with a type and the table id
+    const entry = new EntryDeleteCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: "tblProducts" // table id       
+    }); 
+  }
+
+  public async onDeleteCustomer() {
+    // Initialize with a model name and the table id
+    const entry = new EntryDeleteCL(this, {
+      entityPath: "Customers",
+      initializer: "tblCustomers" // table id      
+    }, "myODataModelName"); 
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryDeleteCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryDeleteCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Initialize with the table id
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Products",
+            initializer: "tblProducts" // table id                
+          }); 
+        },
+
+        onDeleteCategory: async function () {
+          // Initialize with a model name
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Categories",
+            initializer: "tblCategories" // table id                 
+          }, "myODataModelName");
+        }
+      });
+
+    });
+```
+
+### Attach Delete Completed
 
 ## Fragment Class
