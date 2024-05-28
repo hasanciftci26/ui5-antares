@@ -115,6 +115,20 @@ ui5 -v
       - [Default Values](#default-values-1)
     - [Available Features](#available-features)
   - [Entry Delete](#entry-delete)
+    - [Use Case](#use-case-2)
+    - [Constructor](#constructor-5)
+      - [Constructor with a Table ID](#constructor-with-a-table-id-1)
+      - [Constructor with a Context Binding](#constructor-with-a-context-binding-1)
+      - [Constructor with Entity Keys](#constructor-with-entity-keys-1)  
+    - [Select Row Message](#select-row-message-1)    
+    - [Delete Entry](#delete-entry)
+      - [Method Parameters](#method-parameters-2)
+      - [Default Values](#default-values-2)
+    - [Confirmation Text](#confirmation-text)
+    - [Confirmation Title](#confirmation-title)
+    - [Attach Delete Completed](#attach-delete-completed)
+    - [Attach Delete Failed](#attach-delete-failed)
+    - [Available Features](#available-features-1) 
 
 ## Versioning
 
@@ -5051,7 +5065,7 @@ export default class YourController extends Controller {
       initializer: selectedContext
     }); 
 
-    // Call with the initial values
+    // Call
     entry.updateEntry();
   }
 
@@ -5073,6 +5087,7 @@ export default class YourController extends Controller {
       initializer: customerKeys
     });
 
+    // Call
     entry.updateEntry();
   }
 }
@@ -5407,7 +5422,7 @@ The most straightforward method for utilizing the capabilities of the [Entry Del
 
 > **Important:** This method supports only the table types and selection modes listed below. If the selection mode of the table whose ID is being used for object construction is not supported, the library throws an error.
 
-> **Information:** The default message displayed when the end user has not selected a row from the table yet can be modified using [setSelectRowMessage()](#select-row-message) method.
+> **Information:** The default message displayed when the end user has not selected a row from the table yet can be modified using [setSelectRowMessage()](#select-row-message-1) method.
 
 **Supported Table Types**
 
@@ -5431,7 +5446,7 @@ The most straightforward method for utilizing the capabilities of the [Entry Del
 
 Let us consider an `EntitySet` named **Products**, which is bound to an [sap.m.Table][801] on the XML view. Our objective is to add a [sap.m.Button](https://sapui5.hana.ondemand.com/#/api/sap.m.Button) to the header toolbar of the table. When the user selects a row from the table and presses the **Delete Product** button, we will open a dialog with a **Delete** button so the user can display the data before the deletion.
 
-![Delete Constructor Sample](https://github.com/hasanciftci26/ui5-antares/blob/media/update_entry/update_constructor_1.png?raw=true)
+![Delete Constructor Sample](https://github.com/hasanciftci26/ui5-antares/blob/media/delete_entry/delete_constructor_1.png?raw=true)
 
 **TypeScript**
 
@@ -5442,7 +5457,7 @@ Let us consider an `EntitySet` named **Products**, which is bound to an [sap.m.T
 
 `EntityT` type is used for the parameter of the function that is attached using the [attachDeleteCompleted()](#attach-delete-completed) method. This allows the data of the deleted entity to be retrieved after the successful deletion.
 
-`EntityKeysT` is used as one of the types of the `initializer` parameter in the class [constructor](#constructor-4).
+`EntityKeysT` is used as one of the types of the `initializer` parameter in the class [constructor](#constructor-5).
 
 ```ts
 import Controller from "sap/ui/core/mvc/Controller";
@@ -5538,6 +5553,564 @@ sap.ui.define([
     });
 ```
 
+### Constructor with a Context Binding
+
+An alternative approach to constructing an object from the [Entry Delete](#entry-delete) class is to utilise the [context](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.Context) of the entity that will be deleted by the end user.
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products**, which is bound to an [sap.m.Table][801] on the XML view. Our objective is to add a [sap.m.Button](https://sapui5.hana.ondemand.com/#/api/sap.m.Button) to the header toolbar of the table. When the user selects a row from the table and presses the **Delete Product** button, we will retrieve the context of the selected row and use to construct an object from the [Entry Delete](#entry-delete) class.
+
+![Delete Constructor Sample](https://github.com/hasanciftci26/ui5-antares/blob/media/delete_entry/delete_constructor_1.png?raw=true)
+
+**TypeScript**
+
+**EntryDeleteCL\<EntityT, EntityKeysT\>** is a generic class and can be initialized with 2 types. 
+
+- The `EntityT` type contains **all** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+- The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+
+`EntityT` type is used for the parameter of the function that is attached using the [attachDeleteCompleted()](#attach-delete-completed) method. This allows the data of the deleted entity to be retrieved after the successful deletion.
+
+`EntityKeysT` is used as one of the types of the `initializer` parameter in the class [constructor](#constructor-5).
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryDeleteCL from "ui5/antares/entry/v2/EntryDeleteCL"; // Import the class
+import MessageBox from "sap/m/MessageBox";
+import Table from "sap/m/Table";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteCategory() {
+    // Get the selected item and warn the end user if no row was selected
+    const selectedItem = (this.getView().byId("tblCategories") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    // Get the selected context
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize without a type and use the binding context
+    const entry = new EntryDeleteCL(this, {
+      entityPath: "Categories",
+      initializer: selectedContext // binding context
+    }); 
+  }
+
+  public async onDeleteProduct() {
+    // Get the selected item and warn the end user if no row was selected
+    const selectedItem = (this.getView().byId("tblProducts") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    // Get the selected context
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize with a type and use the binding context
+    const entry = new EntryDeleteCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: selectedContext // binding context
+    }); 
+  }
+
+  public async onDeleteCustomer() {
+    // Get the selected item and warn the end user if no row was selected
+    const selectedItem = (this.getView().byId("tblCustomers") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    // Get the selected context
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize with a model name and use the binding context
+    const entry = new EntryDeleteCL(this, {
+      entityPath: "Customers",
+      initializer: selectedContext // binding context   
+    }, "myODataModelName"); 
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryDeleteCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryDeleteCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Get the selected item and warn the end user if no row was selected
+          const selectedItem = this.getView().byId("tblProducts").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          // Get the selected context
+          const selectedContext = selectedItem.getBindingContext();
+
+          // Initialize with the binding context
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Products",
+            initializer: selectedContext // binding context     
+          }); 
+        },
+
+        onDeleteCategory: async function () {
+          // Get the selected item and warn the end user if no row was selected
+          const selectedItem = this.getView().byId("tblCategories").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          // Get the selected context
+          const selectedContext = selectedItem.getBindingContext();
+
+          // Initialize with the binding context
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Categories",
+            initializer: selectedContext // binding context               
+          }, "myODataModelName");
+        }
+      });
+
+    });
+```
+
+### Constructor with Entity Keys
+
+The final method for constructing an object from the [Entry Delete](#entry-delete) class is to utilize the key values of the entity that will be deleted by the end user.
+
+**Sample**
+
+For the purposes of this example, let us consider an `EntitySet` named **Products** with a single **key** property named `ID`, whose type is `Edm.Guid`. We would like to allow the end user to delete a specific entity with the key value: **ID = "b2f0013e-418f-42aa-9a24-3770fe17ce18"**.
+
+> **Hint:** Please note that if the `EntitySet` is bound to a table, you can retrieve the values of the **key** properties of the selected row using the **getBindingContext().getObject()** method.
+
+> **Information:** The EntryDeleteCL class creates a binding context with the values of the specified **key** properties using the `initializer` parameter in the class [constructor](#constructor-5) and subsequently binds the created context to the dialog.
+
+**TypeScript**
+
+**EntryDeleteCL\<EntityT, EntityKeysT\>** is a generic class and can be initialized with 2 types. 
+
+- The `EntityT` type contains **all** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+- The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+
+`EntityT` type is used for the parameter of the function that is attached using the [attachDeleteCompleted()](#attach-delete-completed) method. This allows the data of the deleted entity to be retrieved after the successful deletion.
+
+`EntityKeysT` is used as one of the types of the `initializer` parameter in the class [constructor](#constructor-5).
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryDeleteCL from "ui5/antares/entry/v2/EntryDeleteCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteCategory() {
+    // Prepare the key values of a specific entity
+    const keyValues = {
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+    };
+
+    // Initialize without a type and use the key values as the initializer
+    const entry = new EntryDeleteCL(this, {
+      entityPath: "Categories",
+      initializer: keyValues // key values of the entity
+    });
+  }
+
+  public async onDeleteProduct() {
+    // Prepare the key values of a specific entity
+    const keyValues = {
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+    };
+
+    // Initialize with a type and use the key values as the initializer
+    const entry = new EntryDeleteCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: keyValues // key values of the entity
+    });
+  }
+
+  public async onDeleteCustomer() {
+    // Prepare the key values of a specific entity
+    const keyValues = {
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+    };
+
+    // Initialize with a model name and use the key values as the initializer
+    const entry = new EntryDeleteCL(this, {
+      entityPath: "Customers",
+      initializer: keyValues // key values of the entity
+    }, "myODataModelName"); 
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryDeleteCL"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryDeleteCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Prepare the key values of a specific entity
+          const keyValues = {
+            ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+          };
+
+          // Initialize with the entity set name and use the key values as the initializer
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Products",
+            initializer: keyValues // key values of the entity
+          });  
+        },
+
+        onDeleteCategory: async function () {
+          // Prepare the key values of a specific entity
+          const keyValues = {
+            ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+          };
+
+          // Initialize with the entity set name and use the key values as the initializer
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Categories",
+            initializer: keyValues // key values of the entity        
+          }, "myODataModelName");          
+        }
+      });
+
+    });
+```
+
+### Select Row Message
+
+If the object from the [Entry Delete](#entry-delete) class is constructed using the [Constructor with a Table ID](#constructor-with-a-table-id-1) approach, a default error message is displayed in an [sap.m.MessageBox.error](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) to the end user when the user has not yet selected a row from the table.
+
+To change the default message, **setSelectRowMessage()** method can be utilized.
+
+**Setter (setSelectRowMessage)**
+
+| Parameter | Type   | Mandatory | Description                                                                           | 
+| :-------- | :----- | :-------- | :------------------------------------------------------------------------------------ |
+| message   | string | Yes       | The message that is displayed when the end user has not selected a row from the table |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getSelectRowMessage)**
+
+| Returns | Description                                                                                                                     |
+| :------ | :------------------------------------------------------------------------------------------------------------------------------ |
+| string  | Returns the value that was set using **setSelectRowMessage()** method. Default value is **Please select a row from the table.** |
+
+### Delete Entry
+
+**deleteEntry(previewBeforeDelete: boolean = true)** method binds the context, which is determined using the `initializer` parameter in the class [constructor](#constructor-5), to the dialog that is automatically generated or loaded from the fragment that is placed in the application files. Once the context is bound, the generated/loaded dialog is opened.
+
+By default, **deleteEntry()** method uses the [ODataMetaModel](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.odata.ODataMetaModel) to determine the `EntityType` of the `EntitySet` that was set by the [constructor](#constructor-5) and brings all the properties in the same order as the OData metadata into the generated form. 
+
+The labels are generated assuming that the naming convention of the `EntityType` is **camelCase**. Please see [Label Generation](#label-generation)
+
+> **Important:** It is not possible to modify any of the properties of an `EntitySet` on the auto-generated dialog. This behaviour cannot be altered.
+
+> **Important:** Please be advised that the **deleteEntry()** method must be called after any configurations have been made through the public method of the [Entry Delete](#entry-delete) class. Any configurations (form title, begin button text, etc.) made after the **deleteEntry()** method will not be reflected. Basically, **deleteEntry()** method should be called at the end of your code block.
+
+By default, the **key** properties with **Edm.Guid** type are not visible on the generated form. However, this behavior can be modified using the [setDisplayGuidProperties()](#properties-with-edmguid-type) method.
+
+> **Important:** Please be advised that the random UUID generation for properties with the `Edm.Guid` type is not available in the [Entry Delete](#entry-delete) class.
+
+By default, the **deleteEntry(previewBeforeDelete: boolean = true)** method generates a dialog and opens it with the bound context before the deletion is completed. The auto-generated dialog includes a **Delete** button. When the user presses the **Delete** button, an [sap.m.MessageBox.confirm](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) is displayed to the end user to complete the deletion process.
+
+> **Hint:** The auto-generated dialog opening step can be bypassed by setting the **previewBeforeDelete=false** parameter in the **deleteEntry(previewBeforeDelete: boolean = true)** method. The end user will only display an [sap.m.MessageBox.confirm](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) with this configuration.
+
+#### Method Parameters
+
+| Parameter           | Type    | Mandatory | Default Value | Description                                                                                                     | 
+| :------------------ | :------ | :-------- | :------------ | :-------------------------------------------------------------------------------------------------------------- |
+| previewBeforeDelete | boolean | No        | true          | If set to **false**, no dialog will be displayed by the end user. Only the confirmation MessageBox is displayed |
+
+| Returns         | Description                                                                                                                                                    |
+| :-------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Promise\<void\> | After the promise is resolved, the context can be retrieved by the **getEntryContext()** method using the object instantiated from the **EntryDeleteCL** class |
+
+> **deleteEntry()** method uses the default configurations when creating the dialog. However, these configurations can be modified using the public setter methods.
+
+#### Default Values
+
+[75]: #confirmation-text
+[76]: #confirmation-title
+
+| Term                    | Default Value                       | Description                                               | Setter                           | Getter                           |
+| :---------------------- | :---------------------------------- | :-------------------------------------------------------- | :------------------------------- | :------------------------------- |
+| Naming Strategy         | [NamingStrategies.CAMEL_CASE][12]   | The default naming strategy is **CAMEL_CASE**             | [setNamingStrategy()][2]         | [getNamingStrategy()][2]         |
+| Resource Bundle Prefix  | antares                             | The default resource bundle prefix is **antares**         | [setResourceBundlePrefix()][10]  | [getResourceBundlePrefix()][10]  |
+| Use Metadata Labels     | false                               | The labels are not taken from the metadata but generated  | [setUseMetadataLabels()][11]     | [getUseMetadataLabels()][11]     |
+| Form Type               | [FormTypes.SMART][13]               | SmartForm with SmartFields is generated by default        | [setFormType()][3]               | [getFormType()][3]               |
+| Form Title              | Delete + ${entityPath}              | entityPath from the [constructor](#constructor-5) is used | [setFormTitle()][4]              | [getFormTitle()][4]              |
+| Begin Button Text       | Delete                              | The default begin button text is **Delete**               | [setBeginButtonText()][5]        | [getBeginButtonText()][5]        |
+| Begin Button Type       | [ButtonType.Reject][7]              | The default button type is **Reject**                     | [setBeginButtonType()][6]        | [getBeginButtonType()][6]        |
+| End Button Text         | Close                               | The default end button text is **Close**                  | [setEndButtonText()][8]          | [getEndButtonText()][8]          |
+| End Button Type         | [ButtonType.Default][7]             | The default button type is **Default**                    | [setEndButtonType()][9]          | [getEndButtonType()][9]          |
+| Confirmation Text       | The selected line will be deleted. Do you confirm? | The message displayed in the MessageBox.confirm | [setConfirmationText()][75] | [getConfirmationText()][75]      |
+| Confirmation Title      | Confirm Delete                      | The title of the MessageBox.confirm                       | [setConfirmationTitle()][76]     | [getConfirmationTitle()][76]     |
+
+<br/>
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryDeleteCL from "ui5/antares/entry/v2/EntryDeleteCL"; // Import the class
+import Table from "sap/m/Table";
+import MessageBox from "sap/m/MessageBox";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteProduct() {
+    // Initialize without a type and with a table id
+    const entry = new EntryDeleteCL(this, {
+      entityPath: "Products",
+      initializer: "tblProducts"
+    });
+
+    // Call with no preview
+    entry.deleteEntry(false); 
+  }
+
+  public async onDeleteCategory() {
+    const selectedItem = (this.getView().byId("tblCategories") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize with a type and a binding context
+    const entry = new EntryDeleteCL<ICategory>(this, {
+      entityPath: "Categories",
+      initializer: selectedContext
+    }); 
+
+    // Call with the preview
+    entry.deleteEntry();
+  }
+
+  public async onDeleteCustomer () {
+    const selectedItem = (this.getView().byId("tblCustomers") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    };
+
+    const customerKeys = {
+      ID: selectedItem.getBindingContext().getObject().ID
+    };
+
+    // Initialize without a type and with the key values
+    const entry = new EntryDeleteCL(this, {
+      entityPath: "Customers",
+      initializer: customerKeys
+    });
+
+    // Call with the preview
+    entry.deleteEntry();
+  }
+}
+
+interface ICategory {
+  ID: string;
+  name?: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryDeleteCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryDeleteCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Initialize with a table id
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Products",
+            initializer: "tblProducts"
+          }); 
+
+          // Call with no preview
+          entry.deleteEntry(false);
+        },
+
+        onDeleteCategory: async function () {
+          const selectedItem = this.getView().byId("tblCategories").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          const selectedContext = selectedItem.getBindingContext();
+
+          // Initialize with a binding context
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Categories",
+            initializer: selectedContext
+          }); 
+
+          // Call with the preview
+          entry.deleteEntry();
+        },
+
+        onDeleteCustomer: async function () {
+          const selectedItem = this.getView().byId("tblCustomers").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          const customerKeys = {
+            ID: selectedItem.getBindingContext().getObject().ID
+          };
+
+          // Initialize with the key values
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Customers",
+            initializer: customerKeys
+          }); 
+
+          // Call with the preview
+          entry.deleteEntry();          
+        }
+      });
+
+    });
+```
+
+The generated form with default values will more or less look like the following. It will vary depending on the configurations and the `EntityType` properties of the `EntitySet`.
+
+![Delete Entry](https://github.com/hasanciftci26/ui5-antares/blob/media/delete_entry/delete_entry.png?raw=true)
+
+![Delete Entry Confirmation](https://github.com/hasanciftci26/ui5-antares/blob/media/delete_entry/confirmation_text.png?raw=true)
+
+### Confirmation Text
+
+### Confirmation Title
+
 ### Attach Delete Completed
+
+### Attach Delete Failed
+
+### Available Features
 
 ## Fragment Class
