@@ -30,6 +30,8 @@ The UI5 Antares library offers a comprehensive set of core classes, as outlined 
 
 Please refer to the [Planned Features](#planned-features) section to learn about the features that will be included in the next releases.
 
+> Have a look at the gif below for an overview of the features of the UI5 Antares library.
+
 ![UI5 Antares Gif](https://github.com/hasanciftci26/ui5-antares/blob/media/antares.gif?raw=true)
 
 ## Prerequisites
