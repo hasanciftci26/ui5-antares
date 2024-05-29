@@ -7727,7 +7727,7 @@ You must initialize an object from ODataCreateCL in order to use it.
 
 **ODataCreateCL\<EntityT\>** is a generic class and can be initialized with a type that contains the properties of the EntitySet that is used as a parameter on the class constructor. `EntityT` is used as the type of the `data` parameter of the **setData(data: EntityT)** method and as the returning type of the **getData(): EntityT** method. 
 
-Also, it is used as the returning type of the **create(): EntityT** method which is used to send the POST request through the [sap.ui.model.odata.v2.ODataModel](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.odata.v2.ODataModel).
+Also, it is used as the returning type of the **create(): Promise\<EntityT\>** method which is used to send the POST request through the [sap.ui.model.odata.v2.ODataModel](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.odata.v2.ODataModel).
 
 ```ts
 import Controller from "sap/ui/core/mvc/Controller";
@@ -8421,7 +8421,7 @@ You must initialize an object from ODataUpdateCL in order to use it.
 - The `EntityT` type contains the properties of the `EntitySet` that is used as a parameter on the class constructor. 
 - The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor.
 
-`EntityT` is used as the type of the `data` parameter of the **setData(data: EntityT)** method and as the returning type of the **getData(): EntityT** and **update(): EntityT** methods. 
+`EntityT` is used as the type of the `data` parameter of the **setData(data: EntityT)** method and as the returning type of the **getData(): EntityT** and **update(): Promise\<EntityT\>** methods. 
 
 `EntityKeysT` is used as the type of the `keys` parameter of the **update(keys: EntityKeysT)** method.
 
@@ -9109,7 +9109,7 @@ You must initialize an object from ODataDeleteCL in order to use it.
 
 - The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor.
 
-`EntityKeysT` is used as the returning type and the type of the `keys` parameter of the **delete(keys: EntityKeysT): EntityKeysT** method.
+`EntityKeysT` is used as the returning type and the type of the `keys` parameter of the **delete(keys: EntityKeysT): Promise\<EntityKeysT\>** method.
 
 ```ts
 import Controller from "sap/ui/core/mvc/Controller";
