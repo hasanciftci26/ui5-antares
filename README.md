@@ -143,7 +143,13 @@ ui5 -v
     - [Use Case](#use-case-3)
     - [Constructor](#constructor-6)
       - [Constructor with a Table ID](#constructor-with-a-table-id-2) 
-    - [Select Row Message](#select-row-message-2)         
+      - [Constructor with a Context Binding](#constructor-with-a-context-binding-2)
+      - [Constructor with Entity Keys](#constructor-with-entity-keys-2)        
+    - [Select Row Message](#select-row-message-2)
+    - [Read Entry](#read-entry)
+      - [Method Parameters](#method-parameters-3)
+      - [Default Values](#default-values-3)
+    - [Available Features](#available-features-2)           
   - [Promisified OData V2 Classes](#promisified-odata-v2-classes)
     - [OData Create](#odata-create)
     - [OData Update](#odata-update)
@@ -6849,7 +6855,7 @@ You must initialize an object from EntryReadCL in order to use it.
       <td>string | <a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.model.Context">sap.ui.model.Context</a> | EntityKeysT</td>
       <td>Yes</td>
       <td></td>
-      <td>The ID of the table or the context binding or the key values of the entity that will be read</td>
+      <td>The ID of the table or the context binding or the key values of the entity that will be displayed</td>
     </tr>
     <tr>
       <td>modelName?</td>
@@ -6890,7 +6896,7 @@ The most straightforward method for utilizing the capabilities of the [Entry Rea
 
 Let us consider an `EntitySet` named **Products**, which is bound to an [sap.m.Table][801] on the XML view. Our objective is to add a [sap.m.Button](https://sapui5.hana.ondemand.com/#/api/sap.m.Button) to the header toolbar of the table. When the user selects a row from the table and presses the **Display Product Details** button, we will open a dialog so the user can display all the details of the selected line.
 
-![Read Constructor Sample](https://github.com/hasanciftci26/ui5-antares/blob/media/delete_entry/delete_constructor_1.png?raw=true)
+![Read Constructor Sample](https://github.com/hasanciftci26/ui5-antares/blob/media/read_entry/read_constructor_1.png?raw=true)
 
 **TypeScript**
 
@@ -6995,7 +7001,689 @@ sap.ui.define([
     });
 ```
 
+### Constructor with a Context Binding
+
+An alternative approach to constructing an object from the [Entry Read](#entry-read) class is to utilise the [context](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.Context) of the entity that will be displayed by the end user.
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products**, which is bound to an [sap.m.Table][801] on the XML view. Our objective is to add a [sap.m.Button](https://sapui5.hana.ondemand.com/#/api/sap.m.Button) to the header toolbar of the table. When the user selects a row from the table and presses the **Display Product Details** button, we will retrieve the context of the selected row and use to construct an object from the [Entry Read](#entry-read) class.
+
+![Read Constructor Sample](https://github.com/hasanciftci26/ui5-antares/blob/media/read_entry/read_constructor_1.png?raw=true)
+
+**TypeScript**
+
+**EntryReadCL\<EntityT, EntityKeysT\>** is a generic class and can be initialized with 2 types. 
+
+- The `EntityT` type contains **all** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+- The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+
+`EntityKeysT` is used as one of the types of the `initializer` parameter in the class [constructor](#constructor-6).
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryReadCL from "ui5/antares/entry/v2/EntryReadCL"; // Import the class
+import MessageBox from "sap/m/MessageBox";
+import Table from "sap/m/Table";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDisplayCategoryDetails() {
+    // Get the selected item and warn the end user if no row was selected
+    const selectedItem = (this.getView().byId("tblCategories") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    // Get the selected context
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize without a type and use the binding context
+    const entry = new EntryReadCL(this, {
+      entityPath: "Categories",
+      initializer: selectedContext // binding context
+    }); 
+  }
+
+  public async onDisplayProductDetails() {
+    // Get the selected item and warn the end user if no row was selected
+    const selectedItem = (this.getView().byId("tblProducts") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    // Get the selected context
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize with a type and use the binding context
+    const entry = new EntryReadCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: selectedContext // binding context
+    }); 
+  }
+
+  public async onDisplayCustomerDetails() {
+    // Get the selected item and warn the end user if no row was selected
+    const selectedItem = (this.getView().byId("tblCustomers") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    // Get the selected context
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize with a model name and use the binding context
+    const entry = new EntryReadCL(this, {
+      entityPath: "Customers",
+      initializer: selectedContext // binding context   
+    }, "myODataModelName"); 
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryReadCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryReadCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDisplayProductDetails: async function () {
+          // Get the selected item and warn the end user if no row was selected
+          const selectedItem = this.getView().byId("tblProducts").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          // Get the selected context
+          const selectedContext = selectedItem.getBindingContext();
+
+          // Initialize with the binding context
+          const entry = new EntryReadCL(this, {
+            entityPath: "Products",
+            initializer: selectedContext // binding context     
+          }); 
+        },
+
+        onDisplayCategoryDetails: async function () {
+          // Get the selected item and warn the end user if no row was selected
+          const selectedItem = this.getView().byId("tblCategories").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          // Get the selected context
+          const selectedContext = selectedItem.getBindingContext();
+
+          // Initialize with the binding context
+          const entry = new EntryReadCL(this, {
+            entityPath: "Categories",
+            initializer: selectedContext // binding context               
+          }, "myODataModelName");
+        }
+      });
+
+    });
+```
+
+### Constructor with Entity Keys
+
+The final method for constructing an object from the [Entry Read](#entry-read) class is to utilize the key values of the entity that will be displayed by the end user.
+
+**Sample**
+
+For the purposes of this example, let us consider an `EntitySet` named **Products** with a single **key** property named `ID`, whose type is `Edm.Guid`. We would like to allow the end user to display a specific entity with the key value: **ID = "b2f0013e-418f-42aa-9a24-3770fe17ce18"**.
+
+> **Hint:** Please note that if the `EntitySet` is bound to a table, you can retrieve the values of the **key** properties of the selected row using the **getBindingContext().getObject()** method.
+
+> **Information:** The EntryReadCL class creates a binding context with the values of the specified **key** properties using the `initializer` parameter in the class [constructor](#constructor-6) and subsequently binds the created context to the dialog.
+
+**TypeScript**
+
+**EntryReadCL\<EntityT, EntityKeysT\>** is a generic class and can be initialized with 2 types. 
+
+- The `EntityT` type contains **all** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+- The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+
+`EntityKeysT` is used as one of the types of the `initializer` parameter in the class [constructor](#constructor-5).
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryReadCL from "ui5/antares/entry/v2/EntryReadCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDisplayCategoryDetails() {
+    // Prepare the key values of a specific entity
+    const keyValues = {
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+    };
+
+    // Initialize without a type and use the key values as the initializer
+    const entry = new EntryReadCL(this, {
+      entityPath: "Categories",
+      initializer: keyValues // key values of the entity
+    });
+  }
+
+  public async onDisplayProductDetails() {
+    // Prepare the key values of a specific entity
+    const keyValues = {
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+    };
+
+    // Initialize with a type and use the key values as the initializer
+    const entry = new EntryReadCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: keyValues // key values of the entity
+    });
+  }
+
+  public async onDisplayCustomerDetails() {
+    // Prepare the key values of a specific entity
+    const keyValues = {
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+    };
+
+    // Initialize with a model name and use the key values as the initializer
+    const entry = new EntryReadCL(this, {
+      entityPath: "Customers",
+      initializer: keyValues // key values of the entity
+    }, "myODataModelName"); 
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryReadCL"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryReadCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDisplayProductDetails: async function () {
+          // Prepare the key values of a specific entity
+          const keyValues = {
+            ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+          };
+
+          // Initialize with the entity set name and use the key values as the initializer
+          const entry = new EntryReadCL(this, {
+            entityPath: "Products",
+            initializer: keyValues // key values of the entity
+          });  
+        },
+
+        onDisplayCategoryDetails: async function () {
+          // Prepare the key values of a specific entity
+          const keyValues = {
+            ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18"
+          };
+
+          // Initialize with the entity set name and use the key values as the initializer
+          const entry = new EntryReadCL(this, {
+            entityPath: "Categories",
+            initializer: keyValues // key values of the entity        
+          }, "myODataModelName");          
+        }
+      });
+
+    });
+```
+
 ### Select Row Message
+
+If the object from the [Entry Read](#entry-read) class is constructed using the [Constructor with a Table ID](#constructor-with-a-table-id-2) approach, a default error message is displayed in an [sap.m.MessageBox.error](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) to the end user when the user has not yet selected a row from the table.
+
+To change the default message, **setSelectRowMessage()** method can be utilized.
+
+**Setter (setSelectRowMessage)**
+
+| Parameter | Type   | Mandatory | Description                                                                           | 
+| :-------- | :----- | :-------- | :------------------------------------------------------------------------------------ |
+| message   | string | Yes       | The message that is displayed when the end user has not selected a row from the table |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getSelectRowMessage)**
+
+| Returns | Description                                                                                                                     |
+| :------ | :------------------------------------------------------------------------------------------------------------------------------ |
+| string  | Returns the value that was set using **setSelectRowMessage()** method. Default value is **Please select a row from the table.** |
+
+### Read Entry
+
+**readEntry()** method binds the context, which is determined using the `initializer` parameter in the class [constructor](#constructor-6), to the dialog that is automatically generated or loaded from the fragment that is placed in the application files. Once the context is bound, the generated/loaded dialog is opened.
+
+By default, **readEntry()** method uses the [ODataMetaModel](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.odata.ODataMetaModel) to determine the `EntityType` of the `EntitySet` that was set by the [constructor](#constructor-6) and brings all the properties in the same order as the OData metadata into the generated form. 
+
+The labels are generated assuming that the naming convention of the `EntityType` is **camelCase**. Please see [Label Generation](#label-generation)
+
+> **Important:** It is not possible to modify any of the properties of an `EntitySet` on the auto-generated dialog. This behaviour cannot be altered.
+
+> **Important:** Please be advised that the **readEntry()** method must be called after any configurations have been made through the public method of the [Entry Read](#entry-read) class. Any configurations (form title, end button text, etc.) made after the **readEntry()** method will not be reflected. Basically, **readEntry()** method should be called at the end of your code block.
+
+By default, the **key** properties with **Edm.Guid** type are not visible on the generated form. However, this behavior can be modified using the [setDisplayGuidProperties()](#properties-with-edmguid-type) method.
+
+> **Important:** Please be advised that the random UUID generation for properties with the `Edm.Guid` type is not available in the [Entry Read](#entry-read) class.
+
+#### Method Parameters
+
+| Returns         | Description                                                                                                                                                  |
+| :-------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Promise\<void\> | After the promise is resolved, the context can be retrieved by the **getEntryContext()** method using the object instantiated from the **EntryReadCL** class |
+
+> **readEntry()** method uses the default configurations when creating the dialog. However, these configurations can be modified using the public setter methods.
+
+#### Default Values
+
+| Term                    | Default Value                       | Description                                               | Setter                           | Getter                           |
+| :---------------------- | :---------------------------------- | :-------------------------------------------------------- | :------------------------------- | :------------------------------- |
+| Naming Strategy         | [NamingStrategies.CAMEL_CASE][12]   | The default naming strategy is **CAMEL_CASE**             | [setNamingStrategy()][2]         | [getNamingStrategy()][2]         |
+| Resource Bundle Prefix  | antares                             | The default resource bundle prefix is **antares**         | [setResourceBundlePrefix()][10]  | [getResourceBundlePrefix()][10]  |
+| Use Metadata Labels     | false                               | The labels are not taken from the metadata but generated  | [setUseMetadataLabels()][11]     | [getUseMetadataLabels()][11]     |
+| Form Type               | [FormTypes.SMART][13]               | SmartForm with SmartFields is generated by default        | [setFormType()][3]               | [getFormType()][3]               |
+| Form Title              | Read + ${entityPath}                | entityPath from the [constructor](#constructor-6) is used | [setFormTitle()][4]              | [getFormTitle()][4]              |
+| End Button Text         | Close                               | The default end button text is **Close**                  | [setEndButtonText()][8]          | [getEndButtonText()][8]          |
+| End Button Type         | [ButtonType.Negative][7]            | The default button type is **Negative**                   | [setEndButtonType()][9]          | [getEndButtonType()][9]          |
+
+<br/>
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryReadCL from "ui5/antares/entry/v2/EntryReadCL"; // Import the class
+import Table from "sap/m/Table";
+import MessageBox from "sap/m/MessageBox";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDisplayProductDetails() {
+    // Initialize without a type and with a table id
+    const entry = new EntryReadCL(this, {
+      entityPath: "Products",
+      initializer: "tblProducts"
+    });
+
+    // Call 
+    entry.readEntry(false); 
+  }
+
+  public async onDisplayCategoryDetails() {
+    const selectedItem = (this.getView().byId("tblCategories") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    }
+
+    const selectedContext = selectedItem.getBindingContext();
+
+    // Initialize with a type and a binding context
+    const entry = new EntryReadCL<ICategory>(this, {
+      entityPath: "Categories",
+      initializer: selectedContext
+    }); 
+
+    // Call
+    entry.readEntry();
+  }
+
+  public async onDisplayCustomerDetails () {
+    const selectedItem = (this.getView().byId("tblCustomers") as Table).getSelectedItem();
+
+    if (!selectedItem) {
+      MessageBox.error("Please select a row from the table");
+      return;
+    };
+
+    const customerKeys = {
+      ID: selectedItem.getBindingContext().getObject().ID
+    };
+
+    // Initialize without a type and with the key values
+    const entry = new EntryReadCL(this, {
+      entityPath: "Customers",
+      initializer: customerKeys
+    });
+
+    // Call
+    entry.readEntry();
+  }
+}
+
+interface ICategory {
+  ID: string;
+  name?: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryReadCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryReadCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDisplayProductDetails: async function () {
+          // Initialize with a table id
+          const entry = new EntryReadCL(this, {
+            entityPath: "Products",
+            initializer: "tblProducts"
+          }); 
+
+          // Call
+          entry.readEntry();
+        },
+
+        onDisplayCategoryDetails: async function () {
+          const selectedItem = this.getView().byId("tblCategories").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          const selectedContext = selectedItem.getBindingContext();
+
+          // Initialize with a binding context
+          const entry = new EntryReadCL(this, {
+            entityPath: "Categories",
+            initializer: selectedContext
+          }); 
+
+          // Call
+          entry.readEntry();
+        },
+
+        onDisplayCustomerDetails: async function () {
+          const selectedItem = this.getView().byId("tblCustomers").getSelectedItem();
+
+          if (!selectedItem) {
+            MessageBox.error("Please select a row from the table");
+            return;
+          }
+
+          const customerKeys = {
+            ID: selectedItem.getBindingContext().getObject().ID
+          };
+
+          // Initialize with the key values
+          const entry = new EntryReadCL(this, {
+            entityPath: "Customers",
+            initializer: customerKeys
+          }); 
+
+          // Call
+          entry.readEntry();          
+        }
+      });
+
+    });
+```
+
+The generated form with default values will more or less look like the following. It will vary depending on the configurations and the `EntityType` properties of the `EntitySet`.
+
+![Read Entry](https://github.com/hasanciftci26/ui5-antares/blob/media/read_entry/read_entry.png?raw=true)
+
+### Available Features
+
+The [EntryReadCL](#entry-read) class is derived from the same abstract class as the [EntryCreateCL](#entry-create) class and contains the same methods. However, some of these functions are not applicable to the [EntryReadCL](#entry-read) class. 
+
+> **Important:** Please note that the default values for the available functions may differ.
+
+The features listed below are identical to those available in [EntryCreateCL](#entry-create). Methods can be accessed through the object constructed from the [EntryReadCL](#entry-read) class.
+
+> **Hint**: To access the documentation for a particular feature, please click on the name of the feature.
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Availability</th>
+      <th>Default Value</th>
+      <th>Remarks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#label-generation">Label Generation</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#resource-bundle-prefix">Resource Bundle Prefix</a></td>
+      <td align="center">&#x2714;</td>
+      <td>antares</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#naming-strategy">Naming Strategy</a></td>
+      <td align="center">&#x2714;</td>
+      <td>CAMEL_CASE</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#form-type">Form Type</a></td>
+      <td align="center">&#x2714;</td>
+      <td>SMART</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#form-title">Form Title</a></td>
+      <td align="center">&#x2714;</td>
+      <td>Delete <code>${entityPath}</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#begin-button-text">Begin Button Text</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#begin-button-type">Begin Button Type</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#end-button-text">End Button Text</a></td>
+      <td align="center">&#x2714;</td>
+      <td>Close</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#end-button-type">End Button Type</a></td>
+      <td align="center">&#x2714;</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.m.ButtonType">ButtonType.Negative</a></td>
+      <td></td>
+    </tr>   
+    <tr>
+      <td><a href="#properties-with-edmguid-type">Properties with Edm.Guid Type</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td>The random UUID generation is not available. You can only modify the visibilities of the properties with <code>Edm.Guid</code> type</td>
+    </tr>
+    <tr>
+      <td><a href="#form-property-order">Form Property Order</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#excluded-properties">Excluded Properties</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#mandatory-properties">Mandatory Properties</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#readonly-properties">Readonly Properties</a></td>
+      <td align="center">&#x2717;</td>
+      <td>[all properties]</td>
+      <td>By default, all the properties are readonly and cannot be changed</td>
+    </tr>    
+    <tr>
+      <td><a href="#attach-submit-completed">Attach Submit Completed</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#attach-submit-failed">Attach Submit Failed</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#response-class">Response Class</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#value-help">Value Help</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#validation-logic">Validation Logic</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#custom-control">Custom Control</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#custom-content">Custom Content</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#custom-fragment">Custom Fragment</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+  </tbody>
+</table>
 
 ## Promisified OData V2 Classes
 
