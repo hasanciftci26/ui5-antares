@@ -10,7 +10,7 @@ import UIComponent from "sap/ui/core/UIComponent";
 /**
  * @namespace ui5.antares.odata.v2
  */
-export default class ODataReadCL<EntityT extends object = object, EntityKeyT extends object = object> extends ODataCL {
+export default class ODataReadCL<EntityT extends object = object, EntityKeysT extends object = object> extends ODataCL {
     private filters: Filter[] = [];
     private sorters: Sorter[] = [];
     private urlParameters?: Record<string, string>;
@@ -75,7 +75,7 @@ export default class ODataReadCL<EntityT extends object = object, EntityKeyT ext
         });
     }
 
-    public readByKey(keys: EntityKeyT): Promise<EntityT> {
+    public readByKey(keys: EntityKeysT): Promise<EntityT> {
         const oDataModel = this.getODataModel();
         const path = oDataModel.createKey(this.getEntityPath(), keys);
 

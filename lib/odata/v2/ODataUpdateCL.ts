@@ -7,7 +7,7 @@ import { ODataMethods } from "ui5/antares/types/odata/enums";
 /**
  * @namespace ui5.antares.odata.v2
  */
-export default class ODataUpdateCL<EntityT extends object = object, EntityKeyT extends object = object> extends ODataCL {
+export default class ODataUpdateCL<EntityT extends object = object, EntityKeysT extends object = object> extends ODataCL {
     private payload: EntityT;
     private urlParameters?: Record<string, string>;
     private refreshAfterChange: boolean = true;
@@ -45,7 +45,7 @@ export default class ODataUpdateCL<EntityT extends object = object, EntityKeyT e
         return this.response;
     }
 
-    public update(keys: EntityKeyT): Promise<EntityT> {
+    public update(keys: EntityKeysT): Promise<EntityT> {
         this.checkData(this.payload);
         const oDataModel = this.getODataModel();
         const path = oDataModel.createKey(this.getEntityPath(), keys);
