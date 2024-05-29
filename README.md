@@ -152,10 +152,25 @@ ui5 -v
     - [Available Features](#available-features-2)           
   - [Promisified OData V2 Classes](#promisified-odata-v2-classes)
     - [OData Create](#odata-create)
+      - [Constructor](#constructor-7)
+      - [Set Data](#set-data)
+      - [Create Request](#create-request)
+      - [URL Parameters](#url-parameters)
+      - [Refresh After Change](#refresh-after-change)
+      - [Additional Response Info](#additional-response-info)
+      - [Create Entry](#create-entry)
     - [OData Update](#odata-update)
+      - [Constructor](#constructor-8)
+      - [Set Data](#set-data-1)
+      - [Update Request](#update-request)
+      - [URL Parameters](#url-parameters-1)
+      - [Refresh After Change](#refresh-after-change-1)
+      - [Additional Response Info](#additional-response-info-1)    
     - [OData Delete](#odata-delete)
     - [OData Read](#odata-read)
   - [Fragment Class](#fragment-class)
+  - [Planned Features](#planned-features)
+  - [Change Log](#change-log)
 
 ## Versioning
 
@@ -2268,7 +2283,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -2384,7 +2399,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -3016,7 +3031,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -3158,7 +3173,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -3335,7 +3350,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -3472,7 +3487,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -3641,7 +3656,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -3811,7 +3826,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -4051,7 +4066,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -4337,7 +4352,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -4620,7 +4635,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -4770,7 +4785,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -4925,7 +4940,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -5529,7 +5544,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -5679,7 +5694,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -5834,7 +5849,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -6192,7 +6207,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -6303,7 +6318,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -6418,7 +6433,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -6567,7 +6582,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -6950,7 +6965,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -7098,7 +7113,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -7251,7 +7266,7 @@ interface IProducts {
   description: string;
   brand: string;
   price: number;
-  currency: number;
+  currency: string;
   quantityInStock: number;
   categoryID: string;
   supplierID: string;
@@ -7687,12 +7702,1398 @@ The features listed below are identical to those available in [EntryCreateCL](#e
 
 ## Promisified OData V2 Classes
 
+UI5 Antares, provides promisified OData V2 classes that can be used through the [sap.ui.model.odata.v2.ODataModel](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.odata.v2.ODataModel) you have on your application's manifest.json file.
+
 ### OData Create
 
+ODataCreateCL is a class that uses [sap.ui.model.odata.v2.ODataModel](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.odata.v2.ODataModel) to handle POST (CREATE) requests in a promisified way.
+
+#### Constructor
+
+You must initialize an object from ODataCreateCL in order to use it.
+
+| Parameter  | Type                            | Mandatory | Default Value | Description                                                                                                            | 
+| :--------- | :------------------------------ | :-------- | :------------ | :--------------------------------------------------------------------------------------------------------------------- |
+| controller | [sap.ui.core.mvc.Controller][1] | Yes       |               | The controller object (usually `this`)                                                                                 |
+| entityPath | string                          | Yes       |               | The name of the **EntitySet**. It can start with a **"/"**                                                             |
+| modelName? | string                          | No        | undefined     | The name of the OData V2 model which can be found on the manifest.json file. **Do not specify** if the model name = "" |
+
+**TypeScript**
+
+**ODataCreateCL\<EntityT\>** is a generic class and can be initialized with a type that contains the properties of the EntitySet that is used as a parameter on the class constructor. `EntityT` is used as the type of the `data` parameter of the **setData(data: EntityT)** method and as the returning type of the **getData(): EntityT** method. 
+
+Also, it is used as the returning type of the **create(): EntityT** method which is used to send the POST request through the [sap.ui.model.odata.v2.ODataModel](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.odata.v2.ODataModel).
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    // Initialize without a type
+    const odata = new ODataCreateCL(this, "Products"); 
+  }
+
+  public async onCreateCategory() {
+    // Initialize with a type
+    const odata = new ODataCreateCL<ICategory>(this, "Categories"); 
+  }
+
+  public async onCreateCustomer() {
+    // Initialize with a model name
+    const odata = new ODataCreateCL(this, "Customers", "myODataModelName"); 
+  }
+}
+
+interface ICategory {
+  ID: string;
+  name?: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // Initialize
+          const odata = new ODataCreateCL(this, "Products"); 
+        },
+
+        onCreateCategory: async function () {
+          // Initialize with a model name
+          const odata = new ODataCreateCL(this, "Categories", "myODataModelName");
+        }
+      });
+
+    });
+```
+
+#### Set Data
+
+To set the data that will be sent via the POST HTTP request body, the **setData()** method can be used.
+
+> **Hint:** You can set the data including the associations (deep create).
+
+**Setter (setData)**
+
+| Parameter | Type    | Mandatory | Description                                               | 
+| :-------- | :------ | :-------- | :-------------------------------------------------------- |
+| data      | EntityT | Yes       | The data that will be sent via the POST HTTP request body |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getData)**
+
+| Returns | Description                                                                               |
+| :------ | :---------------------------------------------------------------------------------------- |
+| EntityT | Returns the value that was set using **setData()** method. Default value is **undefined** |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    // Initialize with a type
+    const odata = new ODataCreateCL<IProducts>(this, "Products"); 
+
+    // set the http body
+    odata.setData({
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18",
+      name: "Product Name",
+      description: "Description",
+      brand: "Brand",
+      price: 999,
+      currency: "EUR",
+      quantityInStock: 15,
+      categoryID: "eb7783a6-f30f-4f7d-b85c-f211eea54568",
+      supplierID: "7734d25f-0d1e-4ab4-b8a8-cd201f29fd2f"
+    });
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // Initialize
+          const odata = new ODataCreateCL(this, "Products"); 
+
+          // set the http body
+          odata.setData({
+            ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18",
+            name: "Product Name",
+            description: "Description",
+            brand: "Brand",
+            price: 999,
+            currency: "EUR",
+            quantityInStock: 15,
+            categoryID: "eb7783a6-f30f-4f7d-b85c-f211eea54568",
+            supplierID: "7734d25f-0d1e-4ab4-b8a8-cd201f29fd2f"
+          });
+        }
+      });
+
+    });
+```
+
+#### Create Request
+
+To send the POST (Create) request through the OData V2 model, **create()** method can be utilized.
+
+> **Important:** It is mandatory to set the data using the [setData()](#set-data) method before calling the **create()** method.
+
+The **create()** method runs **asynchronously** and can be awaited. 
+
+The **create()** method returns the data of the created entity if the request was successful.
+
+> **Important:** If the POST request fails, the [OData Create](#odata-create) class will throw an error. To catch the error, the **create()** method should be called in a try-catch block. 
+
+**Error Type**
+
+If the POST request fails, the object thrown by the class can contain the properties below.
+
+| Returns                                                | Description                          |
+| ------------------------------------------------------ | ------------------------------------ |
+| `object`                                               |                                      |
+| &emsp;headers?: `object` \| `undefined`                | The HTTP response headers.           |
+| &emsp;message?: `string` \| `undefined`                | The HTTP response message.           |
+| &emsp;responseText?: `string` \| `undefined`           | The HTTP response text.              |
+| &emsp;statusCode?: `string` \| `number` \| `undefined` | The status code of the HTTP request. |
+| &emsp;statusText?: `string` \| `undefined`             | The HTTP status text.                |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL"; // Import the class
+import { IError } from "ui5/antares/types/common"; // Import the error type
+import MessageBox from "sap/m/MessageBox";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    // Initialize with a type
+    const odata = new ODataCreateCL<IProducts>(this, "Products"); 
+
+    // set the http body
+    odata.setData({
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18",
+      name: "Product Name",
+      description: "Description",
+      brand: "Brand",
+      price: 999,
+      currency: "EUR",
+      quantityInStock: 15,
+      categoryID: "eb7783a6-f30f-4f7d-b85c-f211eea54568",
+      supplierID: "7734d25f-0d1e-4ab4-b8a8-cd201f29fd2f"
+    });
+
+    try {
+      // send the http request and get the result
+      const result = await odata.create();
+      MessageBox.information(result.ID + " was created.");
+    } catch (error) {
+      // catch the error
+      MessageBox.error((error as IError).message || "Request failed");
+    }
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataCreateCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataCreateCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // Initialize
+          const odata = new ODataCreateCL(this, "Products"); 
+
+          // set the http body
+          odata.setData({
+            ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18",
+            name: "Product Name",
+            description: "Description",
+            brand: "Brand",
+            price: 999,
+            currency: "EUR",
+            quantityInStock: 15,
+            categoryID: "eb7783a6-f30f-4f7d-b85c-f211eea54568",
+            supplierID: "7734d25f-0d1e-4ab4-b8a8-cd201f29fd2f"
+          });
+
+          try {
+            // send the http request and get the result
+            const result = await odata.create();
+            MessageBox.information(result.ID + " was created.");
+          } catch (error) {
+            // catch the error
+            MessageBox.error(error.message || "Request failed");
+          }          
+        }
+      });
+
+    });
+```
+
+#### URL Parameters
+
+To set the URL parameters before sending the POST request with the [create()](#create-request) method, the **setUrlParameters()** method can be used.
+
+**Setter (setUrlParameters)**
+
+| Parameter     | Type                   | Mandatory | Description                            | 
+| :------------ | :--------------------- | :-------- | :------------------------------------- |
+| urlParameters | Record<string, string> | Yes       | The URL parameters of the POST request |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getUrlParameters)**
+
+| Returns                             | Description                                                                                        |
+| :---------------------------------- | :------------------------------------------------------------------------------------------------- |
+| Record<string, string> \| undefined | Returns the value that was set using **setUrlParameters()** method. Default value is **undefined** |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    // Initialize with a type
+    const odata = new ODataCreateCL<IProducts>(this, "Products"); 
+
+    // set the url parameters
+    odata.setUrlParameters({
+      "$expand": "toProductLocations"
+    });
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // Initialize
+          const odata = new ODataCreateCL(this, "Products"); 
+
+          // set the url parameters
+          odata.setUrlParameters({
+            "$expand": "toProductLocations"
+          });         
+        }
+      });
+
+    });
+```
+
+#### Refresh After Change
+
+By default, the OData V2 model will be refreshed after the POST request has been completed.
+
+To change the default behavior, the **setRefreshAfterChange()** method can be utilized.
+
+**Setter (setRefreshAfterChange)**
+
+| Parameter          | Type    | Mandatory | Description                                                                                        | 
+| :----------------- | :------ | :-------- | :------------------------------------------------------------------------------------------------- |
+| refreshAfterChange | boolean | Yes       | If set to **false**, the OData V2 model will not be refreshed after the request has been completed |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getRefreshAfterChange)**
+
+| Returns | Description                                                                                        |
+| :------ | :------------------------------------------------------------------------------------------------- |
+| boolean | Returns the value that was set using **setRefreshAfterChange()** method. Default value is **true** |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    // Initialize with a type
+    const odata = new ODataCreateCL<IProducts>(this, "Products"); 
+
+    // deactivate the auto model refresh
+    odata.setRefreshAfterChange(false);
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // Initialize
+          const odata = new ODataCreateCL(this, "Products"); 
+
+          // deactivate the auto model refresh
+          odata.setRefreshAfterChange(false);      
+        }
+      });
+
+    });
+```
+
+#### Additional Response Info
+
+The [create()](#create-request) method returns the data of the successfully created entity. However, you may want to get some additional information such as `status code`, `headers`.
+
+The **getResponse()** method can be utilized to get additional information after the [create()](#create-request) is resolved.
+
+| Returns                                                | Description                          |
+| ------------------------------------------------------ | ------------------------------------ |
+| `object`                                               |                                      |
+| &emsp;$reported?: `boolean` \| `undefined`             |                                      |
+| &emsp;body?: `string` \| `undefined`                   | The HTTP body                        |
+| &emsp;headers?: `object` \| `undefined`                | The HTTP response headers.           |
+| &emsp;statusCode?: `string` \| `number` \| `undefined` | The status code of the HTTP request. |
+| &emsp;statusText?: `string` \| `undefined`             | The HTTP status text.                |
+| &emsp;_imported?: `boolean` \| `undefined`             |                                      |
+| &emsp;data?: `EntityT` \| `undefined`                  | The data that was created            |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL"; // Import the class
+import { IError } from "ui5/antares/types/common"; // Import the error type
+import MessageBox from "sap/m/MessageBox";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onCreateProduct() {
+    // Initialize with a type
+    const odata = new ODataCreateCL<IProducts>(this, "Products"); 
+
+    // set the http body
+    odata.setData({
+      ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18",
+      name: "Product Name",
+      description: "Description",
+      brand: "Brand",
+      price: 999,
+      currency: "EUR",
+      quantityInStock: 15,
+      categoryID: "eb7783a6-f30f-4f7d-b85c-f211eea54568",
+      supplierID: "7734d25f-0d1e-4ab4-b8a8-cd201f29fd2f"
+    });
+
+    try {
+      // send the http request and get the result
+      const result = await odata.create();
+      MessageBox.information(result.ID + " was created.");
+
+      // get the additional response info
+      const response = odata.getResponse();
+
+      if (response) {
+        console.log("Status Code: " + response.statusCode);
+      }
+    } catch (error) {
+      // catch the error
+      MessageBox.error((error as IError).message || "Request failed");
+    }
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataCreateCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataCreateCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // Initialize
+          const odata = new ODataCreateCL(this, "Products"); 
+
+          // set the http body
+          odata.setData({
+            ID: "b2f0013e-418f-42aa-9a24-3770fe17ce18",
+            name: "Product Name",
+            description: "Description",
+            brand: "Brand",
+            price: 999,
+            currency: "EUR",
+            quantityInStock: 15,
+            categoryID: "eb7783a6-f30f-4f7d-b85c-f211eea54568",
+            supplierID: "7734d25f-0d1e-4ab4-b8a8-cd201f29fd2f"
+          });
+
+          try {
+            // send the http request and get the result
+            const result = await odata.create();
+            MessageBox.information(result.ID + " was created.");
+
+            // get the additional response info
+            const response = odata.getResponse();
+
+            if (response) {
+              console.log("Status Code: " + response.statusCode);
+            }            
+          } catch (error) {
+            // catch the error
+            MessageBox.error(error.message || "Request failed");
+          }          
+        }
+      });
+
+    });
+```
+
+#### Create Entry
+
+[2001]: https://sapui5.hana.ondemand.com/#/api/sap.ui.model.Context
+
+To create a transient entity context which can be bound to a form or a dialog, **createEntry()** method can be utilized.
+
+> **Hint**: If you want to create the context with the initial values, [setData()](#set-data) method can be utilized.
+
+| Returns         | Description                         |
+| :-------------- | :---------------------------------- |
+| [Context][2001] | The context of the transient entity |
+
 ### OData Update
+
+ODataUpdateCL is a class that uses [sap.ui.model.odata.v2.ODataModel](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.odata.v2.ODataModel) to handle PATCH/MERGE (UPDATE) requests in a promisified way.
+
+#### Constructor
+
+You must initialize an object from ODataUpdateCL in order to use it.
+
+| Parameter  | Type                            | Mandatory | Default Value | Description                                                                                                            | 
+| :--------- | :------------------------------ | :-------- | :------------ | :--------------------------------------------------------------------------------------------------------------------- |
+| controller | [sap.ui.core.mvc.Controller][1] | Yes       |               | The controller object (usually `this`)                                                                                 |
+| entityPath | string                          | Yes       |               | The name of the **EntitySet**. It can start with a **"/"**                                                             |
+| modelName? | string                          | No        | undefined     | The name of the OData V2 model which can be found on the manifest.json file. **Do not specify** if the model name = "" |
+
+**TypeScript**
+
+**ODataUpdateCL\<EntityT, EntityKeysT\>** is a generic class and can be initialized with 2 types. 
+
+- The `EntityT` type contains the properties of the `EntitySet` that is used as a parameter on the class constructor. 
+- The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor.
+
+`EntityT` is used as the type of the `data` parameter of the **setData(data: EntityT)** method and as the returning type of the **getData(): EntityT** method. 
+
+`EntityKeysT` is used as the type of the `keys` parameter of the **update(keys: EntityKeysT)** method.
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataUpdateCL from "ui5/antares/odata/v2/ODataUpdateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onUpdateProduct() {
+    // Initialize without a type
+    const odata = new ODataUpdateCL(this, "Products"); 
+  }
+
+  public async onUpdateCategory() {
+    // Initialize with a type
+    const odata = new ODataUpdateCL<ICategory, ICategoryKeys>(this, "Categories"); 
+  }
+
+  public async onUpdateCustomer() {
+    // Initialize with a model name
+    const odata = new ODataUpdateCL(this, "Customers", "myODataModelName"); 
+  }
+}
+
+// The properties that will be updated should not be optional
+interface IProducts {
+  ID?: string;
+  name: string;
+  description: string;
+  brand?: string;
+  price?: number;
+  currency?: string;
+  quantityInStock?: number;
+  categoryID?: string;
+  supplierID?: string;
+}
+
+interface ICategoryKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataUpdateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataUpdateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onUpdateProduct: async function () {
+          // Initialize
+          const odata = new ODataUpdateCL(this, "Products"); 
+        },
+
+        onUpdateCategory: async function () {
+          // Initialize with a model name
+          const odata = new ODataUpdateCL(this, "Categories", "myODataModelName");
+        }
+      });
+
+    });
+```
+
+#### Set Data
+
+To set the data that will be sent via the UPDATE HTTP request body, the **setData()** method can be used.
+
+**Setter (setData)**
+
+| Parameter | Type    | Mandatory | Description                                                 | 
+| :-------- | :------ | :-------- | :---------------------------------------------------------- |
+| data      | EntityT | Yes       | The data that will be sent via the UPDATE HTTP request body |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getData)**
+
+| Returns | Description                                                                               |
+| :------ | :---------------------------------------------------------------------------------------- |
+| EntityT | Returns the value that was set using **setData()** method. Default value is **undefined** |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataUpdateCL from "ui5/antares/odata/v2/ODataUpdateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onUpdateProduct() {
+    // Initialize with a type
+    const odata = new ODataUpdateCL<IProducts, IProductKeys>(this, "Products"); 
+
+    // set the http body to update
+    odata.setData({
+      name: "New Product Name",
+      description: "New Description"
+    });
+  }
+
+}
+
+// The properties that will be updated should not be optional
+interface IProducts {
+  ID?: string;
+  name: string;
+  description: string;
+  brand?: string;
+  price?: number;
+  currency?: string;
+  quantityInStock?: number;
+  categoryID?: string;
+  supplierID?: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataUpdateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataUpdateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onUpdateProduct: async function () {
+          // Initialize
+          const odata = new ODataUpdateCL(this, "Products"); 
+
+          // set the http body to update
+          odata.setData({
+            name: "New Product Name",
+            description: "New Description"
+          });
+        }
+      });
+
+    });
+```
+
+#### Update Request
+
+To send the PATCH/MERGE/PUT (Update) request through the OData V2 model, **update(keys: EntityKeysT)** method can be utilized.
+
+> **Important:** It is mandatory to set the data using the [setData()](#set-data-1) method before calling the **update()** method.
+
+The **update()** method runs **asynchronously** and can be awaited. 
+
+The **update()** method returns the data of the update entity if the request was successful.
+
+> **Important:** If the UPDATE request fails, the [OData Updaet](#odata-update) class will throw an error. To catch the error, the **update()** method should be called in a try-catch block. 
+
+**Error Type**
+
+If the UPDATE request fails, the object thrown by the class can contain the properties below.
+
+| Returns                                                | Description                          |
+| ------------------------------------------------------ | ------------------------------------ |
+| `object`                                               |                                      |
+| &emsp;headers?: `object` \| `undefined`                | The HTTP response headers.           |
+| &emsp;message?: `string` \| `undefined`                | The HTTP response message.           |
+| &emsp;responseText?: `string` \| `undefined`           | The HTTP response text.              |
+| &emsp;statusCode?: `string` \| `number` \| `undefined` | The status code of the HTTP request. |
+| &emsp;statusText?: `string` \| `undefined`             | The HTTP status text.                |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataUpdateCL from "ui5/antares/odata/v2/ODataUpdateCL"; // Import the class
+import { IError } from "ui5/antares/types/common"; // Import the error type
+import MessageBox from "sap/m/MessageBox";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onUpdateProduct() {
+    // Initialize with a type
+    const odata = new ODataUpdateCL<IProducts, IProductKeys>(this, "Products"); 
+
+    // set the http body to update
+    odata.setData({
+      name: "New Product Name",
+      description: "New Description"
+    });
+
+    try {
+      // send the http request and get the result. Note: You have to specify the key values of the entity that will be updated
+      const result = await odata.update({
+        ID: "3ccb5dd2-cc12-483a-b569-a6ec844f8f0b"
+      });
+
+      MessageBox.information("The entity with the following ID: " + result.ID + " was updated.");
+    } catch (error) {
+      // catch the error
+      MessageBox.error((error as IError).message || "Request failed");
+    }
+  }
+
+}
+
+// The properties that will be updated should not be optional
+interface IProducts {
+  ID?: string;
+  name: string;
+  description: string;
+  brand?: string;
+  price?: number;
+  currency?: string;
+  quantityInStock?: number;
+  categoryID?: string;
+  supplierID?: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataUpdateCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataUpdateCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onUpdateProduct: async function () {
+          // Initialize
+          const odata = new ODataUpdateCL(this, "Products"); 
+
+          // set the http body to update
+          odata.setData({
+            name: "New Product Name",
+            description: "New Description"
+          });
+
+          try {
+            // send the http request and get the result. Note: You have to specify the key values of the entity that will be updated
+            const result = await odata.update({
+              ID: "3ccb5dd2-cc12-483a-b569-a6ec844f8f0b"
+            });
+
+            MessageBox.information("The entity with the following ID: " + result.ID + " was updated.");
+          } catch (error) {
+            // catch the error
+            MessageBox.error(error.message || "Request failed");
+          }          
+        }
+      });
+
+    });
+```
+
+#### URL Parameters
+
+To set the URL parameters before sending the UPDATE request with the [update()](#update-request) method, the **setUrlParameters()** method can be used.
+
+**Setter (setUrlParameters)**
+
+| Parameter     | Type                   | Mandatory | Description                              | 
+| :------------ | :--------------------- | :-------- | :--------------------------------------- |
+| urlParameters | Record<string, string> | Yes       | The URL parameters of the UPDATE request |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getUrlParameters)**
+
+| Returns                             | Description                                                                                        |
+| :---------------------------------- | :------------------------------------------------------------------------------------------------- |
+| Record<string, string> \| undefined | Returns the value that was set using **setUrlParameters()** method. Default value is **undefined** |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataUpdateCL from "ui5/antares/odata/v2/ODataUpdateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onUpdateProduct() {
+    // Initialize with a type
+    const odata = new ODataUpdateCL<IProducts, IProductKeys>(this, "Products"); 
+
+    // set the url parameters
+    odata.setUrlParameters({
+      "$expand": "toProductLocations"
+    });
+  }
+
+}
+
+// The properties that will be updated should not be optional
+interface IProducts {
+  ID?: string;
+  name: string;
+  description: string;
+  brand?: string;
+  price?: number;
+  currency?: string;
+  quantityInStock?: number;
+  categoryID?: string;
+  supplierID?: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataUpdateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataUpdateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onUpdateProduct: async function () {
+          // Initialize
+          const odata = new ODataUpdateCL(this, "Products"); 
+
+          // set the url parameters
+          odata.setUrlParameters({
+            "$expand": "toProductLocations"
+          });         
+        }
+      });
+
+    });
+```
+
+#### Refresh After Change
+
+By default, the OData V2 model will be refreshed after the UPDATE request has been completed.
+
+To change the default behavior, the **setRefreshAfterChange()** method can be utilized.
+
+**Setter (setRefreshAfterChange)**
+
+| Parameter          | Type    | Mandatory | Description                                                                                        | 
+| :----------------- | :------ | :-------- | :------------------------------------------------------------------------------------------------- |
+| refreshAfterChange | boolean | Yes       | If set to **false**, the OData V2 model will not be refreshed after the request has been completed |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getRefreshAfterChange)**
+
+| Returns | Description                                                                                        |
+| :------ | :------------------------------------------------------------------------------------------------- |
+| boolean | Returns the value that was set using **setRefreshAfterChange()** method. Default value is **true** |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataUpdateCL from "ui5/antares/odata/v2/ODataUpdateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onUpdateProduct() {
+    // Initialize with a type
+    const odata = new ODataUpdateCL<IProducts, IProductKeys>(this, "Products"); 
+
+    // deactivate the auto model refresh
+    odata.setRefreshAfterChange(false);
+  }
+
+}
+
+// The properties that will be updated should not be optional
+interface IProducts {
+  ID?: string;
+  name: string;
+  description: string;
+  brand?: string;
+  price?: number;
+  currency?: string;
+  quantityInStock?: number;
+  categoryID?: string;
+  supplierID?: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataUpdateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataUpdateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onUpdateProduct: async function () {
+          // Initialize
+          const odata = new ODataUpdateCL(this, "Products"); 
+
+          // deactivate the auto model refresh
+          odata.setRefreshAfterChange(false);      
+        }
+      });
+
+    });
+```
+
+#### Additional Response Info
+
+The [update()](#update-request) method returns the data of the successfully updated entity. However, you may want to get some additional information such as `status code`, `headers`.
+
+The **getResponse()** method can be utilized to get additional information after the [update()](#update-request) is resolved.
+
+| Returns                                                | Description                          |
+| ------------------------------------------------------ | ------------------------------------ |
+| `object`                                               |                                      |
+| &emsp;$reported?: `boolean` \| `undefined`             |                                      |
+| &emsp;body?: `string` \| `undefined`                   | The HTTP body                        |
+| &emsp;headers?: `object` \| `undefined`                | The HTTP response headers.           |
+| &emsp;statusCode?: `string` \| `number` \| `undefined` | The status code of the HTTP request. |
+| &emsp;statusText?: `string` \| `undefined`             | The HTTP status text.                |
+| &emsp;_imported?: `boolean` \| `undefined`             |                                      |
+| &emsp;data?: `EntityT` \| `undefined`                  | The data that was updated            |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataUpdateCL from "ui5/antares/odata/v2/ODataUpdateCL"; // Import the class
+import { IError } from "ui5/antares/types/common"; // Import the error type
+import MessageBox from "sap/m/MessageBox";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onUpdateProduct() {
+    // Initialize with a type
+    const odata = new ODataUpdateCL<IProducts, IProductKeys>(this, "Products"); 
+
+    // set the http body
+    odata.setData({
+      name: "New Product Name",
+      description: "New Description"
+    });
+
+    try {
+      // send the http request and get the result
+      const result = await odata.update({
+        ID: "3ccb5dd2-cc12-483a-b569-a6ec844f8f0b"
+      });
+
+      MessageBox.information(result.ID + " was updated.");
+
+      // get the additional response info
+      const response = odata.getResponse();
+
+      if (response) {
+        console.log("Status Code: " + response.statusCode);
+      }
+    } catch (error) {
+      // catch the error
+      MessageBox.error((error as IError).message || "Request failed");
+    }
+  }
+
+}
+
+// The properties that will be updated should not be optional
+interface IProducts {
+  ID?: string;
+  name: string;
+  description: string;
+  brand?: string;
+  price?: number;
+  currency?: string;
+  quantityInStock?: number;
+  categoryID?: string;
+  supplierID?: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataUpdateCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataUpdateCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onUpdateProduct: async function () {
+          // Initialize
+          const odata = new ODataUpdateCL(this, "Products"); 
+
+          // set the http body
+          odata.setData({
+            name: "New Product Name",
+            description: "New Description"
+          });
+
+          try {
+            // send the http request and get the result
+            const result = await odata.update({
+              ID: "3ccb5dd2-cc12-483a-b569-a6ec844f8f0b"
+            });
+
+            MessageBox.information(result.ID + " was updated.");
+
+            // get the additional response info
+            const response = odata.getResponse();
+
+            if (response) {
+              console.log("Status Code: " + response.statusCode);
+            }            
+          } catch (error) {
+            // catch the error
+            MessageBox.error(error.message || "Request failed");
+          }          
+        }
+      });
+
+    });
+```
 
 ### OData Delete
 
 ### OData Read
 
 ## Fragment Class
+
+## Planned Features
+
+Here is a list of features that are in the pipeline for the next releases.
+
+## Change Log
+
+Please see [CHANGELOG.md](./CHANGELOG.md)
