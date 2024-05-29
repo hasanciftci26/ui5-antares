@@ -8416,7 +8416,7 @@ You must initialize an object from ODataUpdateCL in order to use it.
 - The `EntityT` type contains the properties of the `EntitySet` that is used as a parameter on the class constructor. 
 - The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor.
 
-`EntityT` is used as the type of the `data` parameter of the **setData(data: EntityT)** method and as the returning type of the **getData(): EntityT** method. 
+`EntityT` is used as the type of the `data` parameter of the **setData(data: EntityT)** method and as the returning type of the **getData(): EntityT** and **update(): EntityT** methods. 
 
 `EntityKeysT` is used as the type of the `keys` parameter of the **update(keys: EntityKeysT)** method.
 
