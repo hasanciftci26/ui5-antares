@@ -4,6 +4,12 @@ UI5 Antares is a custom SAPUI5 library consisting of some useful classes and met
 
 > UI5 Antares is written in [TypeScript](https://www.typescriptlang.org/). It is compatible with both SAPUI5 JavaScript and SAPUI5 TypeScript applications.
 
+## BEFORE YOU CONTINUE
+
+ &#x26A0; This library uses the classes and components of the [SAPUI5](https://sapui5.hana.ondemand.com/) framework without modifying or copying the source code, which is licensed under the [SAP Developer License](https://tools.hana.ondemand.com/developer-license-3_2.txt). Please read the [SAP Developer License](https://tools.hana.ondemand.com/developer-license-3_2.txt) carefully and remember that you must comply with the restrictions of the **SAP Developer License** while using the [UI5 Antares](#ui5-antares) library.
+
+---
+
 **Features:**
 - OData V2 metadata-based dialog and [Simple Form](https://sapui5.hana.ondemand.com/#/api/sap.ui.layout.form.SimpleForm) - [Smart Form](https://sapui5.hana.ondemand.com/#/api/sap.ui.comp.smartform.SmartForm) generation for CRUD operations
 - Value Help Dialog generation
@@ -16,6 +22,9 @@ UI5 Antares is a custom SAPUI5 library consisting of some useful classes and met
 - [Entry Create](#entry-create)
 - [Entry Update](#entry-update)
 - [Entry Delete](#entry-delete)
+- [Entry Read](#entry-read)
+- [Promisified OData V2 Classes](#promisified-odata-v2-classes)
+- [Fragment Class](#fragment-class)
 
 ## Prerequisites
 
@@ -46,6 +55,7 @@ ui5 -v
 ## Table of Contents
 
 - [UI5 Antares](#ui5-antares)
+  - [BEFORE YOU CONTINUE](#before-you-continue)
   - [Prerequisites](#prerequisites)
   - [Table of Contents](#table-of-contents)
   - [Versioning](#versioning)
@@ -128,7 +138,18 @@ ui5 -v
     - [Confirmation Title](#confirmation-title)
     - [Attach Delete Completed](#attach-delete-completed)
     - [Attach Delete Failed](#attach-delete-failed)
-    - [Available Features](#available-features-1) 
+    - [Available Features](#available-features-1)
+  - [Entry Read](#entry-read)
+    - [Use Case](#use-case-3)
+    - [Constructor](#constructor-6)
+      - [Constructor with a Table ID](#constructor-with-a-table-id-2) 
+    - [Select Row Message](#select-row-message-2)         
+  - [Promisified OData V2 Classes](#promisified-odata-v2-classes)
+    - [OData Create](#odata-create)
+    - [OData Update](#odata-update)
+    - [OData Delete](#odata-delete)
+    - [OData Read](#odata-read)
+  - [Fragment Class](#fragment-class)
 
 ## Versioning
 
@@ -6105,12 +6126,885 @@ The generated form with default values will more or less look like the following
 
 ### Confirmation Text
 
+A default confirmation message is displayed on an [sap.m.MessageBox.confirm](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) to request confirmation from the end user before deleting any data.
+
+To change the default confirmation message, **setConfirmationText()** method can be utilized.
+
+**Setter (setConfirmationText)**
+
+| Parameter | Type   | Mandatory | Description                                                     | 
+| :-------- | :----- | :-------- | :-------------------------------------------------------------- |
+| text      | string | Yes       | The message displayed in MessageBox.confirm before the deletion |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getConfirmationText)**
+
+| Returns | Description                                                                                                                                    |
+| :------ | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| string  | Returns the value that was set using **setConfirmationText()** method. Default value is **The selected line will be deleted. Do you confirm?** |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryDeleteCL from "ui5/antares/entry/v2/EntryDeleteCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteProduct() {
+    // Initialize with a type and with a table id
+    const entry = new EntryDeleteCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: "tblProducts"
+    });
+
+    // Change the confirmation message
+    entry.setConfirmationText("This line will be removed from the database. Do you want to continue?");
+
+    // Call with no preview
+    entry.deleteEntry(false); 
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryDeleteCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryDeleteCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Initialize with a table id
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Products",
+            initializer: "tblProducts"
+          });
+
+          // Change the confirmation message
+          entry.setConfirmationText("This line will be removed from the database. Do you want to continue?");
+
+          // Call with no preview
+          entry.deleteEntry(false);  
+        }
+      });
+
+    });
+```
+
 ### Confirmation Title
+
+A default title is displayed on an [sap.m.MessageBox.confirm](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) to request confirmation from the end user before deleting any data.
+
+To change the default title of the MessageBox, **setConfirmationTitle()** method can be utilized.
+
+**Setter (setConfirmationTitle)**
+
+| Parameter | Type   | Mandatory | Description                                                   | 
+| :-------- | :----- | :-------- | :------------------------------------------------------------ |
+| title     | string | Yes       | The title displayed in MessageBox.confirm before the deletion |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getConfirmationTitle)**
+
+| Returns | Description                                                                                                 |
+| :------ | :---------------------------------------------------------------------------------------------------------- |
+| string  | Returns the value that was set using **setConfirmationTitle()** method. Default value is **Confirm Delete** |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryDeleteCL from "ui5/antares/entry/v2/EntryDeleteCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteProduct() {
+    // Initialize with a type and with a table id
+    const entry = new EntryDeleteCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: "tblProducts"
+    });
+
+    // Change the confirmation title
+    entry.setConfirmationTitle("My Confirmation Title");
+
+    // Call with no preview
+    entry.deleteEntry(false); 
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryDeleteCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryDeleteCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Initialize with a table id
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Products",
+            initializer: "tblProducts"
+          });
+
+          // Change the confirmation title
+          entry.setConfirmationTitle("My Confirmation Title");
+
+          // Call with no preview
+          entry.deleteEntry(false);  
+        }
+      });
+
+    });
+```
 
 ### Attach Delete Completed
 
+The [Entry Delete](#entry-delete) class can call a function that has been attached using the **attachDeleteCompleted()** method after a successful deletion. This function will then receive the data of the deleted entity.
+
+To attach a function, **attachDeleteCompleted()** method can be utilized.
+
+[421]: #constructor-5
+
+**Setter (attachDeleteCompleted)**
+
+| Parameter | Type                    | Mandatory | Description                                                        | 
+| :-------- | :---------------------- | :-------- | :----------------------------------------------------------------- |
+| completed | (data: EntityT) => void | Yes       | The function that will be called after the successful deletion     |
+| listener? | object                  | No        | The default listener is the **controller** from [constructor][421] |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Sample**
+
+Once the deletion is successful, you would like to receive a response and take the necessary actions.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryDeleteCL from "ui5/antares/entry/v2/EntryDeleteCL"; // Import the class
+import MessageBox from "sap/m/MessageBox";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteProduct() {
+    // Initialize with a type and with a table id
+    const entry = new EntryDeleteCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: "tblProducts"
+    });
+
+    // Attach the function
+    entry.attachDeleteCompleted(this.onDeleteCompleted, this);
+
+    // Call with no preview
+    entry.deleteEntry(false); 
+  }
+
+  // If possible, use the same type that is used in the constructor
+  private onDeleteCompleted (data: IProducts) {
+    const productID = data.ID;
+
+    MessageBox.information(`The product with the following ID is removed: ${productID}`);
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryDeleteCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryDeleteCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Initialize with a table id
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Products",
+            initializer: "tblProducts"
+          });
+
+          // Attach the function
+          entry.attachDeleteCompleted(this.onDeleteCompleted, this);
+
+          // Call with no preview
+          entry.deleteEntry(false); 
+        },
+
+        // Handler function
+        onDeleteCompleted: function (data) {
+          const productID = data.ID;
+
+          MessageBox.information(`The product with the following ID is removed: ${productID}`);
+        }
+      });
+
+    });
+```
+
 ### Attach Delete Failed
 
+In the event that the deletion of the entity is unsuccessful, [Entry Delete](#entry-delete) class can then call a function with a specific signature. The result of the deletion will then be passed to the attached function.
+
+To attach a function, **attachDeleteFailed()** method can be utilized.
+
+**Setter (attachDeleteFailed)**
+
+| Parameter | Type                                                               | Mandatory | Description                                                        | 
+| :-------- | :----------------------------------------------------------------- | :-------- | :----------------------------------------------------------------- |
+| failed    | (response: [ResponseCL\<IDeleteFailed\>](#response-class)) => void | Yes       | The function that will be called after the deletion fail           |
+| listener? | object                                                             | No        | The default listener is the **controller** from [constructor][421] |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+<br>
+
+An object constructed from the [ResponceCL](#response-class) class passed as a parameter to the function. This object has 2 public methods.
+
+**getResponse()**
+
+| Returns                      | Description                          |
+| ---------------------------- | ------------------------------------ |
+| `object` \| `undefined`      |                                      |
+| &emsp;headers: `object`      | The HTTP response headers.           |
+| &emsp;message: `string`      | The HTTP response message.           |
+| &emsp;responseText: `string` | The HTTP response text.              |
+| &emsp;statusCode: `string`   | The status code of the HTTP request. |
+| &emsp;statusText: `string`   | The HTTP status text.                |
+
+---
+
+**getStatusCode()**
+
+| Returns             | Description                                 |
+| :------------------ | :------------------------------------------ |
+| string or undefined | Returns the status code of the HTTP Request |
+
+**Sample**
+
+Once the deletion is not successful, you would like to receive a response and take the necessary actions.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryDeleteCL from "ui5/antares/entry/v2/EntryDeleteCL"; // Import the class
+import ResponseCL from "ui5/antares/entry/v2/ResponseCL"; // Import the ResponseCL class
+import { IDeleteFailed } from "ui5/antares/types/entry/delete"; // Import the Delete Failed type
+import MessageBox from "sap/m/MessageBox";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteProduct() {
+    // Initialize with a type and with a table id
+    const entry = new EntryDeleteCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: "tblProducts"
+    });
+
+    // Attach the function
+    entry.attachDeleteFailed(this.onDeleteFailed, this);
+
+    // Call with no preview
+    entry.deleteEntry(false); 
+  }
+
+  // If possible, use the IDeleteFailed type
+  private onDeleteFailed (response: ResponseCL<IDeleteFailed>) {
+    const statusCode = response.getStatusCode(); // get the status code
+    const deleteResponse = response.getResponse(); // get the response
+
+    if (deleteResponse) {
+      MessageBox.error(deleteResponse.message);
+    }
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryDeleteCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryDeleteCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Initialize with a table id
+          const entry = new EntryDeleteCL(this, {
+            entityPath: "Products",
+            initializer: "tblProducts"
+          });
+
+          // Attach the function
+          entry.attachDeleteFailed(this.onDeleteFailed, this);
+
+          // Call with no preview
+          entry.deleteEntry(false); 
+        },
+
+        // Handler function
+        onDeleteFailed: function (response) {
+          const statusCode = response.getStatusCode(); // get the status code
+          const deleteResponse = response.getResponse(); // get the response
+
+          if (deleteResponse) {
+            MessageBox.error(deleteResponse.message);
+          }
+        }
+      });
+
+    });
+```
+
 ### Available Features
+
+The [EntryDeleteCL](#entry-delete) class is derived from the same abstract class as the [EntryCreateCL](#entry-create) class and contains the same methods. However, some of these functions are not applicable to the [EntryDeleteCL](#entry-delete) class. 
+
+> **Important:** Please note that the default values for the available functions may differ.
+
+The features listed below are identical to those available in [EntryCreateCL](#entry-create). Methods can be accessed through the object constructed from the [EntryDeleteCL](#entry-delete) class.
+
+> **Hint**: To access the documentation for a particular feature, please click on the name of the feature.
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Availability</th>
+      <th>Default Value</th>
+      <th>Remarks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#label-generation">Label Generation</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#resource-bundle-prefix">Resource Bundle Prefix</a></td>
+      <td align="center">&#x2714;</td>
+      <td>antares</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#naming-strategy">Naming Strategy</a></td>
+      <td align="center">&#x2714;</td>
+      <td>CAMEL_CASE</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#form-type">Form Type</a></td>
+      <td align="center">&#x2714;</td>
+      <td>SMART</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#form-title">Form Title</a></td>
+      <td align="center">&#x2714;</td>
+      <td>Delete <code>${entityPath}</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#begin-button-text">Begin Button Text</a></td>
+      <td align="center">&#x2714;</td>
+      <td>Delete</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#begin-button-type">Begin Button Type</a></td>
+      <td align="center">&#x2714;</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.m.ButtonType">ButtonType.Reject</a></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#end-button-text">End Button Text</a></td>
+      <td align="center">&#x2714;</td>
+      <td>Close</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#end-button-type">End Button Type</a></td>
+      <td align="center">&#x2714;</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.m.ButtonType">ButtonType.Default</a></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#confirmation-text">Confirmation Text</a></td>
+      <td align="center">&#x2714;</td>
+      <td>The selected line will be deleted. Do you confirm?</td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#confirmation-title">Confirmation Title</a></td>
+      <td align="center">&#x2714;</td>
+      <td>Confirm Delete</td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#properties-with-edmguid-type">Properties with Edm.Guid Type</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td>The random UUID generation is not available. You can only modify the visibilities of the properties with <code>Edm.Guid</code> type</td>
+    </tr>
+    <tr>
+      <td><a href="#form-property-order">Form Property Order</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#excluded-properties">Excluded Properties</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#mandatory-properties">Mandatory Properties</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#readonly-properties">Readonly Properties</a></td>
+      <td align="center">&#x2717;</td>
+      <td>[all properties]</td>
+      <td>By default, all the properties are readonly and cannot be changed</td>
+    </tr>    
+    <tr>
+      <td><a href="#attach-submit-completed">Attach Submit Completed</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td>Please see <a href="#attach-delete-completed">Attach Delete Completed</a></td>
+    </tr>    
+    <tr>
+      <td><a href="#attach-submit-failed">Attach Submit Failed</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td>Please see <a href="#attach-delete-failed">Attach Delete Failed</a></td>
+    </tr>    
+    <tr>
+      <td><a href="#response-class">Response Class</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td>Only available for <a href="#attach-delete-failed">Attach Delete Failed</a></td>
+    </tr>    
+    <tr>
+      <td><a href="#value-help">Value Help</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#validation-logic">Validation Logic</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#custom-control">Custom Control</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#custom-content">Custom Content</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
+      <td><a href="#custom-fragment">Custom Fragment</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+  </tbody>
+</table>
+
+## Entry Read
+
+Entry Read (EntryReadCL) is a class that manages the READ operation through the OData V2 model. It basically avoids developers having to deal with fragments, row selection while working on custom SAPUI5 applications or Fiori Elements extensions. Below you can see the features that Entry Read has.
+
+**Features:**
+- sap.m.Dialog generation with a SmartForm, SimpleForm or Custom content
+- Property sorting, excluding
+- Label generation for the SmartForm, SimpleForm elements
+- Call a fragment and bind the context in case you do not want to use the auto-generated dialog
+
+### Use Case
+
+Let's say that you have an EntitySet named `Products` which is bound to a table and the `Products` entity has many properties that would not fit to the table. The objective is to enable the end user to select a row from the table and display the details with more properties through the OData V2 Model on a dialog screen. The following steps outline the process.
+
+1) You need to create a **.fragment.xml** file that contains a Dialog with a form content (Simple, Smart etc.) and call it from the controller or generate the dialog directly on the controller
+2) You need to handle the table selection
+3) You need to handle the binding of the selected entity to the dialog or form
+
+[EntryReadCL](#entry-read) class basically handles all of the steps defined above.
+
+### Constructor
+
+You must initialize an object from EntryReadCL in order to use it.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Default Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>controller</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.core.mvc.Controller">sap.ui.core.mvc.Controller</a></td>
+      <td>Yes</td>
+      <td></td>
+      <td>The controller object (usually <code>this</code>)</td>
+    </tr>
+    <tr>
+      <td>settings</td>
+      <td>object</td>
+      <td>Yes</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>&emsp;entityPath</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td></td>
+      <td>The name of the <strong>EntitySet</strong>. It can start with a <strong>"/"</strong></td>
+    </tr>
+    <tr>
+      <td>&emsp;initializer</td>
+      <td>string | <a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.model.Context">sap.ui.model.Context</a> | EntityKeysT</td>
+      <td>Yes</td>
+      <td></td>
+      <td>The ID of the table or the context binding or the key values of the entity that will be read</td>
+    </tr>
+    <tr>
+      <td>modelName?</td>
+      <td>string</td>
+      <td>No</td>
+      <td>undefined</td>
+      <td>The name of the OData V2 model which can be found on the manifest.json file. <strong>Do not specify</strong> if the model name = ""</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+There are three distinct methods for constructing an object from the [Entry Read](#entry-read) class.
+
+### Constructor with a Table ID
+
+The most straightforward method for utilizing the capabilities of the [Entry Read](#entry-read) class is to construct an object with the ID of a table that you have on your XML view. This method offers several advantages.
+
+1) The table row selected by the end user is automatically detected by the [Entry Read](#entry-read) class, and the context binding of the selected row is bound to the auto-generated dialog.
+2) If no table row is selected by the end user, a default message is displayed in the [sap.m.MessageBox.error](https://sapui5.hana.ondemand.com/#/api/sap.m.MessageBox) to the end user.
+
+> **Important:** This method supports only the table types and selection modes listed below. If the selection mode of the table whose ID is being used for object construction is not supported, the library throws an error.
+
+> **Information:** The default message displayed when the end user has not selected a row from the table yet can be modified using [setSelectRowMessage()](#select-row-message-2) method.
+
+**Supported Table Types**
+
+| Table Type                               | Selection Mode                                                              |
+| :--------------------------------------- | :-------------------------------------------------------------------------- |
+| [sap.m.Table][801]                       | [SingleSelect][806] \| [SingleSelectLeft][806] \| [SingleSelectMaster][806] |
+| [sap.ui.table.Table][802]                | [Single][807]                                                               |
+| [sap.ui.comp.smarttable.SmartTable][803] | [Single][807]                                                               |
+| [sap.ui.table.AnalyticalTable][804]      | [Single][807]                                                               |
+| [sap.ui.table.TreeTable][805]            | [Single][807]                                                               |
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products**, which is bound to an [sap.m.Table][801] on the XML view. Our objective is to add a [sap.m.Button](https://sapui5.hana.ondemand.com/#/api/sap.m.Button) to the header toolbar of the table. When the user selects a row from the table and presses the **Display Product Details** button, we will open a dialog so the user can display all the details of the selected line.
+
+![Read Constructor Sample](https://github.com/hasanciftci26/ui5-antares/blob/media/delete_entry/delete_constructor_1.png?raw=true)
+
+**TypeScript**
+
+**EntryReadCL\<EntityT, EntityKeysT\>** is a generic class and can be initialized with 2 types. 
+
+- The `EntityT` type contains **all** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+- The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor. 
+
+`EntityKeysT` is used as one of the types of the `initializer` parameter in the class [constructor](#constructor-6).
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryReadCL from "ui5/antares/entry/v2/EntryReadCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDisplayCategoryDetails() {
+    // Initialize without a type and with the table id
+    const entry = new EntryReadCL(this, {
+      entityPath: "Categories",
+      initializer: "tblCategories" // table id       
+    }); 
+  }
+
+  public async onDisplayProductDetails() {
+    // Initialize with a type and the table id
+    const entry = new EntryReadCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: "tblProducts" // table id       
+    }); 
+  }
+
+  public async onDisplayCustomerDetails() {
+    // Initialize with a model name and the table id
+    const entry = new EntryReadCL(this, {
+      entityPath: "Customers",
+      initializer: "tblCustomers" // table id      
+    }, "myODataModelName"); 
+  }
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: number;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryReadCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryReadCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDisplayProductDetails: async function () {
+          // Initialize with the table id
+          const entry = new EntryReadCL(this, {
+            entityPath: "Products",
+            initializer: "tblProducts" // table id                
+          }); 
+        },
+
+        onDisplayCategoryDetails: async function () {
+          // Initialize with a model name
+          const entry = new EntryReadCL(this, {
+            entityPath: "Categories",
+            initializer: "tblCategories" // table id                 
+          }, "myODataModelName");
+        }
+      });
+
+    });
+```
+
+### Select Row Message
+
+## Promisified OData V2 Classes
+
+### OData Create
+
+### OData Update
+
+### OData Delete
+
+### OData Read
 
 ## Fragment Class
