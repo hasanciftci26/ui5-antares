@@ -17,7 +17,9 @@ UI5 Antares is a custom SAPUI5 library consisting of some useful classes and met
 - Request handling for OData V2 CRUD operations
 - Promisified OData V2 methods based on the [sap.ui.model.odata.v2.ODataModel](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.odata.v2.ODataModel) class
 
-**Main Classes**
+**Core Classes**
+
+The UI5 Antares library offers a comprehensive set of core classes, as outlined below.
 
 - [Entry Create](#entry-create)
 - [Entry Update](#entry-update)
@@ -25,6 +27,8 @@ UI5 Antares is a custom SAPUI5 library consisting of some useful classes and met
 - [Entry Read](#entry-read)
 - [Promisified OData V2 Classes](#promisified-odata-v2-classes)
 - [Fragment Class](#fragment-class)
+
+Please refer to the [Planned Features](#planned-features) section to learn about the features that will be included in the next releases.
 
 ## Prerequisites
 
@@ -181,6 +185,14 @@ ui5 -v
       - [Sorters](#sorters)
       - [Additional Response Info](#additional-response-info-3)       
   - [Fragment Class](#fragment-class)
+    - [Constructor](#constructor-11)
+    - [Load Content](#load-content)
+    - [Open Dialog or Popover](#open-dialog-or-popover)
+      - [Open Sync](#open-sync)
+      - [Open Async](#open-async)
+    - [Close Dialog or Popover](#close-dialog-or-popover)
+    - [Get Fragment Content](#get-fragment-content)
+    - [Destroy Fragment Content](#destroy-fragment-content)
   - [Planned Features](#planned-features)
   - [Change Log](#change-log)
 
@@ -10441,9 +10453,967 @@ sap.ui.define([
 
 ## Fragment Class
 
+The Fragment class provides some public methods to load the contents of a fragment (*.fragment.xml) file and open a dialog or popover. 
+
+> The FragmentCL class is also used in the [Custom Control From Fragment](#custom-control-from-fragment) and [Custom Content From Fragment](#custom-content-from-fragment) methods of the Entry classes.
+
+### Constructor
+
+You must initialize an object from FragmentCL in order to use it.
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Mandatory</th>
+      <th>Default Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>controller</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.core.mvc.Controller">sap.ui.core.mvc.Controller</a></td>
+      <td>Yes</td>
+      <td></td>
+      <td>The controller object (usually <code>this</code>)</td>
+    </tr>
+    <tr>
+      <td>fragmentPath</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td></td>
+      <td>The path of the fragment whose content will be loaded or opened</td>
+    </tr>
+    <tr>
+      <td>openByControl?</td>
+      <td><a href="https://sapui5.hana.ondemand.com/#/api/sap.ui.core.Control">sap.ui.core.Control</a></td>
+      <td>No</td>
+      <td></td>
+      <td>If the loaded fragment contains a popover, this parameter sets which control the popover opens next to. For instance: sap.m.Button</td>
+    </tr>
+  </tbody>
+</table>
+
+**Sample**
+
+Let us assume that we have created a file with the extension **.fragment.xml** and the following content. We would now like to open the dialog in the controller.
+
+```xml
+<core:FragmentDefinition
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog title="Create New Product">
+        <form:SimpleForm>
+            <form:content>
+                <Label text="Product ID" />
+                <MaskInput
+                    mask="CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC"
+                    value="{ID}"
+                    placeholderSymbol="_"
+                >
+                    <rules>
+                        <MaskInputRule
+                            maskFormatSymbol="C"
+                            regex="[a-f0-9]"
+                        />
+                    </rules>
+                </MaskInput>
+                <Label text="Name" />
+                <Input value="{name}" />
+                <Label text="Description" />
+                <TextArea
+                    value="{description}"
+                    rows="5"
+                />
+                <Label text="Price" />
+                <Slider
+                    width="100%"
+                    min="1000"
+                    max="100000"
+                    showAdvancedTooltip="true"
+                    showHandleTooltip="true"
+                    inputsAsTooltips="true"
+                    enableTickmarks="true"
+                    step="1000"
+                    class="sapUiMediumMarginBottom"
+                    value="{price}"
+                />
+                <Label text="Currency" />
+                <ComboBox selectedKey="{currency}">
+                    <items>
+                        <core:Item
+                            key="EUR"
+                            text="Euro"
+                        />
+                        <core:Item
+                            key="USD"
+                            text="US Dollar"
+                        />
+                        <core:Item
+                            key="TRY"
+                            text="Turkish Lira"
+                        />
+                    </items>
+                </ComboBox>
+            </form:content>
+        </form:SimpleForm>
+        <beginButton>
+            <Button
+                text="Complete"
+                press="onCompleteProduct"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="Close"
+                press="onCloseProductDialog"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
+```
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import FragmentCL from "ui5/antares/ui/FragmentCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onOpenDialog() {
+    // Initialize with the controller and fragment path
+    const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/FragmentCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, FragmentCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onOpenDialog: async function () {
+          // Initialize with the controller and fragment path
+          const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+        }
+      });
+
+    });
+```
+
+### Load Content
+
+To load the content inside of a fragment file, the **load(): Promise\<Control \| Control\[\]\>** method can be utilized.
+
+> **Information:** If the fragment contains more than one UI control, the **load()** method will return an array containing the UI controls. For single content, the **load()** method will return the UI control itself.
+
+> **Information:** Please be aware that **load()** function is **asynchronous** and must be awaited.
+
+**Sample**
+
+Let us assume that we have created a file with the extension **.fragment.xml** and the following content. We would now like to use the sap.m.Text in the controller.
+
+```xml
+<core:FragmentDefinition
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Text text="My Text" />
+</core:FragmentDefinition>
+
+```
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import FragmentCL from "ui5/antares/ui/FragmentCL"; // Import the class
+import Text from "sap/m/Text";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onLoadFragment() {
+    // Initialize with the controller and fragment path
+    const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+
+    // load the content of the fragment
+    const content = await fragment.load() as unknown as Text;
+
+    // use the content
+    console.log(content.getText());
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/FragmentCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, FragmentCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onLoadFragment: async function () {
+          // Initialize with the controller and fragment path
+          const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+
+          // load the content of the fragment
+          const content = await fragment.load();
+
+          // use the content
+          console.log(content.getText());
+        }
+      });
+
+    });
+```
+
+### Open Dialog or Popover
+
+To open a dialog or a popover from a fragment file, there are two distinct methods that can be executed.
+
+Please note that both methods only support the following dialog and popover classes:
+
+1) [sap.m.Dialog](https://sapui5.hana.ondemand.com/#/api/sap.m.Dialog)
+2) [sap.m.Popover](https://sapui5.hana.ondemand.com/#/api/sap.m.Popover)
+3) [sap.m.MessagePopover](https://sapui5.hana.ondemand.com/#/api/sap.m.MessagePopover)
+4) [sap.m.ColorPalettePopover](https://sapui5.hana.ondemand.com/#/api/sap.m.ColorPalettePopover)
+5) [sap.m.ResponsivePopover](https://sapui5.hana.ondemand.com/#/api/sap.m.ResponsivePopover)
+
+#### Open Sync
+
+To utilize the **open()** method, it is essential to first execute the [load()](#load-content) method.
+
+> **Hint:** The **open()** method returns the dialog or popover loaded from a fragment using the [load()](#load-content) method.
+
+> **Important:** When opening a popover, it is necessary to set the control that the popover opens next to. Please see [constructor](#constructor-11)
+
+**Sample 1**
+
+Let us assume that we have created a file with the extension **.fragment.xml** and the following content. We would now like to open the **dialog** in the controller.
+
+```xml
+<core:FragmentDefinition
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog title="Create New Product">
+        <form:SimpleForm>
+            <form:content>
+                <Label text="Product ID" />
+                <MaskInput
+                    mask="CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC"
+                    value="{ID}"
+                    placeholderSymbol="_"
+                >
+                    <rules>
+                        <MaskInputRule
+                            maskFormatSymbol="C"
+                            regex="[a-f0-9]"
+                        />
+                    </rules>
+                </MaskInput>
+                <Label text="Name" />
+                <Input value="{name}" />
+                <Label text="Description" />
+                <TextArea
+                    value="{description}"
+                    rows="5"
+                />
+            </form:content>
+        </form:SimpleForm>
+        <beginButton>
+            <Button
+                text="Complete"
+                press="onCompleteProduct"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="Close"
+                press="onCloseProductDialog"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
+```
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import FragmentCL from "ui5/antares/ui/FragmentCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async openDialog() {
+    // Initialize with the controller and fragment path
+    const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+
+    // load the content of the fragment
+    await fragment.load();
+
+    // open the dialog
+    fragment.open();
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/FragmentCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, FragmentCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        openDialog: async function () {
+          // Initialize with the controller and fragment path
+          const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+
+          // load the content of the fragment
+          await fragment.load();
+
+          // open the dialog
+          fragment.open();
+        }
+      });
+
+    });
+```
+
+**Sample 2**
+
+Let us assume that we have created a file with the extension **.fragment.xml** and the following content. We would now like to open the **popover** in the controller.
+
+```xml
+<core:FragmentDefinition
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Popover>
+        <content>
+            <Text text="Test" />
+            <Button
+                text="Finish"
+                press="onFinish"
+            />
+        </content>
+    </Popover>
+</core:FragmentDefinition>
+```
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import FragmentCL from "ui5/antares/ui/FragmentCL"; // Import the class
+import Button from "sap/m/Button";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async openPopover() {
+    // Initialize with the controller and fragment path and the open by control
+    const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName", this.getView()?.byId("myButton") as Button);
+
+    // load the content of the fragment
+    await fragment.load();
+
+    // open the dialog
+    fragment.open();
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/FragmentCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, FragmentCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        openPopover: async function () {
+          // Initialize with the controller and fragment path and the open by control
+          const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName", this.getView().byId("myButton"));
+
+          // load the content of the fragment
+          await fragment.load();
+
+          // open the dialog
+          fragment.open();
+        }
+      });
+
+    });
+```
+
+#### Open Async
+
+The **openAsync()** method firstly loads the dialog or popover from a fragment and then opens it.
+
+> **Hint:** The **openAsync()** method returns the dialog or popover loaded from a fragment.
+
+> **Important:** When opening a popover, it is necessary to set the control that the popover opens next to. Please see [constructor](#constructor-11)
+
+> **Information:** Please be aware that **openAsync()** function is **asynchronous**. To retrieve the dialog or popover, please await the **openAsync()** method.
+
+**Sample 1**
+
+Let us assume that we have created a file with the extension **.fragment.xml** and the following content. We would now like to open the **dialog** in the controller.
+
+```xml
+<core:FragmentDefinition
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog title="Create New Product">
+        <form:SimpleForm>
+            <form:content>
+                <Label text="Product ID" />
+                <MaskInput
+                    mask="CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC"
+                    value="{ID}"
+                    placeholderSymbol="_"
+                >
+                    <rules>
+                        <MaskInputRule
+                            maskFormatSymbol="C"
+                            regex="[a-f0-9]"
+                        />
+                    </rules>
+                </MaskInput>
+                <Label text="Name" />
+                <Input value="{name}" />
+                <Label text="Description" />
+                <TextArea
+                    value="{description}"
+                    rows="5"
+                />
+            </form:content>
+        </form:SimpleForm>
+        <beginButton>
+            <Button
+                text="Complete"
+                press="onCompleteProduct"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="Close"
+                press="onCloseProductDialog"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
+```
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import FragmentCL from "ui5/antares/ui/FragmentCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async openDialog() {
+    // Initialize with the controller and fragment path
+    const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+
+    // open the dialog
+    fragment.openAsync();
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/FragmentCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, FragmentCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        openDialog: async function () {
+          // Initialize with the controller and fragment path
+          const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+
+          // open the dialog
+          fragment.openAsync();
+        }
+      });
+
+    });
+```
+
+**Sample 2**
+
+Let us assume that we have created a file with the extension **.fragment.xml** and the following content. We would now like to open the **popover** in the controller.
+
+```xml
+<core:FragmentDefinition
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Popover>
+        <content>
+            <Text text="Test" />
+            <Button
+                text="Finish"
+                press="onFinish"
+            />
+        </content>
+    </Popover>
+</core:FragmentDefinition>
+```
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import FragmentCL from "ui5/antares/ui/FragmentCL"; // Import the class
+import Button from "sap/m/Button";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async openPopover() {
+    // Initialize with the controller and fragment path and the open by control
+    const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName", this.getView()?.byId("myButton") as Button);
+
+    // open the dialog
+    fragment.openAsync();
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/FragmentCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, FragmentCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        openPopover: async function () {
+          // Initialize with the controller and fragment path and the open by control
+          const fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName", this.getView().byId("myButton"));
+
+          // open the dialog
+          fragment.openAsync();
+        }
+      });
+
+    });
+```
+
+### Close Dialog or Popover
+
+To close the dialog or the popover opened by one of the following approaches, please use the **close()** method.
+
+> **Important:** Please be advised that it is your responsibility to destroy the content after using the **close()** method. This can be achieved by using the [destroyFragmentContent()](#destroy-fragment-content) method.
+
+1) [load()](#load-content) and [open()](#open-sync)
+2) [openAsync()](#open-async)
+
+**Sample**
+
+Let us assume that we have created a file with the extension **.fragment.xml** and the following content. We would now like to open the **dialog** in the controller. When the user presses the **Close** button, we will close the dialog and destroy it.
+
+```xml
+<core:FragmentDefinition
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog title="Create New Product">
+        <form:SimpleForm>
+            <form:content>
+                <Label text="Product ID" />
+                <MaskInput
+                    mask="CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC"
+                    value="{ID}"
+                    placeholderSymbol="_"
+                >
+                    <rules>
+                        <MaskInputRule
+                            maskFormatSymbol="C"
+                            regex="[a-f0-9]"
+                        />
+                    </rules>
+                </MaskInput>
+                <Label text="Name" />
+                <Input value="{name}" />
+                <Label text="Description" />
+                <TextArea
+                    value="{description}"
+                    rows="5"
+                />
+            </form:content>
+        </form:SimpleForm>
+        <beginButton>
+            <Button
+                text="Complete"
+                press="onCompleteProduct"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="Close"
+                press="onCloseDialog"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
+```
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import FragmentCL from "ui5/antares/ui/FragmentCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  private fragment: FragmentCL; // The class property
+
+  public onInit() {
+
+  }
+
+  public async openDialog() {
+    // Initialize with the controller and fragment path and set to the class property
+    this.fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+
+    // open the dialog
+    this.fragment.openAsync();
+  }
+
+  public async onCloseDialog () {
+    this.fragment.close(); // close the dialog
+    this.fragment.destroyFragmentContent(); // do not forget to destroy after closing
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/FragmentCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, FragmentCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        openDialog: async function () {
+          // Initialize with the controller and fragment path and set to the class property
+          this.fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+
+          // open the dialog
+          this.fragment.openAsync();
+        },
+
+        onCloseDialog: async function () {
+          this.fragment.close(); // close the dialog
+          this.fragment.destroyFragmentContent(); // do not forget to destroy after closing
+        }
+      });
+
+    });
+```
+
+### Get Fragment Content
+
+To retrieve the content loaded from a fragment file using the [load()](#load-content) method, the **getFragmentContent()** method can be utilized.
+
+| Returns                              | Description                                                                                                                         |
+| :----------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| [Control][701] \| [Control\[\]][701] | Returns the control or controls loaded from a fragment file using the [load()](#load-content) or [openAsync()](#open-async) methods |
+
+### Destroy Fragment Content
+
+To destroy the content loaded from a fragment using the [load()](#load-content) or [openAsync()](#open-async) methods, the **destroyFragmentContent()** method can be utilized.
+
+**Sample**
+
+Let us assume that we have created a file with the extension **.fragment.xml** and the following content. We would now like to open the **dialog** in the controller. When the user presses the **Close** button, we will close the dialog and destroy it.
+
+```xml
+<core:FragmentDefinition
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog title="Create New Product">
+        <form:SimpleForm>
+            <form:content>
+                <Label text="Product ID" />
+                <MaskInput
+                    mask="CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC"
+                    value="{ID}"
+                    placeholderSymbol="_"
+                >
+                    <rules>
+                        <MaskInputRule
+                            maskFormatSymbol="C"
+                            regex="[a-f0-9]"
+                        />
+                    </rules>
+                </MaskInput>
+                <Label text="Name" />
+                <Input value="{name}" />
+                <Label text="Description" />
+                <TextArea
+                    value="{description}"
+                    rows="5"
+                />
+            </form:content>
+        </form:SimpleForm>
+        <beginButton>
+            <Button
+                text="Complete"
+                press="onCompleteProduct"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="Close"
+                press="onCloseDialog"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
+```
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import FragmentCL from "ui5/antares/ui/FragmentCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  private fragment: FragmentCL; // The class property
+
+  public onInit() {
+
+  }
+
+  public async openDialog() {
+    // Initialize with the controller and fragment path and set to the class property
+    this.fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+
+    // open the dialog
+    this.fragment.openAsync();
+  }
+
+  public async onCloseDialog () {
+    this.fragment.close(); // close the dialog
+    this.fragment.destroyFragmentContent(); // do not forget to destroy after closing
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/FragmentCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, FragmentCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        openDialog: async function () {
+          // Initialize with the controller and fragment path and set to the class property
+          this.fragment = new FragmentCL(this, "your.apps.namespace.fragments.FragmentFileName");
+
+          // open the dialog
+          this.fragment.openAsync();
+        },
+
+        onCloseDialog: async function () {
+          this.fragment.close(); // close the dialog
+          this.fragment.destroyFragmentContent(); // do not forget to destroy after closing
+        }
+      });
+
+    });
+```
+
 ## Planned Features
 
 Here is a list of features that are in the pipeline for the next releases.
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Supported UI5 Antares Versions</th>
+      <th>Scope</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Form Grouping</td>
+      <td>*</td>
+      <td width="100rem"><a href="#entry-create">Entry Create</a><br><a href="#entry-update">Entry Update</a><br><a href="#entry-delete">Entry Delete</a><br><a href="#entry-read">Entry Read</a></td>
+      <td>The capability of creating the SimpleForm or SmartForm with the grouping of properties as shown in the sample: <a href="https://sapui5.hana.ondemand.com/#/entity/sap.ui.layout.form.SimpleForm/sample/sap.ui.layout.sample.SimpleForm480_Trial">Simple Form Fullscreen – three groups (horizontal)</a></td>
+    </tr>
+    <tr>
+      <td>Deep Create</td>
+      <td>*</td>
+      <td width="100rem"><a href="#entry-create">Entry Create</a></td>
+      <td>Creating a deep entity on the auto-generated dialog will be possible. When the cardinality is 1-1, the properties of the associated entity will be added into the auto-generated form in a different group. When the cardinality is 1-N, a table will be placed after the auto-generated form</td>
+    </tr>    
+  </tbody>
+</table>
 
 ## Change Log
 
