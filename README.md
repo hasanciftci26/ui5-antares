@@ -167,6 +167,11 @@ ui5 -v
       - [Refresh After Change](#refresh-after-change-1)
       - [Additional Response Info](#additional-response-info-1)    
     - [OData Delete](#odata-delete)
+      - [Constructor](#constructor-9)
+      - [Delete Request](#delete-request)
+      - [URL Parameters](#url-parameters-2)
+      - [Refresh After Change](#refresh-after-change-2)
+      - [Additional Response Info](#additional-response-info-2)     
     - [OData Read](#odata-read)
   - [Fragment Class](#fragment-class)
   - [Planned Features](#planned-features)
@@ -8614,7 +8619,7 @@ The **update()** method runs **asynchronously** and can be awaited.
 
 The **update()** method returns the data of the update entity if the request was successful.
 
-> **Important:** If the UPDATE request fails, the [OData Updaet](#odata-update) class will throw an error. To catch the error, the **update()** method should be called in a try-catch block. 
+> **Important:** If the UPDATE request fails, the [OData Update](#odata-update) class will throw an error. To catch the error, the **update()** method should be called in a try-catch block. 
 
 **Error Type**
 
@@ -9085,6 +9090,495 @@ sap.ui.define([
 ```
 
 ### OData Delete
+
+ODataDeleteCL is a class that uses [sap.ui.model.odata.v2.ODataModel](https://sapui5.hana.ondemand.com/#/api/sap.ui.model.odata.v2.ODataModel) to handle DELETE requests in a promisified way.
+
+#### Constructor
+
+You must initialize an object from ODataDeleteCL in order to use it.
+
+| Parameter  | Type                            | Mandatory | Default Value | Description                                                                                                            | 
+| :--------- | :------------------------------ | :-------- | :------------ | :--------------------------------------------------------------------------------------------------------------------- |
+| controller | [sap.ui.core.mvc.Controller][1] | Yes       |               | The controller object (usually `this`)                                                                                 |
+| entityPath | string                          | Yes       |               | The name of the **EntitySet**. It can start with a **"/"**                                                             |
+| modelName? | string                          | No        | undefined     | The name of the OData V2 model which can be found on the manifest.json file. **Do not specify** if the model name = "" |
+
+**TypeScript**
+
+**ODataDeleteCL\<EntityKeysT\>** is a generic class and can be initialized with a type. 
+
+- The `EntityKeysT` type contains the **key** properties of the `EntitySet` that is used as a parameter on the class constructor.
+
+`EntityKeysT` is used as the returning type and the type of the `keys` parameter of the **delete(keys: EntityKeysT): EntityKeysT** method.
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataDeleteCL from "ui5/antares/odata/v2/ODataDeleteCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteProduct() {
+    // Initialize without a type
+    const odata = new ODataDeleteCL(this, "Products"); 
+  }
+
+  public async onDeleteCategory() {
+    // Initialize with a type
+    const odata = new ODataDeleteCL<ICategoryKeys>(this, "Categories"); 
+  }
+
+  public async onDeleteCustomer() {
+    // Initialize with a model name
+    const odata = new ODataDeleteCL(this, "Customers", "myODataModelName"); 
+  }
+}
+
+interface ICategoryKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataDeleteCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataDeleteCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Initialize
+          const odata = new ODataDeleteCL(this, "Products"); 
+        },
+
+        onDeleteCategory: async function () {
+          // Initialize with a model name
+          const odata = new ODataDeleteCL(this, "Categories", "myODataModelName");
+        }
+      });
+
+    });
+```
+
+#### Delete Request
+
+To send the DELETE request through the OData V2 model, **delete(keys: EntityKeysT): Promise\<EntityKeysT\>** method can be utilized.
+
+The **delete()** method runs **asynchronously** and can be awaited. 
+
+The **delete()** method returns the key data of the deleted entity if the request was successful.
+
+> **Important:** If the DELETE request fails, the [OData Delete](#odata-delete) class will throw an error. To catch the error, the **delete()** method should be called in a try-catch block. 
+
+**Error Type**
+
+If the DELETE request fails, the object thrown by the class can contain the properties below.
+
+| Returns                                                | Description                          |
+| ------------------------------------------------------ | ------------------------------------ |
+| `object`                                               |                                      |
+| &emsp;headers?: `object` \| `undefined`                | The HTTP response headers.           |
+| &emsp;message?: `string` \| `undefined`                | The HTTP response message.           |
+| &emsp;responseText?: `string` \| `undefined`           | The HTTP response text.              |
+| &emsp;statusCode?: `string` \| `number` \| `undefined` | The status code of the HTTP request. |
+| &emsp;statusText?: `string` \| `undefined`             | The HTTP status text.                |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataDeleteCL from "ui5/antares/odata/v2/ODataDeleteCL"; // Import the class
+import { IError } from "ui5/antares/types/common"; // Import the error type
+import MessageBox from "sap/m/MessageBox";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteProduct() {
+    // Initialize with a type
+    const odata = new ODataDeleteCL<IProductKeys>(this, "Products"); 
+
+    try {
+      // send the http request and get the result. Note: You have to specify the key values of the entity that will be deleted
+      const result = await odata.delete({
+        ID: "3ccb5dd2-cc12-483a-b569-a6ec844f8f0b"
+      });
+
+      MessageBox.information("The entity with the following ID: " + result.ID + " was deleted.");
+    } catch (error) {
+      // catch the error
+      MessageBox.error((error as IError).message || "Request failed");
+    }
+  }
+
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataDeleteCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataDeleteCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Initialize
+          const odata = new ODataDeleteCL(this, "Products"); 
+
+          try {
+            // send the http request and get the result. Note: You have to specify the key values of the entity that will be deleted
+            const result = await odata.delete({
+              ID: "3ccb5dd2-cc12-483a-b569-a6ec844f8f0b"
+            });
+
+            MessageBox.information("The entity with the following ID: " + result.ID + " was deleted.");
+          } catch (error) {
+            // catch the error
+            MessageBox.error(error.message || "Request failed");
+          }          
+        }
+      });
+
+    });
+```
+
+#### URL Parameters
+
+To set the URL parameters before sending the DELETE request with the [delete()](#delete-request) method, the **setUrlParameters()** method can be used.
+
+**Setter (setUrlParameters)**
+
+| Parameter     | Type                   | Mandatory | Description                              | 
+| :------------ | :--------------------- | :-------- | :--------------------------------------- |
+| urlParameters | Record<string, string> | Yes       | The URL parameters of the DELETE request |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getUrlParameters)**
+
+| Returns                             | Description                                                                                        |
+| :---------------------------------- | :------------------------------------------------------------------------------------------------- |
+| Record<string, string> \| undefined | Returns the value that was set using **setUrlParameters()** method. Default value is **undefined** |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataDeleteCL from "ui5/antares/odata/v2/ODataDeleteCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteProduct() {
+    // Initialize with a type
+    const odata = new ODataDeleteCL<IProductKeys>(this, "Products"); 
+
+    // set the url parameters
+    odata.setUrlParameters({
+      "$expand": "toProductLocations"
+    });
+  }
+
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataDeleteCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataDeleteCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Initialize
+          const odata = new ODataDeleteCL(this, "Products"); 
+
+          // set the url parameters
+          odata.setUrlParameters({
+            "$expand": "toProductLocations"
+          });         
+        }
+      });
+
+    });
+```
+
+#### Refresh After Change
+
+By default, the OData V2 model will be refreshed after the DELETE request has been completed.
+
+To change the default behavior, the **setRefreshAfterChange()** method can be utilized.
+
+**Setter (setRefreshAfterChange)**
+
+| Parameter          | Type    | Mandatory | Description                                                                                        | 
+| :----------------- | :------ | :-------- | :------------------------------------------------------------------------------------------------- |
+| refreshAfterChange | boolean | Yes       | If set to **false**, the OData V2 model will not be refreshed after the request has been completed |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getRefreshAfterChange)**
+
+| Returns | Description                                                                                        |
+| :------ | :------------------------------------------------------------------------------------------------- |
+| boolean | Returns the value that was set using **setRefreshAfterChange()** method. Default value is **true** |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataDeleteCL from "ui5/antares/odata/v2/ODataDeleteCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteProduct() {
+    // Initialize with a type
+    const odata = new ODataDeleteCL<IProductKeys>(this, "Products"); 
+
+    // deactivate the auto model refresh
+    odata.setRefreshAfterChange(false);
+  }
+
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataDeleteCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataDeleteCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Initialize
+          const odata = new ODataDeleteCL(this, "Products"); 
+
+          // deactivate the auto model refresh
+          odata.setRefreshAfterChange(false);      
+        }
+      });
+
+    });
+```
+
+#### Additional Response Info
+
+The [delete()](#delete-request) method returns the key data of the successfully deleted entity. However, you may want to get some additional information such as `status code`, `headers`.
+
+The **getResponse()** method can be utilized to get additional information after the [delete()](#delete-request) is resolved.
+
+| Returns                                                | Description                          |
+| ------------------------------------------------------ | ------------------------------------ |
+| `object`                                               |                                      |
+| &emsp;$reported?: `boolean` \| `undefined`             |                                      |
+| &emsp;body?: `string` \| `undefined`                   | The HTTP body                        |
+| &emsp;headers?: `object` \| `undefined`                | The HTTP response headers.           |
+| &emsp;statusCode?: `string` \| `number` \| `undefined` | The status code of the HTTP request. |
+| &emsp;statusText?: `string` \| `undefined`             | The HTTP status text.                |
+| &emsp;_imported?: `boolean` \| `undefined`             |                                      |
+| &emsp;data?: `string` \| `undefined`                   | The data that was deleted            |
+
+**Sample**
+
+Please see the sample below.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ODataDeleteCL from "ui5/antares/odata/v2/ODataDeleteCL"; // Import the class
+import { IError } from "ui5/antares/types/common"; // Import the error type
+import MessageBox from "sap/m/MessageBox";
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public async onDeleteProduct() {
+    // Initialize with a type
+    const odata = new ODataDeleteCL<IProductKeys>(this, "Products"); 
+
+    try {
+      // send the http request and get the result
+      const result = await odata.delete({
+        ID: "3ccb5dd2-cc12-483a-b569-a6ec844f8f0b"
+      });
+
+      MessageBox.information(result.ID + " was deleted.");
+
+      // get the additional response info
+      const response = odata.getResponse();
+
+      if (response) {
+        console.log("Status Code: " + response.statusCode);
+      }
+    } catch (error) {
+      // catch the error
+      MessageBox.error((error as IError).message || "Request failed");
+    }
+  }
+
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/odata/v2/ODataDeleteCL", // Import the class
+    "sap/m/MessageBox"
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ODataDeleteCL, MessageBox) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onDeleteProduct: async function () {
+          // Initialize
+          const odata = new ODataDeleteCL(this, "Products"); 
+
+          try {
+            // send the http request and get the result
+            const result = await odata.delete({
+              ID: "3ccb5dd2-cc12-483a-b569-a6ec844f8f0b"
+            });
+
+            MessageBox.information(result.ID + " was deleted.");
+
+            // get the additional response info
+            const response = odata.getResponse();
+
+            if (response) {
+              console.log("Status Code: " + response.statusCode);
+            }            
+          } catch (error) {
+            // catch the error
+            MessageBox.error(error.message || "Request failed");
+          }          
+        }
+      });
+
+    });
+```
 
 ### OData Read
 
