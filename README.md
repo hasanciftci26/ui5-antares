@@ -11403,13 +11403,13 @@ Here is a list of features that are in the pipeline for the next releases.
     <tr>
       <td>Form Grouping</td>
       <td>*</td>
-      <td width="100rem"><a href="#entry-create">Entry Create</a><br><a href="#entry-update">Entry Update</a><br><a href="#entry-delete">Entry Delete</a><br><a href="#entry-read">Entry Read</a></td>
+      <td width="150"><a href="#entry-create">Entry Create</a><br><a href="#entry-update">Entry Update</a><br><a href="#entry-delete">Entry Delete</a><br><a href="#entry-read">Entry Read</a></td>
       <td>The capability of creating the SimpleForm or SmartForm with the grouping of properties as shown in the sample: <a href="https://sapui5.hana.ondemand.com/#/entity/sap.ui.layout.form.SimpleForm/sample/sap.ui.layout.sample.SimpleForm480_Trial">Simple Form Fullscreen – three groups (horizontal)</a></td>
     </tr>
     <tr>
       <td>Deep Create</td>
       <td>*</td>
-      <td width="100rem"><a href="#entry-create">Entry Create</a></td>
+      <td width="150"><a href="#entry-create">Entry Create</a></td>
       <td>Creating a deep entity on the auto-generated dialog will be possible. When the cardinality is 1-1, the properties of the associated entity will be added into the auto-generated form in a different group. When the cardinality is 1-N, a table will be placed after the auto-generated form</td>
     </tr>    
   </tbody>
