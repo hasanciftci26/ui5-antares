@@ -7,6 +7,7 @@ import { FormTypes } from "ui5/antares/types/entry/enums";
 import ValueHelpCL from "ui5/antares/ui/ValueHelpCL";
 import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
 import { ValidationOperator } from "ui5/antares/types/ui/enums";
+import EntryReadCL from "ui5/antares/entry/v2/EntryReadCL";
 
 /**
  * @namespace test.ui5.antares.controller
@@ -59,6 +60,15 @@ export default class Homepage extends BaseController {
         });
 
         entry.deleteEntry();
+    }
+
+    public async onReadProduct(): Promise<void> {
+        const entry = new EntryReadCL(this, {
+            entityPath: "Products",
+            initializer: "stProducts"
+        });
+
+        entry.readEntry();
     }
 
     public async onCreateCustomer(): Promise<void> {
