@@ -1,4 +1,3 @@
-import ColorPalettePopover from "sap/m/ColorPalettePopover";
 import Dialog from "sap/m/Dialog";
 import MessagePopover from "sap/m/MessagePopover";
 import Popover from "sap/m/Popover";
@@ -31,7 +30,7 @@ export default class FragmentCL extends BaseObject {
         }
     }
 
-    public async openAsync(): Promise<Dialog | Popover | MessagePopover | ResponsivePopover | ColorPalettePopover> {
+    public async openAsync(): Promise<Dialog | Popover | MessagePopover | ResponsivePopover> {
         const fragment = await this.load();
 
         if (fragment instanceof Dialog) {
@@ -39,9 +38,19 @@ export default class FragmentCL extends BaseObject {
             return fragment;
         }
 
-        if (fragment instanceof Popover || fragment instanceof MessagePopover || fragment instanceof ResponsivePopover || fragment instanceof ColorPalettePopover) {
+        if (fragment instanceof Popover) {
             if (!this.openByControl) {
                 (this.fragment as Popover).destroy();
+                throw new Error("Popover requires a control to be opened by. Provide the control through the class constructor.");
+            }
+
+            fragment.openBy(this.openByControl, false);
+            return fragment;
+        }
+
+        if (fragment instanceof MessagePopover || fragment instanceof ResponsivePopover) {
+            if (!this.openByControl) {
+                (this.fragment as Control).destroy();
                 throw new Error("Popover requires a control to be opened by. Provide the control through the class constructor.");
             }
 
@@ -52,7 +61,7 @@ export default class FragmentCL extends BaseObject {
         throw new Error("openAsync() method can only be used with fragments that contain Dialog or Popover.");
     }
 
-    public open(): Dialog | Popover | MessagePopover | ResponsivePopover | ColorPalettePopover {
+    public open(): Dialog | Popover | MessagePopover | ResponsivePopover {
         if (!this.fragment) {
             throw new Error("No fragment was found to open. Use load() method to initialize the fragment.");
         }
@@ -62,10 +71,19 @@ export default class FragmentCL extends BaseObject {
             return this.fragment;
         }
 
-        if (this.fragment instanceof Popover || this.fragment instanceof MessagePopover ||
-            this.fragment instanceof ResponsivePopover || this.fragment instanceof ColorPalettePopover) {
+        if (this.fragment instanceof Popover) {
             if (!this.openByControl) {
                 (this.fragment as Popover).destroy();
+                throw new Error("Popover requires a control to be opened by. Provide the control through the class constructor.");
+            }
+
+            this.fragment.openBy(this.openByControl, false);
+            return this.fragment;
+        }
+
+        if (this.fragment instanceof MessagePopover || this.fragment instanceof ResponsivePopover) {
+            if (!this.openByControl) {
+                (this.fragment as Control).destroy();
                 throw new Error("Popover requires a control to be opened by. Provide the control through the class constructor.");
             }
 

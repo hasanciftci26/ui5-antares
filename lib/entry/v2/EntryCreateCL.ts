@@ -1,4 +1,3 @@
-import { Button$PressEvent } from "sap/m/Button";
 import Controller from "sap/ui/core/mvc/Controller";
 import View from "sap/ui/core/mvc/View";
 import { DialogStrategies, FormTypes, GuidStrategies } from "ui5/antares/types/entry/enums";
@@ -74,7 +73,7 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         entryDialog.getDialog().open();
     }
 
-    private onCreateTriggered(event: Button$PressEvent) {
+    private onCreateTriggered() {
         const validation = this.valueValidation();
 
         if (!validation.validated) {
@@ -85,7 +84,7 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         this.submit();
     }
 
-    private onEntryCanceled(event: Button$PressEvent) {
+    private onEntryCanceled() {
         this.reset();
         this.closeEntryDialog();
         this.destroyEntryDialog();

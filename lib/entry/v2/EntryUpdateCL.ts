@@ -1,4 +1,3 @@
-import { Button$PressEvent } from "sap/m/Button";
 import Dialog from "sap/m/Dialog";
 import MessageBox from "sap/m/MessageBox";
 import UIComponent from "sap/ui/core/UIComponent";
@@ -73,7 +72,7 @@ export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT 
         entryDialog.getDialog().open();
     }
 
-    private onUpdateTriggered(event: Button$PressEvent) {
+    private onUpdateTriggered() {
         const validation = this.valueValidation();
 
         if (!validation.validated) {
@@ -82,9 +81,9 @@ export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT 
         }
 
         this.submit();
-    }    
+    }
 
-    private onEntryCanceled(event: Button$PressEvent) {
+    private onEntryCanceled() {
         this.reset();
         this.closeEntryDialog();
         this.destroyEntryDialog();
@@ -118,6 +117,6 @@ export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT 
         } else {
             fragment.destroyFragmentContent();
             throw new Error("Provided fragment must contain a sap.m.Dialog control. Put all the controls into a sap.m.Dialog");
-        }        
+        }
     }
 }

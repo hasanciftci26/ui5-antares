@@ -1,4 +1,3 @@
-import { Button$PressEvent } from "sap/m/Button";
 import Dialog from "sap/m/Dialog";
 import MessageBox from "sap/m/MessageBox";
 import { ButtonType } from "sap/m/library";
@@ -115,13 +114,13 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
         entryDialog.getDialog().open();
     }
 
-    private onDeleteTriggered(event: Button$PressEvent) {
+    private onDeleteTriggered() {
         this.deleteEntryContext();
         this.closeEntryDialog();
         this.destroyEntryDialog();
     }
 
-    private onEntryCanceled(event: Button$PressEvent) {
+    private onEntryCanceled() {
         this.reset();
         this.closeEntryDialog();
         this.destroyEntryDialog();
@@ -165,14 +164,17 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
             initialFocus: "NO",
             onClose: (event: "YES" | "NO") => {
                 if (event === "YES") {
-                    context.delete({ refreshAfterChange: true, groupId: "$auto" }).then(() => {
-                        if (this.deleteCompleted) {
-                            this.deleteCompleted.call(this.completedListener, data);
-                        }
-                    }).catch((error: IDeleteFailed) => {
-                        if (this.deleteFailed) {
-                            const response = new ResponseCL<IDeleteFailed>(error, error.statusCode);
-                            this.deleteFailed.call(this.failedListener, response);
+                    this.getODataModel().remove(context.getPath(), {
+                        success: () => {
+                            if (this.deleteCompleted) {
+                                this.deleteCompleted.call(this.completedListener, data);
+                            }
+                        },
+                        error: (error: IDeleteFailed) => {
+                            if (this.deleteFailed) {
+                                const response = new ResponseCL<IDeleteFailed>(error, error.statusCode);
+                                this.deleteFailed.call(this.failedListener, response);
+                            }
                         }
                     });
                 }

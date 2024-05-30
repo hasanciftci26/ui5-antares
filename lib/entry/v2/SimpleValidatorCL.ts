@@ -150,9 +150,9 @@ export default class SimpleValidatorCL extends BaseObject {
 
         if (!standardControlType) {
             return;
-        }        
+        }
 
-        if (!validator.validate(datePicker.getDateValue() || "", standardControlType.getValue())) {
+        if (!validator.validate(datePicker.getDateValue() as Date || "", standardControlType.getValue())) {
             validation.validated = false;
             validation.type = "VALIDATION";
             validation.message = validator.getValidationMessage();
@@ -181,9 +181,9 @@ export default class SimpleValidatorCL extends BaseObject {
 
         if (!standardControlType) {
             return;
-        }        
+        }
 
-        if (!validator.validate(dateTimePicker.getDateValue() || "", standardControlType.getValue())) {
+        if (!validator.validate(dateTimePicker.getDateValue() as Date || "", standardControlType.getValue())) {
             validation.validated = false;
             validation.type = "VALIDATION";
             validation.message = validator.getValidationMessage();

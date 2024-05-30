@@ -1,8 +1,7 @@
 import Control from "sap/ui/core/Control";
-import UI5Date from "sap/ui/core/date/UI5Date";
 import { ValidationOperator } from "ui5/antares/types/ui/enums";
 
-export type ValidatorValue = string | number | Date | UI5Date;
+export type ValidatorValue = string | number | Date;
 export type ValidatorValueParameter =  ValidatorValue | Control;
 
 export interface IValidationSettings {

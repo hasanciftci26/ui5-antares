@@ -5,7 +5,6 @@ import Control from "sap/ui/core/Control";
 import NumberFormat from "sap/ui/core/format/NumberFormat";
 import { PropertyType } from "ui5/antares/types/entity/type";
 import MessageBox from "sap/m/MessageBox";
-import UI5Date from "sap/ui/core/date/UI5Date";
 
 /**
  * @namespace ui5.antares.ui
@@ -201,7 +200,7 @@ export default class ValidationLogicCL extends BaseObject {
     }
 
     private datePropertyCorrection(correctedValues: ICorrectedValues) {
-        if (correctedValues.originalValue instanceof UI5Date || correctedValues.originalValue instanceof Date) {
+        if (correctedValues.originalValue instanceof Date) {
             return;
         }
 
@@ -217,7 +216,7 @@ export default class ValidationLogicCL extends BaseObject {
     }
 
     private dateValue1Correction(correctedValues: ICorrectedValues) {
-        if (correctedValues.value1 instanceof UI5Date || correctedValues.value1 instanceof Date) {
+        if (correctedValues.value1 instanceof Date) {
             return;
         }
 
@@ -229,7 +228,7 @@ export default class ValidationLogicCL extends BaseObject {
             return;
         }
 
-        if (correctedValues.value2 instanceof UI5Date || correctedValues.value2 instanceof Date) {
+        if (correctedValues.value2 instanceof Date) {
             return;
         }
 

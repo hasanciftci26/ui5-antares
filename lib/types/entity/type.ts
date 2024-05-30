@@ -25,3 +25,34 @@ export interface IEntityType {
     annotationLabel?: string;
     displayFormat?: string;
 }
+
+export interface IEntitySet {
+    entityType: string;
+}
+
+export interface IMetaModelEntityType {
+    name: string;
+    key: {
+        propertyRef: IPropertyRef[];
+    };
+    property?: IProperty[];
+}
+
+export interface IPropertyRef {
+    name: string;
+}
+
+export interface IProperty {
+    name: string;
+    type: PropertyType;
+    precision?: string;
+    scale?: string;
+    nullable?: "false" | "true";
+    extensions?: IExtensions[];
+}
+
+export interface IExtensions {
+    name: string;
+    namespace: string;
+    value: string;    
+}

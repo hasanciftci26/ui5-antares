@@ -1,8 +1,8 @@
 import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";
-import ODataMetaModel, { EntitySet, EntityType } from "sap/ui/model/odata/ODataMetaModel";
+import ODataMetaModel from "sap/ui/model/odata/ODataMetaModel";
 import ModelCL from "ui5/antares/base/v2/ModelCL";
-import { IEntityType } from "ui5/antares/types/entity/type";
+import { IEntitySet, IEntityType, IMetaModelEntityType } from "ui5/antares/types/entity/type";
 import { NamingStrategies } from "ui5/antares/types/entry/enums";
 import Util from "ui5/antares/util/Util";
 
@@ -31,10 +31,10 @@ export default class EntityCL extends ModelCL {
         return this.metaModel;
     }
 
-    public async getEntityType(): Promise<EntityType> {
+    public async getEntityType(): Promise<IMetaModelEntityType> {
         try {
             const entitySet = await this.getEntitySet();
-            const entityType: EntityType | undefined = this.metaModel.getODataEntityType(entitySet.entityType) as EntityType;
+            const entityType: IMetaModelEntityType | undefined = this.metaModel.getODataEntityType(entitySet.entityType) as IMetaModelEntityType;
 
             if (!entityType) {
                 throw new Error(`${entitySet.entityType} EntityType was not found in the OData metadata!`);
@@ -46,10 +46,10 @@ export default class EntityCL extends ModelCL {
         }
     }
 
-    public getEntitySet(): Promise<EntitySet> {
+    public getEntitySet(): Promise<IEntitySet> {
         return new Promise((resolve, reject) => {
             this.metaModel.loaded().then(() => {
-                const entitySet: EntitySet | undefined = this.metaModel.getODataEntitySet(this.entityName) as EntitySet;
+                const entitySet: IEntitySet | undefined = this.metaModel.getODataEntitySet(this.entityName) as IEntitySet;
 
                 if (!entitySet) {
                     reject(`${this.entityName} EntitySet was not found in the OData metadata!`);
