@@ -455,7 +455,7 @@ export default class ValueHelpCL extends ModelCL {
             if (filters.length) {
                 binding.filter(new Filter({ filters: filters, and: true }));
             } else {
-                binding.filter();
+                binding.filter([]);
             }
         }
 
@@ -465,7 +465,7 @@ export default class ValueHelpCL extends ModelCL {
             if (filters.length) {
                 binding.filter(new Filter({ filters: filters, and: true }));
             } else {
-                binding.filter();
+                binding.filter([]);
             }
         }
     }

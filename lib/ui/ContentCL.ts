@@ -270,10 +270,6 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             checkbox.setEditable(false);
         }
 
-        if (property.nullable === "false") {
-            checkbox.setRequired(true);
-        }
-
         if (this.entry.getReadonlyProperties().includes(property.propertyName)) {
             checkbox.setEditable(false);
         }
