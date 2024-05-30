@@ -200,6 +200,7 @@ ui5 -v
     - [Destroy Fragment Content](#destroy-fragment-content)
   - [Planned Features](#planned-features)
   - [Change Log](#change-log)
+  - [License](#license)
 
 ## Versioning
 
@@ -11423,3 +11424,7 @@ Here is a list of features that are in the pipeline for the next releases.
 ## Change Log
 
 Please see [CHANGELOG.md](./CHANGELOG.md)
+
+# License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](./LICENSE) file for details.
