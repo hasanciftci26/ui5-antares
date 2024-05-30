@@ -16,7 +16,9 @@
   "files": [
     "dist",
     "ui5.yaml",
-    "LICENSE"
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "types": "dist/index.d.ts",
   "author": "Hasan Çiftçi (hasanciftcii26@gmail.com)",
