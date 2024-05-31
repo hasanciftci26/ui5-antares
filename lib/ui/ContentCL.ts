@@ -19,6 +19,8 @@ import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 import CustomData from "sap/ui/core/CustomData";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
 import { PropertyBindingInfo } from "sap/ui/base/ManagedObject";
+import { IFormGroups } from "ui5/antares/types/entry/common";
+import Title from "sap/ui/core/Title";
 
 /**
  * @namespace ui5.antares.ui
@@ -39,13 +41,13 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
     }
 
     public async getSmartForm(): Promise<SmartForm> {
-        const smartFormGroup = await this.getSmartFormGroup();
+        const smartFormGroups = await this.getSmartFormGroups();
 
         const smartForm = new SmartForm({
             editTogglable: false,
             editable: true,
             title: this.entry.getFormTitle(),
-            groups: [smartFormGroup]
+            groups: smartFormGroups
         });
 
         return smartForm;
@@ -56,6 +58,10 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
 
         const simpleForm = new SimpleForm({
             editable: true,
+            layout: "ResponsiveGridLayout",
+            columnsXL: 3,
+            columnsL: 3,
+            columnsM: 2,
             title: this.entry.getFormTitle(),
             content: simpleFormContent
         });
@@ -63,18 +69,87 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         return simpleForm;
     }
 
-    private async getSmartFormGroup(): Promise<Group> {
-        this.smartGroup = new Group();
+    private async getSmartFormGroups(): Promise<Group[]> {
+        const formGroups = this.entry.getFormGroups();
+        const smartGroups: Group[] = [];
+
+        this.smartGroup = new Group({
+            title: this.entry.getDefaultGroupTitle()
+        });
+
+        smartGroups.push(this.smartGroup);
+        // Key properties are always in the default group
         await this.addKeyProperties();
-        await this.addProperties();
-        return this.smartGroup;
+
+        if (formGroups.length) {
+            if (this.entry.getIncludeAllProperties()) {
+                await this.addDefaultGroupElements(formGroups);
+            }
+
+            for (const group of formGroups) {
+                this.smartGroup = new Group({
+                    title: group.title === "UI5AntaresDefaultGroup" ? this.entry.getUnknownGroupTitle() : group.title
+                });
+
+                smartGroups.push(this.smartGroup);
+                await this.addProperties(group);
+            }
+        } else {
+            await this.addProperties();
+        }
+
+        return smartGroups;
     }
 
     private async getSimpleFormContent(): Promise<UI5Element[]> {
+        const formGroups = this.entry.getFormGroups();
         this.simpleFormElements = [];
+
+        if (this.entry.getDefaultGroupTitle()) {
+            this.simpleFormElements.push(new Title({ text: this.entry.getDefaultGroupTitle() }));
+        }
+
+        // Key properties are always in the default group
         await this.addKeyProperties();
-        await this.addProperties();
+
+        if (formGroups.length) {
+            if (this.entry.getIncludeAllProperties()) {
+                await this.addDefaultGroupElements(formGroups);
+            }
+
+            for (const group of formGroups) {
+                this.simpleFormElements.push(new Title({ text: group.title === "UI5AntaresDefaultGroup" ? this.entry.getUnknownGroupTitle() : group.title }));
+                await this.addProperties(group);
+            }
+        } else {
+            await this.addProperties();
+        }
+
         return this.simpleFormElements;
+    }
+
+    private async addDefaultGroupElements(groups: IFormGroups[]) {
+        const groupProperties = groups.reduce((props, group) => props = [...props, ...group.properties], [] as string[]);
+        const entityTypeKeys = await this.getEntityTypeKeys();
+        const entityTypeProperties = await this.getEntityTypeProperties();
+        const defaultProperties: string[] = [];
+
+        for (const property of entityTypeProperties) {
+            if (entityTypeKeys.some(key => key.propertyName === property.propertyName) ||
+                this.entry.getExcludedProperties().includes(property.propertyName) ||
+                groupProperties.includes(property.propertyName)) {
+                continue;
+            }
+
+            defaultProperties.push(property.propertyName);
+        }
+
+        if (defaultProperties.length) {
+            groups.push({
+                title: "UI5AntaresDefaultGroup",
+                properties: defaultProperties
+            });
+        }
     }
 
     private async addKeyProperties() {
@@ -102,13 +177,19 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         });
     }
 
-    private async addProperties() {
+    private async addProperties(group?: IFormGroups) {
         const entityTypeKeys = await this.getEntityTypeKeys();
         const entityTypeProperties = await this.getEntityTypeProperties();
 
         for (const property of this.entry.getPropertyOrder()) {
             if (entityTypeKeys.some(key => key.propertyName === property) || !entityTypeProperties.some(prop => prop.propertyName === property)) {
                 continue;
+            }
+
+            if (group) {
+                if (!group.properties.includes(property)) {
+                    continue;
+                }
             }
 
             let entityTypeProperty = entityTypeProperties.find(prop => prop.propertyName === property) as IEntityType;
@@ -138,6 +219,12 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                     this.entry.getPropertyOrder().includes(property.propertyName) ||
                     this.entry.getExcludedProperties().includes(property.propertyName)) {
                     continue;
+                }
+
+                if (group) {
+                    if (!group.properties.includes(property.propertyName)) {
+                        continue;
+                    }
                 }
 
                 if (this.entry.getFormType() === FormTypes.SMART) {
@@ -200,17 +287,17 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
 
         switch (this.entry.getDisplayGuidProperties()) {
             case GuidStrategies.NONE:
-                if (property.propertyType === "Edm.Guid") {
+                if (property.propertyType === "Edm.Guid" && !this.entry.getFormGroups().length) {
                     smartField.setVisible(false);
                 }
                 break;
             case GuidStrategies.ONLY_KEY:
-                if (property.propertyType === "Edm.Guid" && !keyField) {
+                if (property.propertyType === "Edm.Guid" && !keyField && !this.entry.getFormGroups().length) {
                     smartField.setVisible(false);
                 }
                 break;
             case GuidStrategies.ONLY_NON_KEY:
-                if (property.propertyType === "Edm.Guid" && keyField) {
+                if (property.propertyType === "Edm.Guid" && keyField && !this.entry.getFormGroups().length) {
                     smartField.setVisible(false);
                 }
                 break;
@@ -402,17 +489,17 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
 
         switch (this.entry.getDisplayGuidProperties()) {
             case GuidStrategies.NONE:
-                if (property.propertyType === "Edm.Guid") {
+                if (property.propertyType === "Edm.Guid" && !this.entry.getFormGroups().length) {
                     input.setVisible(false);
                 }
                 break;
             case GuidStrategies.ONLY_KEY:
-                if (property.propertyType === "Edm.Guid" && !keyField) {
+                if (property.propertyType === "Edm.Guid" && !keyField && !this.entry.getFormGroups().length) {
                     input.setVisible(false);
                 }
                 break;
             case GuidStrategies.ONLY_NON_KEY:
-                if (property.propertyType === "Edm.Guid" && keyField) {
+                if (property.propertyType === "Edm.Guid" && keyField && !this.entry.getFormGroups().length) {
                     input.setVisible(false);
                 }
                 break;

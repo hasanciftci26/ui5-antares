@@ -28,6 +28,8 @@ import AnalyticalTable from "sap/ui/table/AnalyticalTable";
 import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
 import SmartValidatorCL from "ui5/antares/entry/v2/SmartValidatorCL";
 import SimpleValidatorCL from "ui5/antares/entry/v2/SimpleValidatorCL";
+import { IFormGroups } from "ui5/antares/types/entry/common";
+import Group from "sap/ui/comp/smartform/Group";
 
 /**
  * @namespace ui5.antares.entry.v2
@@ -45,6 +47,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     private endButtonType: ButtonType = ButtonType.Negative;
     private propertyOrder: string[] = [];
     private useAllProperties: boolean = true;
+    private includeAllProperties: boolean = true;
     private excludedProperties: string[] = [];
     private mandatoryProperties: string[] = [];
     private readonlyProperties: string[] = [];
@@ -75,6 +78,9 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     private validationLogics: ValidationLogicCL[] = [];
     private displayGuidProperties: GuidStrategies = GuidStrategies.ONLY_NON_KEY;
     private generateRandomGuid: GuidStrategies = GuidStrategies.ONLY_KEY;
+    private formGroups: IFormGroups[] = [];
+    private defaultGroupTitle?: string;
+    private unknownGroupTitle: string = "Unknown Group";
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
@@ -327,6 +333,35 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         return this.readonlyProperties;
     }
 
+    public setFormGroups(groups: IFormGroups[], includeAllProperties: boolean = true) {
+        this.formGroups = groups;
+        this.includeAllProperties = includeAllProperties;
+    }
+
+    public getFormGroups(): IFormGroups[] {
+        return this.formGroups;
+    }
+
+    public getIncludeAllProperties(): boolean {
+        return this.includeAllProperties;
+    }
+
+    public setDefaultGroupTitle(title: string) {
+        this.defaultGroupTitle = title;
+    }
+
+    public getDefaultGroupTitle(): string | undefined {
+        return this.defaultGroupTitle;
+    }
+
+    public setUnknownGroupTitle(title: string) {
+        this.unknownGroupTitle = title;
+    }
+
+    public getUnknownGroupTitle(): string {
+        return this.unknownGroupTitle;
+    }
+
     public async addControlFromFragment(fragment: FragmentCL) {
         await fragment.load();
         const content = fragment.getFragmentContent();
@@ -459,7 +494,10 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     }
 
     private validateSmartValues(): IValueValidation {
-        const smartGroupElements = ((this.entryDialog as DialogCL).getDialog().getContent()[0] as SmartForm).getGroups()[0].getGroupElements() as GroupElement[];
+        const smartGroups: Group[] = ((this.entryDialog as DialogCL).getDialog().getContent()[0] as SmartForm).getGroups();
+        const smartGroupElements: GroupElement[] = smartGroups.reduce((groupElements, currentGroup) => {
+            return groupElements = [...groupElements, ...(currentGroup.getGroupElements() as GroupElement[])];
+        }, [] as GroupElement[]);
         const validator = new SmartValidatorCL(smartGroupElements, this.customControls, this.validationLogics, this.mandatoryErrorMessage);
         return validator.validate();
     }
