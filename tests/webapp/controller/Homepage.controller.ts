@@ -8,6 +8,7 @@ import ValueHelpCL from "ui5/antares/ui/ValueHelpCL";
 import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
 import { ValidationOperator } from "ui5/antares/types/ui/enums";
 import EntryReadCL from "ui5/antares/entry/v2/EntryReadCL";
+import Button from "sap/m/Button";
 
 /**
  * @namespace test.ui5.antares.controller
@@ -46,6 +47,8 @@ export default class Homepage extends BaseController {
             value1: 1500,
             message: "Price must be greater than 1500"
         }));
+
+        entry.addCustomContent(new Button({text: "Custom Button"}));
         entry.createNewEntry();
     }
 
@@ -65,6 +68,7 @@ export default class Homepage extends BaseController {
             properties: ["Price", "Currency"]
         }]);        
 
+        entry.setDisplayObjectPage(true, "TargetHomepage");
         entry.updateEntry();
     }
 
@@ -73,6 +77,8 @@ export default class Homepage extends BaseController {
             entityPath: "Products",
             initializer: "stProducts"
         });
+
+        entry.setDisplayObjectPage(true, "TargetHomepage");
 
         entry.deleteEntry();
     }

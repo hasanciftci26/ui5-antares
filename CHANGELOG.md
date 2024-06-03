@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.123.1002] - 2024-06-05
+
+### Added
+
+- **Form Grouping Feature:** It is now possible to have form groups in the generated form. Additionally, form groups are used as the sections of the sap.uxap.ObjectPageLayout when the object page is activated.
+- **Object Page Feature:** It is now possible to decide to use either sap.m.Dialog or sap.uxap.ObjectPageLayout for Entry classes. 
+
 ## [1.120.1001] - 2024-05-30
 
 ### Added
@@ -30,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.123.1002]: https://github.com/hasanciftci26/ui5-antares/compare/1.123.1001...1.123.1002?diff=split
 [1.120.1001]: https://github.com/hasanciftci26/ui5-antares/tree/1.120.1001
 [1.96.25001]: https://github.com/hasanciftci26/ui5-antares/tree/1.96.25001
 [1.123.1001]: https://github.com/hasanciftci26/ui5-antares/tree/1.123.1001

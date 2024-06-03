@@ -31,7 +31,6 @@ import SimpleValidatorCL from "ui5/antares/entry/v2/SimpleValidatorCL";
 import { IFormGroups } from "ui5/antares/types/entry/common";
 import Group from "sap/ui/comp/smartform/Group";
 import ObjectPageLayoutCL from "ui5/antares/ui/ObjectPageLayoutCL";
-import Targets from "sap/ui/core/routing/Targets";
 import Target from "sap/ui/core/routing/Target";
 import UI5Element from "sap/ui/core/Element";
 
@@ -92,6 +91,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     private objectPageView: View;
     private fromTarget: string;
     private createdTarget: Target;
+    private customContentSectionTitle: string = "Custom Contents";
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
@@ -414,6 +414,14 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         return this.createdTarget;
     }
 
+    public setCustomContentSectionTitle(title: string) {
+        this.customContentSectionTitle = title;
+    }
+
+    public getCustomContentSectionTitle(): string {
+        return this.customContentSectionTitle;
+    }
+
     public async addControlFromFragment(fragment: FragmentCL) {
         await fragment.load();
         const content = fragment.getFragmentContent();
@@ -555,12 +563,15 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
             sections.forEach((section) => {
                 const subSections = section.getSubSections();
                 const blocks = subSections[0].getBlocks();
-                const smartForm = blocks[0] as SmartForm;
-                const groupElements = smartForm.getGroups().reduce((groupElements, currentGroup) => {
-                    return groupElements = [...groupElements, ...(currentGroup.getGroupElements() as GroupElement[])];
-                }, [] as GroupElement[]);
+                const blockContent = blocks[0];
 
-                smartGroupElements = [...smartGroupElements, ...groupElements];
+                if (blockContent instanceof SmartForm) {
+                    const groupElements = blockContent.getGroups().reduce((groupElements, currentGroup) => {
+                        return groupElements = [...groupElements, ...(currentGroup.getGroupElements() as GroupElement[])];
+                    }, [] as GroupElement[]);
+
+                    smartGroupElements = [...smartGroupElements, ...groupElements];
+                }
             });
         } else {
             const smartGroups: Group[] = ((this.entryDialog as DialogCL).getDialog().getContent()[0] as SmartForm).getGroups();
@@ -583,9 +594,12 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
             sections.forEach((section) => {
                 const subSections = section.getSubSections();
                 const blocks = subSections[0].getBlocks();
-                const simpleForm = blocks[0] as SimpleForm;
+                const blockContent = blocks[0];
 
-                simpleFormElements = [...simpleFormElements, ...simpleForm.getContent()];
+                if (blockContent instanceof SimpleForm) {
+                    simpleFormElements = [...simpleFormElements, ...blockContent.getContent()];
+                }
+
             });
         } else {
             simpleFormElements = ((this.entryDialog as DialogCL).getDialog().getContent()[0] as SimpleForm).getContent();

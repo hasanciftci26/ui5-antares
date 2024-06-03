@@ -16,6 +16,7 @@ import ObjectPageSubSection from "sap/uxap/ObjectPageSubSection";
  */
 export default class ObjectPageLayoutCL extends BaseObject {
     private objectPageLayout: ObjectPageLayout;
+    private emptySection: ObjectPageSection;
 
     constructor(headerText: string, avatarSrc: string, headerLabel: string) {
         super();
@@ -83,6 +84,24 @@ export default class ObjectPageLayoutCL extends BaseObject {
         });
 
         this.objectPageLayout.addSection(section);
+    }
+
+    public addEmptySection(sectionTitle: string) {
+        const subSection = new ObjectPageSubSection({
+            titleUppercase: false
+        });
+
+        this.emptySection = new ObjectPageSection({
+            titleUppercase: false,
+            title: sectionTitle,
+            subSections: subSection
+        });
+
+        this.objectPageLayout.addSection(this.emptySection);
+    }
+
+    public addContentToSection(content: Control) {
+        this.emptySection.getSubSections()[0].addBlock(content);
     }
 
     public getObjectPageLayout(): ObjectPageLayout {

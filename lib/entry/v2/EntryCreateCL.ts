@@ -153,6 +153,14 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
             objectPageInstance.getObjectPageLayout().setBindingContext(this.getEntryContext(), this.getModelName());
         }
 
+        if (this.getCustomContents().length) {
+            objectPageInstance.addEmptySection(this.getCustomContentSectionTitle());
+
+            this.getCustomContents().forEach((customContent) => {
+                objectPageInstance.addContentToSection(customContent);
+            });
+        }
+
         await this.createTypedView();
         this.displayTypedView();
     }
