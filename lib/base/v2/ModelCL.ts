@@ -3,6 +3,8 @@ import BaseObject from "sap/ui/base/Object";
 import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";
 import View from "sap/ui/core/mvc/View";
+import Router from "sap/ui/core/routing/Router";
+import Targets from "sap/ui/core/routing/Targets";
 import BindingMode from "sap/ui/model/BindingMode";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import ResourceModel from "sap/ui/model/resource/ResourceModel";
@@ -21,6 +23,8 @@ export default abstract class ModelCL extends BaseObject {
     private resourceBundle?: ResourceBundle;
     private bindingMode: BindingMode | "Default" | "OneTime" | "OneWay" | "TwoWay";
     private resourceModel?: ResourceModel;
+    private uiRouter: Router;
+    private uiTargets: Targets;
 
     constructor(controller: Controller | UIComponent, modelName?: string) {
         super();
@@ -43,6 +47,8 @@ export default abstract class ModelCL extends BaseObject {
 
         this.oDataModel = this.ownerComponent.getModel(this.modelName) as ODataModel;
         this.bindingMode = this.oDataModel.getDefaultBindingMode();
+        this.uiRouter = this.ownerComponent.getRouter();
+        this.uiTargets = this.ownerComponent.getTargets();
         this.setMetadataUrl();
     }
 
@@ -84,6 +90,14 @@ export default abstract class ModelCL extends BaseObject {
 
     protected getResourceModel(): ResourceModel | undefined {
         return this.resourceModel;
+    }
+
+    protected getUIRouter(): Router {
+        return this.uiRouter;
+    }
+
+    protected getUITargets(): Targets {
+        return this.uiTargets;
     }
 
     private setMetadataUrl(): void {

@@ -37,7 +37,15 @@ export default class Homepage extends BaseController {
         }]);
 
         entry.setMandatoryProperties(["Price", "CategoryID"]);
-
+        entry.setDisplayObjectPage(true, "TargetHomepage");
+        entry.setDefaultGroupTitle("First Section");
+        entry.setFormType(FormTypes.SIMPLE);
+        entry.addValidationLogic(new ValidationLogicCL({
+            propertyName: "Price",
+            operator: ValidationOperator.GT,
+            value1: 1500,
+            message: "Price must be greater than 1500"
+        }));
         entry.createNewEntry();
     }
 

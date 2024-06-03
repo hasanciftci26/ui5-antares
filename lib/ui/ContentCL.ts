@@ -21,6 +21,7 @@ import { ODataMethods } from "ui5/antares/types/odata/enums";
 import { PropertyBindingInfo } from "sap/ui/base/ManagedObject";
 import { IFormGroups } from "ui5/antares/types/entry/common";
 import Title from "sap/ui/core/Title";
+import ColumnLayout from "sap/ui/comp/smartform/ColumnLayout";
 
 /**
  * @namespace ui5.antares.ui
@@ -540,5 +541,97 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property.propertyName) }));
         }
         this.simpleFormElements.push(control.getControl());
+    }
+
+    public async addSmartSections() {
+        const objectPageInstance = this.entry.getObjectPageInstance();
+        const formGroups = this.entry.getFormGroups();
+        const smartFormForKeys = this.createSmartForm();
+
+        await this.addKeyProperties();
+        objectPageInstance.addSection(smartFormForKeys, this.entry.getDefaultGroupTitle() || this.entry.getFormTitle());
+
+        if (formGroups.length) {
+            if (this.entry.getIncludeAllProperties()) {
+                await this.addDefaultGroupElements(formGroups);
+            }
+
+            for (const group of formGroups) {
+                const smartForm = this.createSmartForm();
+                await this.addProperties(group);
+                objectPageInstance.addSection(smartForm, group.title === "UI5AntaresDefaultGroup" ? this.entry.getUnknownGroupTitle() : group.title);
+            }
+        } else {
+            await this.addProperties();
+        }
+    }
+
+    public async addSimpleSections() {
+        const objectPageInstance = this.entry.getObjectPageInstance();
+        const formGroups = this.entry.getFormGroups();
+        const simpleFormForKeys = this.createSimpleForm();
+
+        await this.addKeyProperties();
+
+        this.simpleFormElements.forEach((element) => {
+            simpleFormForKeys.addContent(element);
+        });
+
+        objectPageInstance.addSection(simpleFormForKeys, this.entry.getDefaultGroupTitle() || this.entry.getFormTitle());
+
+        if (formGroups.length) {
+            if (this.entry.getIncludeAllProperties()) {
+                await this.addDefaultGroupElements(formGroups);
+            }
+
+            for (const group of formGroups) {
+                const simpleForm = this.createSimpleForm();
+                await this.addProperties(group);
+
+                this.simpleFormElements.forEach((element) => {
+                    simpleForm.addContent(element);
+                });
+
+                objectPageInstance.addSection(simpleForm, group.title === "UI5AntaresDefaultGroup" ? this.entry.getUnknownGroupTitle() : group.title);
+            }
+        } else {
+            await this.addProperties();
+        }
+    }
+
+    private createSmartForm(): SmartForm {
+        this.smartGroup = new Group();
+
+        const smartForm = new SmartForm({
+            editTogglable: false,
+            editable: true,
+            groups: this.smartGroup,
+            layout: new ColumnLayout({
+                columnsXL: 1,
+                columnsL: 1,
+                columnsM: 1,
+                emptyCellsLarge: 5
+            })
+        });
+
+        return smartForm;
+    }
+
+    private createSimpleForm(): SimpleForm {
+        this.simpleFormElements = [];
+
+        const simpleForm = new SimpleForm({
+            editable: true,
+            layout: "ColumnLayout",
+            emptySpanXL: 5,
+            emptySpanL: 5,
+            emptySpanM: 5,
+            emptySpanS: 5,
+            columnsXL: 1,
+            columnsL: 1,
+            columnsM: 1
+        });
+
+        return simpleForm;
     }
 }

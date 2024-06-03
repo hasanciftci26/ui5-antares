@@ -29,10 +29,14 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         this.getODataModel().setDefaultBindingMode("TwoWay");
         this.getODataModel().setUseBatch(true);
 
-        if (this.getDialogStrategy() === DialogStrategies.LOAD) {
-            await this.loadDialog(data);
+        if (this.getDisplayObjectPage()) {
+            await this.createObjectPage(data);
         } else {
-            await this.createDialog(data);
+            if (this.getDialogStrategy() === DialogStrategies.LOAD) {
+                await this.loadDialog(data);
+            } else {
+                await this.createDialog(data);
+            }
         }
     }
 
@@ -124,6 +128,33 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
             fragment.destroyFragmentContent();
             throw new Error("Provided fragment must contain a sap.m.Dialog control. Put all the controls into a sap.m.Dialog");
         }
+    }
+
+    private async createObjectPage(data?: EntityT) {
+        const content = new ContentCL<EntryCreateCL<EntityT>, EntityT>(this.getSourceController(), this, ODataMethods.CREATE, this.getModelName());
+
+        // Create Object Page
+        this.createObjectPageLayout();
+        const objectPageInstance = this.getObjectPageInstance();
+        objectPageInstance.addCompleteButton(this.getBeginButtonText(), this.getBeginButtonType());
+        objectPageInstance.addCancelButton(this.getEndButtonText(), this.getEndButtonType());
+
+        //Create Context
+        const dataWithGuid = await this.generateGuid(data);
+        this.createEntryContext(dataWithGuid);
+
+        if (this.getFormType() === FormTypes.SMART) {
+            await content.addSmartSections();
+            objectPageInstance.getObjectPageLayout().setModel(this.getODataModel());
+            objectPageInstance.getObjectPageLayout().setBindingContext(this.getEntryContext());
+        } else {
+            await content.addSimpleSections();
+            objectPageInstance.getObjectPageLayout().setModel(this.getODataModel(), this.getModelName());
+            objectPageInstance.getObjectPageLayout().setBindingContext(this.getEntryContext(), this.getModelName());
+        }
+
+        await this.createTypedView();
+        this.displayTypedView();
     }
 
     private async generateGuid(data?: EntityT): Promise<EntityT | undefined> {
