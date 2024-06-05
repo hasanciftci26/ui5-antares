@@ -90,6 +90,11 @@ export default class Homepage extends BaseController {
             initializer: "stProducts"
         });
 
+        entry.setFormGroups([{
+            title: "Super",
+            properties: ["Price", "Currency"]
+        }]);
+        entry.setDisplayObjectPage(true, "TargetHomepage");
         entry.readEntry();
     }
 
