@@ -1,4 +1,3 @@
-import { Button$PressEvent } from "sap/m/Button";
 import Controller from "sap/ui/core/mvc/Controller";
 import View from "sap/ui/core/mvc/View";
 import { DialogStrategies, FormTypes, GuidStrategies } from "ui5/antares/types/entry/enums";
@@ -16,6 +15,8 @@ import EntityCL from "ui5/antares/entity/v2/EntityCL";
  * @namespace ui5.antares.entry.v2
  */
 export default class EntryCreateCL<EntityT extends object = object> extends EntryCL<EntityT> {
+    private manualSubmitter?: (entry: EntryCreateCL<EntityT>) => void;
+    private manualSubmitListener?: object;
 
     constructor(controller: Controller | UIComponent, entityPath: string, modelName?: string) {
         super(controller, entityPath, ODataMethods.CREATE, modelName);
@@ -78,7 +79,15 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         entryDialog.getDialog().open();
     }
 
-    private onCreateTriggered(event: Button$PressEvent) {
+    private onCreateTriggered() {
+        if (this.manualSubmitter) {
+            this.manualSubmitter.call(this.manualSubmitListener || this.getSourceController(), this);
+        } else {
+            this.completeSubmit();
+        }
+    }
+
+    private completeSubmit() {
         const validation = this.valueValidation();
 
         if (!validation.validated) {
@@ -89,7 +98,7 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         this.submit();
     }
 
-    private onEntryCanceled(event: Button$PressEvent) {
+    private onEntryCanceled() {
         this.reset();
         this.closeEntryDialog();
         this.destroyEntryDialog();
@@ -217,5 +226,14 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         }
 
         return dataWithGuid;
+    }
+
+    public registerManualSubmit(submitter: (entry: EntryCreateCL<EntityT>) => void, listener?: object) {
+        this.manualSubmitter = submitter;
+        this.manualSubmitListener = listener;
+    }
+
+    public submitManually() {
+        this.completeSubmit();
     }
 }

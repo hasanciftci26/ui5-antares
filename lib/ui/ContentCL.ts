@@ -51,6 +51,14 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             groups: smartFormGroups
         });
 
+        if (this.entry.getFormGroups().length) {
+            smartForm.setLayout(new ColumnLayout({
+                columnsXL: 3,
+                columnsL: 3,
+                columnsM: 2
+            }));
+        }
+
         return smartForm;
     }
 
@@ -66,6 +74,10 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             title: this.entry.getFormTitle(),
             content: simpleFormContent
         });
+
+        if (this.entry.getFormGroups().length) {
+            simpleForm.setLayout("ColumnLayout");
+        }
 
         return simpleForm;
     }

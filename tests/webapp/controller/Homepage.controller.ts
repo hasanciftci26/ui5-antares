@@ -39,9 +39,9 @@ export default class Homepage extends BaseController {
         }]);
 
         entry.setMandatoryProperties(["Price", "CategoryID"]);
-        entry.setDisplayObjectPage(true, "TargetHomepage");
+        // entry.setDisplayObjectPage(true, "TargetHomepage");
         entry.setDefaultGroupTitle("First Section");
-        entry.setFormType(FormTypes.SIMPLE);
+        // entry.setFormType(FormTypes.SIMPLE);
         entry.addValidationLogic(new ValidationLogicCL({
             propertyName: "Price",
             operator: ValidationOperator.GT,
@@ -49,8 +49,18 @@ export default class Homepage extends BaseController {
             message: "Price must be greater than 1500"
         }));
 
-        entry.addCustomContent(new Button({text: "Custom Button"}));
+        entry.registerManualSubmit(this.onManualCreateSubmit, this);
+        entry.addCustomContent(new Button({ text: "Custom Button" }));
         entry.createNewEntry();
+    }
+
+    public onManualCreateSubmit(entry: EntryCreateCL<IProducts>) {
+        entry.submitManually();
+    }
+
+    public onManualUpdateSubmit(entry: EntryUpdateCL<IProducts>) {
+        MessageToast.show("Manual update")
+        entry.submitManually();
     }
 
     public async onUpdateProduct(): Promise<void> {
@@ -67,9 +77,10 @@ export default class Homepage extends BaseController {
         }, {
             title: "Money",
             properties: ["Price", "Currency"]
-        }]);        
+        }]);
 
-        entry.setDisplayObjectPage(true, "TargetHomepage");
+        // entry.setDisplayObjectPage(true, "TargetHomepage");
+        entry.registerManualSubmit(this.onManualUpdateSubmit, this);
         entry.updateEntry();
     }
 

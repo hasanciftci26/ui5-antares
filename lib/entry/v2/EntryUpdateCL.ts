@@ -1,4 +1,3 @@
-import { Button$PressEvent } from "sap/m/Button";
 import Dialog from "sap/m/Dialog";
 import MessageBox from "sap/m/MessageBox";
 import UIComponent from "sap/ui/core/UIComponent";
@@ -17,6 +16,8 @@ import FragmentCL from "ui5/antares/ui/FragmentCL";
  */
 export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT extends object = object> extends EntryCL<EntityT, EntityKeysT> {
     private settings: IUpdateSettings<EntityKeysT>;
+    private manualSubmitter?: (entry: EntryUpdateCL<EntityT>) => void;
+    private manualSubmitListener?: object;
 
     constructor(controller: Controller | UIComponent, settings: IUpdateSettings<EntityKeysT>, modelName?: string) {
         super(controller, settings.entityPath, ODataMethods.UPDATE, modelName);
@@ -77,7 +78,15 @@ export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT 
         entryDialog.getDialog().open();
     }
 
-    private onUpdateTriggered(event: Button$PressEvent) {
+    private onUpdateTriggered() {
+        if (this.manualSubmitter) {
+            this.manualSubmitter.call(this.manualSubmitListener || this.getSourceController(), this);
+        } else {
+            this.completeSubmit();
+        }
+    }
+
+    private completeSubmit() {
         const validation = this.valueValidation();
 
         if (!validation.validated) {
@@ -88,7 +97,7 @@ export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT 
         this.submit();
     }
 
-    private onEntryCanceled(event: Button$PressEvent) {
+    private onEntryCanceled() {
         this.reset();
         this.closeEntryDialog();
         this.destroyEntryDialog();
@@ -155,5 +164,14 @@ export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT 
 
         await this.createTypedView();
         this.displayTypedView();
+    }
+
+    public registerManualSubmit(submitter: (entry: EntryUpdateCL<EntityT>) => void, listener?: object) {
+        this.manualSubmitter = submitter;
+        this.manualSubmitListener = listener;
+    }
+
+    public submitManually() {
+        this.completeSubmit();
     }
 }

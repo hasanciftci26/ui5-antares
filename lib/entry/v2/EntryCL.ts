@@ -33,6 +33,7 @@ import Group from "sap/ui/comp/smartform/Group";
 import ObjectPageLayoutCL from "ui5/antares/ui/ObjectPageLayoutCL";
 import Target from "sap/ui/core/routing/Target";
 import UI5Element from "sap/ui/core/Element";
+import Dialog from "sap/m/Dialog";
 
 /**
  * @namespace ui5.antares.entry.v2
@@ -533,6 +534,14 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
 
     protected getEntryDialog(): DialogCL | FragmentCL {
         return this.entryDialog;
+    }
+
+    public getGeneratedDialog(): Dialog {
+        if (this.entryDialog instanceof DialogCL) {
+            return this.entryDialog.getDialog();
+        } else {
+            return this.entryDialog.getFragmentContent() as Dialog;
+        }
     }
 
     protected closeEntryDialog() {
