@@ -14,6 +14,7 @@ import ContentCL from "ui5/antares/ui/ContentCL";
 import DialogCL from "ui5/antares/ui/DialogCL";
 import FragmentCL from "ui5/antares/ui/FragmentCL";
 import ResponseCL from "ui5/antares/entry/v2/ResponseCL";
+import Targets from "sap/ui/core/routing/Targets";
 
 /**
  * @namespace ui5.antares.entry.v2
@@ -70,10 +71,14 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
         await this.initializeContext(this.settings.initializer);
 
         if (previewBeforeDelete) {
-            if (this.getDialogStrategy() === DialogStrategies.LOAD) {
-                await this.loadDialog();
+            if (this.getDisplayObjectPage()) {
+                await this.createObjectPage();
             } else {
-                await this.createDialog();
+                if (this.getDialogStrategy() === DialogStrategies.LOAD) {
+                    await this.loadDialog();
+                } else {
+                    await this.createDialog();
+                }
             }
         } else {
             this.deleteEntryContext();
@@ -155,7 +160,7 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
         }
     }
 
-    private deleteEntryContext() {
+    private deleteEntryContext(isObjectPage: boolean = false) {
         const context = this.getEntryContext() as Context;
         const data = context.getObject() as EntityT;
 
@@ -169,14 +174,63 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
                         if (this.deleteCompleted) {
                             this.deleteCompleted.call(this.completedListener, data);
                         }
+
+                        if (isObjectPage) {
+                            (this.getUIRouter().getTargets() as Targets).display(this.getFromTarget());
+                        }
                     }).catch((error: IDeleteFailed) => {
                         if (this.deleteFailed) {
                             const response = new ResponseCL<IDeleteFailed>(error, error.statusCode);
                             this.deleteFailed.call(this.failedListener, response);
                         }
+
+                        if (isObjectPage) {
+                            (this.getUIRouter().getTargets() as Targets).display(this.getFromTarget());
+                        }
                     });
                 }
             }
         });
+    }
+
+    private async createObjectPage() {
+        const content = new ContentCL<EntryDeleteCL<EntityT>, EntityT>(this.getSourceController(), this, ODataMethods.DELETE, this.getModelName());
+
+        // Create Object Page
+        this.createObjectPageLayout();
+        const objectPageInstance = this.getObjectPageInstance();
+        objectPageInstance.addCompleteButton(this.getBeginButtonText(), this.getBeginButtonType());
+        objectPageInstance.addCancelButton(this.getEndButtonText(), this.getEndButtonType());
+
+        if (this.getFormType() === FormTypes.SMART) {
+            await content.addSmartSections();
+            objectPageInstance.getObjectPageLayout().setModel(this.getODataModel());
+            objectPageInstance.getObjectPageLayout().setBindingContext(this.getEntryContext());
+        } else {
+            await content.addSimpleSections();
+            objectPageInstance.getObjectPageLayout().setModel(this.getODataModel(), this.getModelName());
+            objectPageInstance.getObjectPageLayout().setBindingContext(this.getEntryContext(), this.getModelName());
+        }
+
+        if (this.getCustomContents().length) {
+            objectPageInstance.addEmptySection(this.getCustomContentSectionTitle());
+
+            this.getCustomContents().forEach((customContent) => {
+                objectPageInstance.addContentToSection(customContent);
+            });
+        }
+
+        this.registerEventForObjectPage();
+        await this.createTypedView();
+        this.displayTypedView();
+    }
+
+    private registerEventForObjectPage() {
+        const eventBus = this.getSourceOwnerComponent().getEventBus();
+        eventBus.subscribeOnce("UI5AntaresEntryDelete", "Complete", this.objectPageEventHandler, this);
+    }
+
+    private objectPageEventHandler(channelId: string, eventId: string, data: object) {
+        this.deleteEntryContext(true);
     }
 }

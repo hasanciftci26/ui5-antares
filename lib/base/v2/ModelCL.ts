@@ -60,7 +60,7 @@ export default abstract class ModelCL extends BaseObject {
         return this.sourceView;
     }
 
-    protected getSourceOwnerComponent(): UIComponent {
+    public getSourceOwnerComponent(): UIComponent {
         return this.ownerComponent;
     }
 

@@ -9,6 +9,7 @@ import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
 import { ValidationOperator } from "ui5/antares/types/ui/enums";
 import EntryReadCL from "ui5/antares/entry/v2/EntryReadCL";
 import Button from "sap/m/Button";
+import MessageToast from "sap/m/MessageToast";
 
 /**
  * @namespace test.ui5.antares.controller
@@ -79,7 +80,7 @@ export default class Homepage extends BaseController {
         });
 
         entry.setDisplayObjectPage(true, "TargetHomepage");
-
+        entry.attachDeleteCompleted(this.onDeleteCompleted, this);
         entry.deleteEntry();
     }
 
@@ -106,4 +107,8 @@ export default class Homepage extends BaseController {
     /* ======================================================================================================================= */
     /* Internal methods                                                                                                        */
     /* ======================================================================================================================= */
+
+    public onDeleteCompleted() {
+        MessageToast.show("Successfully deleted.");
+    }
 }

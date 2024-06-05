@@ -39,6 +39,7 @@ import UI5Element from "sap/ui/core/Element";
  */
 export default abstract class EntryCL<EntityT extends object = object, EntityKeysT extends object = object> extends ModelCL {
     private fragmentPath?: string;
+    private entryMethod: ODataMethods;
     private formTitle: string;
     private entityPath: string;
     private entityName: string;
@@ -97,6 +98,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         super(controller, modelName);
         this.entityPath = entityPath.startsWith("/") ? entityPath : `/${entityPath}`;
         this.entityName = this.entityPath.slice(1);
+        this.entryMethod = method;
 
         switch (method) {
             case ODataMethods.CREATE:
@@ -420,6 +422,10 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
 
     public getCustomContentSectionTitle(): string {
         return this.customContentSectionTitle;
+    }
+
+    public getEntryMethod(): ODataMethods {
+        return this.entryMethod;
     }
 
     public async addControlFromFragment(fragment: FragmentCL) {
@@ -890,7 +896,8 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
             viewName: "module:ui5/antares/ui/view/UI5AntaresObjectPageView",
             viewData: {
                 entry: this,
-                router: this.getUIRouter()
+                router: this.getUIRouter(),
+                method: this.entryMethod
             }
         });
 
