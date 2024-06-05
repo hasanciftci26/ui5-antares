@@ -19,6 +19,11 @@ export default class UI5AntaresObjectPage extends Controller {
         view.addEventDelegate({
             onAfterHide: () => {
                 if (!this.completeTriggered) {
+                    if (viewData.method === ODataMethods.DELETE) {
+                        const eventBus = viewData.entry.getSourceOwnerComponent().getEventBus();
+                        eventBus.publish("UI5AntaresEntryDelete", "UnsubscribeEvents");
+                    }
+
                     viewData.entry.reset();
                 }
                 view.destroy();
@@ -40,6 +45,7 @@ export default class UI5AntaresObjectPage extends Controller {
         if (viewData.method === ODataMethods.DELETE) {
             const eventBus = viewData.entry.getSourceOwnerComponent().getEventBus();
             eventBus.publish("UI5AntaresEntryDelete", "Complete");
+            eventBus.publish("UI5AntaresEntryDelete", "UnsubscribeEvents");
         } else {
             const validation = viewData.entry.valueValidation();
 

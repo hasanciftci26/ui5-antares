@@ -160,7 +160,7 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
         }
     }
 
-    private deleteEntryContext(isObjectPage: boolean = false) {
+    private deleteEntryContext() {
         const context = this.getEntryContext() as Context;
         const data = context.getObject() as EntityT;
 
@@ -175,7 +175,7 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
                             this.deleteCompleted.call(this.completedListener, data);
                         }
 
-                        if (isObjectPage) {
+                        if (this.getDisplayObjectPage()) {
                             (this.getUIRouter().getTargets() as Targets).display(this.getFromTarget());
                         }
                     }).catch((error: IDeleteFailed) => {
@@ -184,7 +184,7 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
                             this.deleteFailed.call(this.failedListener, response);
                         }
 
-                        if (isObjectPage) {
+                        if (this.getDisplayObjectPage()) {
                             (this.getUIRouter().getTargets() as Targets).display(this.getFromTarget());
                         }
                     });
@@ -227,10 +227,17 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
 
     private registerEventForObjectPage() {
         const eventBus = this.getSourceOwnerComponent().getEventBus();
-        eventBus.subscribeOnce("UI5AntaresEntryDelete", "Complete", this.objectPageEventHandler, this);
+        eventBus.subscribe("UI5AntaresEntryDelete", "Complete", this.objectPageEventHandler, this);
+        eventBus.subscribe("UI5AntaresEntryDelete", "UnsubscribeEvents", this.unsubscribeEvents, this);
     }
 
     private objectPageEventHandler(channelId: string, eventId: string, data: object) {
-        this.deleteEntryContext(true);
+        this.deleteEntryContext();
+    }
+
+    private unsubscribeEvents() {
+        const eventBus = this.getSourceOwnerComponent().getEventBus();
+        eventBus.unsubscribe("UI5AntaresEntryDelete", "Complete", this.objectPageEventHandler, this);
+        eventBus.unsubscribe("UI5AntaresEntryDelete", "UnsubscribeEvents", this.unsubscribeEvents, this);
     }
 }
