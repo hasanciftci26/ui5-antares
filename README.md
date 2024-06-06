@@ -12,6 +12,7 @@ UI5 Antares is a custom SAPUI5 library consisting of some useful classes and met
 
 **Features:**
 - OData V2 metadata-based dialog and [Simple Form](https://sapui5.hana.ondemand.com/#/api/sap.ui.layout.form.SimpleForm) - [Smart Form](https://sapui5.hana.ondemand.com/#/api/sap.ui.comp.smartform.SmartForm) generation for CRUD operations
+- OData V2 metadata-based object page and [Simple Form](https://sapui5.hana.ondemand.com/#/api/sap.ui.layout.form.SimpleForm) - [Smart Form](https://sapui5.hana.ondemand.com/#/api/sap.ui.comp.smartform.SmartForm) generation for CRUD operations
 - Value Help Dialog generation
 - User input validation/mandatory checks
 - Request handling for OData V2 CRUD operations
@@ -80,6 +81,7 @@ ui5 -v
     - [Create New Entry](#create-new-entry)
       - [Method Parameters](#method-parameters)
       - [Default Values](#default-values)
+    - [Manual Submit](#manual-submit)
     - [Label Generation](#label-generation)
       - [Resource Model](#resource-model-i18n)
       - [Label Generation From The Technical Names](#label-generation-from-the-technical-names)
@@ -90,6 +92,8 @@ ui5 -v
     - [Form Type](#form-type)
       - [FormTypes Enum](#formtypes-enum)
     - [Form Title](#form-title)
+    - [Form Grouping](#form-grouping)
+      - [IFormGroups Type Definition](#iformgroups-type-definition)
     - [Begin Button Text](#begin-button-text)
     - [Begin Button Type](#begin-button-type)
     - [End Button Text](#end-button-text)
@@ -426,6 +430,7 @@ Entry Create (EntryCreateCL) is a class that manages the CREATE (POST) operation
 
 **Features:**
 - sap.m.Dialog generation with a SmartForm, SimpleForm or Custom content
+- sap.uxap.ObjectPageLayout generation with a SmartForm, SimpleForm or Custom Content
 - User input validation via ValidationLogicCL class
 - Value Help Dialog generation via ValueHelpCL class
 - Property sorting, readonly properties, UUID generation for the properties with Edm.Guid type
@@ -671,6 +676,210 @@ sap.ui.define([
 The generated form with default values will more or less look like the following. It will vary depending on the configurations and the `EntityType` properties of the `EntitySet`.
 
 ![Generated Form](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/create_new_entry_default.png?raw=true)
+
+### Manual Submit
+
+By default, any changes that are made by the end user on the auto-generated form are automatically submitted by the [Entry Create](#entry-create) and [Entry Update](#entry-update) classes when the end user presses on the begin button. However, there may be a requirement to run some codes before submitting the changes through the OData V2 model. 
+
+It is possible to register a function that will be called instead of running the automatic submit mechanism when the end user presses the begin button.
+
+> **Important:** Please be advised that the manual submit feature is only available for the [Entry Create](#entry-create) and [Entry Update](#entry-update) classes.
+
+> **Important:** It is not possible to use this feature with the [Object Page](#object-page) feature.
+
+To register a function, **registerManualSubmit()** method can be utilized. The registered function will be called when the end user presses the begin button and an object constructed from the [Entry Create](#entry-create) or [Entry Update](#entry-update) class will be passed as a parameter to the function.
+
+To complete the process after running your own code in the registered function, please call the **submitManually()** method using the object passed as a parameter to the function.
+
+Additionally, the auto-generated dialog (sap.m.Dialog) can be obtained by calling the **getGeneratedDialog()** method with the object passed as a parameter to the function.
+
+**Setter (registerManualSubmit)**
+
+| Parameter | Type                                                                  | Mandatory | Description                                                             | 
+| :-------- | :-------------------------------------------------------------------- | :-------- | :---------------------------------------------------------------------- |
+| submitter | (entry: EntryCreateCL\<EntityT\> \| EntryUpdateCL\<EntityT\>) => void | Yes       | The function that will be called when the user presses the begin button |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getGeneratedDialog)**
+
+| Returns                                                             | Description                       |
+| :------------------------------------------------------------------ | :-------------------------------- |
+| [sap.m.Dialog](https://sapui5.hana.ondemand.com/#/api/sap.m.Dialog) | Returns the auto-generated dialog |
+
+**Sample**
+
+Let us consider an `EntitySet` named **Products** and we wish to run some codes before submitting the changes through the OData V2 model.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import EntryUpdateCL from "ui5/antares/entry/v2/EntryUpdateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public onCreateProduct() {
+    // initialize
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // register the submitter function
+    entry.registerManualSubmit(this.createProductManually, this);
+
+    // call the dialog
+    entry.createNewEntry();
+  }
+
+  // use the same generic type with the constructor in onCreateProduct method
+  private async createProductManually(entry: EntryCreateCL<IProducts>) {
+    // obtain the generated dialog
+    const dialog = entry.getGeneratedDialog();
+
+    dialog.getContent().forEach((content) => {
+      // here you can access each element of the dialog
+    });
+
+    // run your own code (can also be async)
+
+    // do not forget to complete the submit process
+    entry.submitManually();
+  }
+
+  public async onUpdateProduct() {
+    // Initialize with a type and use the table id as the initializer
+    const entry = new EntryUpdateCL<IProducts, IProductKeys>(this, {
+      entityPath: "Products",
+      initializer: "tblProducts" // table id
+    });
+
+    // register the submitter function
+    entry.registerManualSubmit(this.updateProductManually, this);
+
+    // call the dialog
+    entry.updateEntry();    
+  }
+
+  // use the same generic type with the constructor in onUpdateProduct method
+  private async updateProductManually(entry: EntryUpdateCL<IProducts>) {
+    // obtain the generated dialog
+    const dialog = entry.getGeneratedDialog();
+
+    dialog.getContent().forEach((content) => {
+      // here you can access each element of the dialog
+    });
+
+    // run your own code (can also be async)
+
+    // do not forget to complete the submit process
+    entry.submitManually();    
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "ui5/antares/entry/v2/EntryUpdateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, EntryUpdateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // initialize
+          const entry = new EntryCreateCL(this, "Products");
+
+          // register the submitter function
+          entry.registerManualSubmit(this._createProductManually, this);
+
+          // call the dialog
+          entry.createNewEntry(); 
+        },
+
+        _createProductManually: async function (entry) {
+          // obtain the generated dialog
+          const dialog = entry.getGeneratedDialog();
+      
+          dialog.getContent().forEach((content) => {
+            // here you can access each element of the dialog
+          });
+      
+          // run your own code (can also be async)
+      
+          // do not forget to complete the submit process
+          entry.submitManually();          
+        },
+
+        onUpdateProduct: async function () {
+          // Initialize and use the table id as the initializer
+          const entry = new EntryUpdateCL(this, {
+            entityPath: "Products",
+            initializer: "tblProducts" // table id
+          });
+
+          // register the submitter function
+          entry.registerManualSubmit(this._updateProductManually, this);
+
+          // call the dialog
+          entry.updateEntry();      
+        },
+
+        _updateProductManually: async function (entry) {
+          // obtain the generated dialog
+          const dialog = entry.getGeneratedDialog();
+      
+          dialog.getContent().forEach((content) => {
+            // here you can access each element of the dialog
+          });
+      
+          // run your own code (can also be async)
+      
+          // do not forget to complete the submit process
+          entry.submitManually();    
+        }
+
+      });
+
+    });
+```
 
 ### Label Generation
 
@@ -1294,6 +1503,189 @@ sap.ui.define([
 ```
 
 ![Form Title](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/form_title.png?raw=true)
+
+### Form Grouping
+
+By default, all the properties of an `EntitySet` are placed in a single group or section in the auto-generated dialog or object page and the title for that group is hidden (it is visible on the object page). It is possible to categorize the properties into different groups in the auto-generated form.
+
+> **Important:** The form grouping feature creates sections in the object page when the [Object Page](#object-page) feature is activated. 
+
+To create the form groups or object page sections, **setFormGroups()** method can be utilized.
+
+> **Important:** All of the **key** properties of the `EntitySet` are placed into a default group, and this behavior is not open to modification. The title of this group can be modified using the **setDefaultGroupTitle()** method. If you don't use **setDefaultGroupTitle()** method, the default group title will remain hidden in the auto-generated dialog. However, it is always visible in the auto-generated object page and the title is derived from the [Form Title](#form-title) feature for the object page.
+
+> **Important:** Any properties that are not included in the **setFormGroups()** method or the default group are placed in a group designated as the **Unknown Group**. To disable the **Unknown Group** set the second parameter of the **setFormGroups()** method to `false`. This configuration allows only the **key** properties and the other properties specified in the **setFormGroups()** method to be visible in the auto-generated dialog or auto-generated object page.
+
+> **Important:** Should you wish to retain the **Unknown Group** but modify the group title, you may use the **setUnknownGroupTitle()** method.
+
+**Setter (setFormGroups)**
+
+| Parameter            | Type                                            | Mandatory | Description                                                                                    | 
+| :------------------- | :---------------------------------------------- | :-------- | :--------------------------------------------------------------------------------------------- |
+| groups               | [IFormGroups\[\]](#iformgroups-type-definition) | Yes       | The form groups or sections displayed in the auto-generated dialog or object page              |
+| includeAllProperties | boolean                                         | No        | If set to **false** all the other **non-key** properties will not be included. Default is true |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getFormGroups)**
+
+| Returns                                         | Description                                                                                |
+| :---------------------------------------------- | :----------------------------------------------------------------------------------------- |
+| [IFormGroups\[\]](#iformgroups-type-definition) | Returns the groups that were set using **setFormGroups()** method. Default value is **[]** |
+
+---
+
+**Setter (setDefaultGroupTitle)**
+
+| Parameter | Type   | Mandatory | Description                                                                            | 
+| :-------- | :----- | :-------- | :------------------------------------------------------------------------------------- |
+| title     | string | Yes       | The title of the default group or section that is generated for the **key** properties |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getDefaultGroupTitle)**
+
+| Returns | Description                                                                                                                                                                                          |
+| :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| string  | Returns the title that was set using **setDefaultGroupTitle()** method. Default value is **undefined** for the dialog. However, it is derived from the [Form Title](#form-title) for the object page |
+
+---
+
+**Setter (setUnknownGroupTitle)**
+
+| Parameter | Type   | Mandatory | Description                                                                              | 
+| :-------- | :----- | :-------- | :--------------------------------------------------------------------------------------- |
+| title     | string | Yes       | The title of the unknown group or section that is generated for the **other** properties |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getUnknownGroupTitle)**
+
+| Returns | Description                                                                                                |
+| :------ | :--------------------------------------------------------------------------------------------------------- |
+| string  | Returns the title that was set using **setUnknownGroupTitle()** method. Default value is **Unknown Group** |
+
+---
+
+**Sample:** 
+
+Let us consider an `EntitySet` named **Products** and we wish to categorize the properties into different groups in the auto-generated form. Please see the results after the code blocks.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public onCreateProduct() {
+    // initialize
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // set the form groups and include all the other properties
+    entry.setFormGroups([{
+      title: "My Group 1",
+      properties: ["name", "description"]
+    },{
+      title: "My Group 2",
+      properties: ["brand", "price", "currency"]
+    }]);
+
+    // set the default group title
+    entry.setDefaultGroupTitle("My Default Group");
+
+    // set the unknown group title
+    entry.setUnknownGroupTitle("My Unknown Group");
+
+    // call the dialog
+    entry.createNewEntry();
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // initialize
+          const entry = new EntryCreateCL(this, "Products");
+
+          // set the form groups and include all the other properties
+          entry.setFormGroups([{
+            title: "My Group 1",
+            properties: ["name", "description"]
+          },{
+            title: "My Group 2",
+            properties: ["brand", "price", "currency"]
+          }]);
+
+          // set the default group title
+          entry.setDefaultGroupTitle("My Default Group");
+
+          // set the unknown group title
+          entry.setUnknownGroupTitle("My Unknown Group");
+
+          // call the dialog
+          entry.createNewEntry(); 
+        }
+
+      });
+
+    });
+```
+
+![Form Grouping](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/form_grouping_1.png?raw=true)
+
+#### IFormGroups Type Definition
+
+| Property          | Type       | Description                                         |
+| :---------------- | :--------- | :-------------------------------------------------- |
+| IFormGroups       | `object`   |                                                     |
+| &emsp; title      | `string`   | The title of the form group or object page section  |
+| &emsp; properties | `string[]` | The properties that will be included into the group |
 
 ### Begin Button Text
 
@@ -3281,6 +3673,8 @@ sap.ui.define([
 | ValidationOperator.NotEndsWith   | Not ends with. It can only be used with `string` type   |
 | ValidationOperator.NotStartsWith | Not starts with. It can only be used with `string` type |
 | ValidationOperator.StartsWith    | Starts with. It can only be used with `string` type     |
+
+### Object Page
 
 ### Custom Control
 
