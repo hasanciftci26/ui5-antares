@@ -28,12 +28,19 @@ import AnalyticalTable from "sap/ui/table/AnalyticalTable";
 import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
 import SmartValidatorCL from "ui5/antares/entry/v2/SmartValidatorCL";
 import SimpleValidatorCL from "ui5/antares/entry/v2/SimpleValidatorCL";
+import { IFormGroups } from "ui5/antares/types/entry/common";
+import Group from "sap/ui/comp/smartform/Group";
+import ObjectPageLayoutCL from "ui5/antares/ui/ObjectPageLayoutCL";
+import Target from "sap/ui/core/routing/Target";
+import UI5Element from "sap/ui/core/Element";
+import Dialog from "sap/m/Dialog";
 
 /**
  * @namespace ui5.antares.entry.v2
  */
 export default abstract class EntryCL<EntityT extends object = object, EntityKeysT extends object = object> extends ModelCL {
     private fragmentPath?: string;
+    private entryMethod: ODataMethods;
     private formTitle: string;
     private entityPath: string;
     private entityName: string;
@@ -45,6 +52,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     private endButtonType: ButtonType = ButtonType.Negative;
     private propertyOrder: string[] = [];
     private useAllProperties: boolean = true;
+    private includeAllProperties: boolean = true;
     private excludedProperties: string[] = [];
     private mandatoryProperties: string[] = [];
     private readonlyProperties: string[] = [];
@@ -75,28 +83,48 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     private validationLogics: ValidationLogicCL[] = [];
     private displayGuidProperties: GuidStrategies = GuidStrategies.ONLY_NON_KEY;
     private generateRandomGuid: GuidStrategies = GuidStrategies.ONLY_KEY;
+    private formGroups: IFormGroups[] = [];
+    private defaultGroupTitle?: string;
+    private unknownGroupTitle: string = "Unknown Group";
+    private displayObjectPage: boolean = false;
+    private objectPageLayout: ObjectPageLayoutCL;
+    private objectPageAvatarSrc: string;
+    private objectPageHeaderLabel: string;
+    private objectPageView: View;
+    private fromTarget: string;
+    private createdTarget: Target;
+    private customContentSectionTitle: string = "Custom Contents";
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
         this.entityPath = entityPath.startsWith("/") ? entityPath : `/${entityPath}`;
         this.entityName = this.entityPath.slice(1);
+        this.entryMethod = method;
 
         switch (method) {
             case ODataMethods.CREATE:
                 this.beginButtonText = "Create";
                 this.formTitle = `Create New ${this.entityName}`;
+                this.objectPageAvatarSrc = "sap-icon://add";
+                this.objectPageHeaderLabel = `You can create a new ${this.entityName} on this page.`;
                 break;
             case ODataMethods.UPDATE:
                 this.beginButtonText = "Update";
                 this.formTitle = `Update ${this.entityName}`;
+                this.objectPageAvatarSrc = "sap-icon://edit";
+                this.objectPageHeaderLabel = `You can update ${this.entityName} on this page.`;
                 break;
             case ODataMethods.DELETE:
                 this.beginButtonText = "Delete";
                 this.formTitle = `Delete ${this.entityName}`;
+                this.objectPageAvatarSrc = "sap-icon://delete";
+                this.objectPageHeaderLabel = `You can delete ${this.entityName} on this page.`;
                 break;
             case ODataMethods.READ:
                 this.beginButtonText = "Read";
                 this.formTitle = `Read ${this.entityName}`;
+                this.objectPageAvatarSrc = "sap-icon://display";
+                this.objectPageHeaderLabel = `You can display ${this.entityName} on this page.`;
                 break;
         }
     }
@@ -135,7 +163,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         this.namingStrategy = strategy;
     }
 
-    public getFormTitle(): string | undefined {
+    public getFormTitle(): string {
         return this.formTitle;
     }
 
@@ -327,6 +355,80 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         return this.readonlyProperties;
     }
 
+    public setFormGroups(groups: IFormGroups[], includeAllProperties: boolean = true) {
+        this.formGroups = groups;
+        this.includeAllProperties = includeAllProperties;
+    }
+
+    public getFormGroups(): IFormGroups[] {
+        return this.formGroups;
+    }
+
+    public getIncludeAllProperties(): boolean {
+        return this.includeAllProperties;
+    }
+
+    public setDefaultGroupTitle(title: string) {
+        this.defaultGroupTitle = title;
+    }
+
+    public getDefaultGroupTitle(): string | undefined {
+        return this.defaultGroupTitle;
+    }
+
+    public setUnknownGroupTitle(title: string) {
+        this.unknownGroupTitle = title;
+    }
+
+    public getUnknownGroupTitle(): string {
+        return this.unknownGroupTitle;
+    }
+
+    public setDisplayObjectPage(display: boolean, fromTarget: string) {
+        this.displayObjectPage = display;
+        this.fromTarget = fromTarget;
+    }
+
+    public getDisplayObjectPage(): boolean {
+        return this.displayObjectPage;
+    }
+
+    public setObjectPageAvatarSrc(src: string) {
+        this.objectPageAvatarSrc = src;
+    }
+
+    public getObjectPageAvatarSrc(): string {
+        return this.objectPageAvatarSrc;
+    }
+
+    public setObjectPageHeaderLabel(label: string) {
+        this.objectPageHeaderLabel = label;
+    }
+
+    public getObjectPageHeaderLabel(): string {
+        return this.objectPageHeaderLabel;
+    }
+
+    public getFromTarget(): string {
+        return this.fromTarget;
+    }
+
+    public getCreatedTarget(): Target {
+        return this.createdTarget;
+    }
+
+    public setCustomContentSectionTitle(title: string) {
+        this.customContentSectionTitle = title;
+    }
+
+    public getCustomContentSectionTitle(): string {
+        return this.customContentSectionTitle;
+    }
+
+    public getEntryMethod(): ODataMethods {
+        return this.entryMethod;
+    }
+
     public async addControlFromFragment(fragment: FragmentCL) {
         await fragment.load();
         const content = fragment.getFragmentContent();
@@ -434,6 +536,14 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         return this.entryDialog;
     }
 
+    public getGeneratedDialog(): Dialog {
+        if (this.entryDialog instanceof DialogCL) {
+            return this.entryDialog.getDialog();
+        } else {
+            return this.entryDialog.getFragmentContent() as Dialog;
+        }
+    }
+
     protected closeEntryDialog() {
         if (this.entryDialog instanceof DialogCL) {
             this.entryDialog.getDialog().close();
@@ -450,7 +560,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         }
     }
 
-    protected valueValidation(): IValueValidation {
+    public valueValidation(): IValueValidation {
         if (this.formType === FormTypes.SMART) {
             return this.validateSmartValues();
         } else {
@@ -459,13 +569,57 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     }
 
     private validateSmartValues(): IValueValidation {
-        const smartGroupElements = ((this.entryDialog as DialogCL).getDialog().getContent()[0] as SmartForm).getGroups()[0].getGroupElements() as GroupElement[];
+        let smartGroupElements: GroupElement[] = [];
+
+        if (this.displayObjectPage) {
+            const objectPageLayout = this.objectPageLayout.getObjectPageLayout();
+            const sections = objectPageLayout.getSections();
+
+            sections.forEach((section) => {
+                const subSections = section.getSubSections();
+                const blocks = subSections[0].getBlocks();
+                const blockContent = blocks[0];
+
+                if (blockContent instanceof SmartForm) {
+                    const groupElements = blockContent.getGroups().reduce((groupElements, currentGroup) => {
+                        return groupElements = [...groupElements, ...(currentGroup.getGroupElements() as GroupElement[])];
+                    }, [] as GroupElement[]);
+
+                    smartGroupElements = [...smartGroupElements, ...groupElements];
+                }
+            });
+        } else {
+            const smartGroups: Group[] = ((this.entryDialog as DialogCL).getDialog().getContent()[0] as SmartForm).getGroups();
+            smartGroupElements = smartGroups.reduce((groupElements, currentGroup) => {
+                return groupElements = [...groupElements, ...(currentGroup.getGroupElements() as GroupElement[])];
+            }, [] as GroupElement[]);
+        }
+
         const validator = new SmartValidatorCL(smartGroupElements, this.customControls, this.validationLogics, this.mandatoryErrorMessage);
         return validator.validate();
     }
 
     private validateSimpleValues(): IValueValidation {
-        const simpleFormElements = ((this.entryDialog as DialogCL).getDialog().getContent()[0] as SimpleForm).getContent();
+        let simpleFormElements: UI5Element[] = [];
+
+        if (this.displayObjectPage) {
+            const objectPageLayout = this.objectPageLayout.getObjectPageLayout();
+            const sections = objectPageLayout.getSections();
+
+            sections.forEach((section) => {
+                const subSections = section.getSubSections();
+                const blocks = subSections[0].getBlocks();
+                const blockContent = blocks[0];
+
+                if (blockContent instanceof SimpleForm) {
+                    simpleFormElements = [...simpleFormElements, ...blockContent.getContent()];
+                }
+
+            });
+        } else {
+            simpleFormElements = ((this.entryDialog as DialogCL).getDialog().getContent()[0] as SimpleForm).getContent();
+        }
+
         const validator = new SimpleValidatorCL(simpleFormElements, this.customControls, this.validationLogics, this.mandatoryErrorMessage);
         return validator.validate();
     }
@@ -487,6 +641,10 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
 
         this.setOldBindingMode();
 
+        if (this.displayObjectPage) {
+            return;
+        }
+
         if (this.getDialogStrategy() === DialogStrategies.LOAD) {
             this.closeEntryDialog();
             this.destroyEntryDialog();
@@ -495,7 +653,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
 
     public submit(resetAllOnFail: boolean = false) {
         if (this.getODataModel().hasPendingChanges()) {
-            if (this.dialogStrategy === DialogStrategies.LOAD && this.autoMandatoryCheck) {
+            if (this.dialogStrategy === DialogStrategies.LOAD && this.autoMandatoryCheck && !this.displayObjectPage) {
                 if (!this.checkContextMandatory()) {
                     MessageBox.error(this.mandatoryErrorMessage);
                     return;
@@ -530,6 +688,10 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
                                     this.submitFailed.call(this.submitFailedListener, errorResponse);
                                 }
                             } else {
+                                if (this.displayObjectPage) {
+                                    this.getODataModel().refresh(true);
+                                }
+
                                 if (this.submitCompleted) {
                                     let responseData: EntityT | undefined;
 
@@ -570,8 +732,11 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         }
 
         this.setOldBindingMode();
-        this.closeEntryDialog();
-        this.destroyEntryDialog();
+
+        if (!this.displayObjectPage) {
+            this.closeEntryDialog();
+            this.destroyEntryDialog();
+        }
     }
 
     protected async initializeContext(initializer: string | Context | EntityKeysT) {
@@ -728,5 +893,46 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         }
 
         return validationLogicData.getValue();
+    }
+
+    protected createObjectPageLayout() {
+        this.objectPageLayout = new ObjectPageLayoutCL(this.formTitle, this.objectPageAvatarSrc, this.objectPageHeaderLabel);
+    }
+
+    public getObjectPageInstance(): ObjectPageLayoutCL {
+        return this.objectPageLayout;
+    }
+
+    protected async createTypedView() {
+        this.objectPageView = await View.create({
+            id: "UI5AntaresObjectPageViewID",
+            viewName: "module:ui5/antares/ui/view/UI5AntaresObjectPageView",
+            viewData: {
+                entry: this,
+                router: this.getUIRouter(),
+                method: this.entryMethod
+            }
+        });
+
+        this.getUITargets().getViews().setView("module:ui5/antares/ui/view/UI5AntaresObjectPageView", this.objectPageView);
+    }
+
+    protected displayTypedView() {
+        this.createNewTarget();
+        this.createdTarget.display();
+    }
+
+    private createNewTarget() {
+        const target = this.getUITargets().getTarget("UI5AntaresObjectPageTarget", true);
+
+        if (!target) {
+            this.getUITargets().addTarget("UI5AntaresObjectPageTarget", {
+                name: "module:ui5/antares/ui/view/UI5AntaresObjectPageView",
+                type: "View",
+                clearControlAggregation: true
+            });
+        }
+
+        this.createdTarget = this.getUITargets().getTarget("UI5AntaresObjectPageTarget", true) as Target;
     }
 }

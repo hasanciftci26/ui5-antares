@@ -16,7 +16,9 @@ export default class DialogCL extends BaseObject {
         this.dialogId = dialogId;
 
         this.dialog = new Dialog(this.dialogId, {
-            showHeader: false
+            showHeader: false,
+            resizable: true,
+            draggable: true
         });
     }
 

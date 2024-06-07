@@ -6,6 +6,7 @@ import Label from "sap/m/Label";
 import BaseObject from "sap/ui/base/Object";
 import CustomData from "sap/ui/core/CustomData";
 import UI5Element from "sap/ui/core/Element";
+import Title from "sap/ui/core/Title";
 import { IValueValidation } from "ui5/antares/types/entry/submit";
 import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
@@ -82,7 +83,7 @@ export default class SimpleValidatorCL extends BaseObject {
     }
 
     private standardControlValidation(control: UI5Element, validation: IValueValidation) {
-        if (control instanceof CheckBox || control instanceof Label) {
+        if (control instanceof CheckBox || control instanceof Label || control instanceof Title) {
             return;
         }
 
@@ -150,7 +151,7 @@ export default class SimpleValidatorCL extends BaseObject {
 
         if (!standardControlType) {
             return;
-        }
+        }        
 
         if (!validator.validate(datePicker.getDateValue() as Date || "", standardControlType.getValue())) {
             validation.validated = false;
@@ -181,7 +182,7 @@ export default class SimpleValidatorCL extends BaseObject {
 
         if (!standardControlType) {
             return;
-        }
+        }        
 
         if (!validator.validate(dateTimePicker.getDateValue() as Date || "", standardControlType.getValue())) {
             validation.validated = false;
