@@ -1,4 +1,3 @@
-import { Button$PressEvent } from "sap/m/Button";
 import Controller from "sap/ui/core/mvc/Controller";
 import View from "sap/ui/core/mvc/View";
 import { DialogStrategies, FormTypes, GuidStrategies } from "ui5/antares/types/entry/enums";
@@ -16,6 +15,8 @@ import EntityCL from "ui5/antares/entity/v2/EntityCL";
  * @namespace ui5.antares.entry.v2
  */
 export default class EntryCreateCL<EntityT extends object = object> extends EntryCL<EntityT> {
+    private manualSubmitter?: (entry: EntryCreateCL<EntityT>) => void;
+    private manualSubmitListener?: object;
 
     constructor(controller: Controller | UIComponent, entityPath: string, modelName?: string) {
         super(controller, entityPath, ODataMethods.CREATE, modelName);
@@ -29,10 +30,14 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         this.getODataModel().setDefaultBindingMode("TwoWay");
         this.getODataModel().setUseBatch(true);
 
-        if (this.getDialogStrategy() === DialogStrategies.LOAD) {
-            await this.loadDialog(data);
+        if (this.getDisplayObjectPage()) {
+            await this.createObjectPage(data);
         } else {
-            await this.createDialog(data);
+            if (this.getDialogStrategy() === DialogStrategies.LOAD) {
+                await this.loadDialog(data);
+            } else {
+                await this.createDialog(data);
+            }
         }
     }
 
@@ -74,7 +79,15 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         entryDialog.getDialog().open();
     }
 
-    private onCreateTriggered(event: Button$PressEvent) {
+    private onCreateTriggered() {
+        if (this.manualSubmitter) {
+            this.manualSubmitter.call(this.manualSubmitListener || this.getSourceController(), this);
+        } else {
+            this.completeSubmit();
+        }
+    }
+
+    private completeSubmit() {
         const validation = this.valueValidation();
 
         if (!validation.validated) {
@@ -85,7 +98,7 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         this.submit();
     }
 
-    private onEntryCanceled(event: Button$PressEvent) {
+    private onEntryCanceled() {
         this.reset();
         this.closeEntryDialog();
         this.destroyEntryDialog();
@@ -124,6 +137,41 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
             fragment.destroyFragmentContent();
             throw new Error("Provided fragment must contain a sap.m.Dialog control. Put all the controls into a sap.m.Dialog");
         }
+    }
+
+    private async createObjectPage(data?: EntityT) {
+        const content = new ContentCL<EntryCreateCL<EntityT>, EntityT>(this.getSourceController(), this, ODataMethods.CREATE, this.getModelName());
+
+        // Create Object Page
+        this.createObjectPageLayout();
+        const objectPageInstance = this.getObjectPageInstance();
+        objectPageInstance.addCompleteButton(this.getBeginButtonText(), this.getBeginButtonType());
+        objectPageInstance.addCancelButton(this.getEndButtonText(), this.getEndButtonType());
+
+        //Create Context
+        const dataWithGuid = await this.generateGuid(data);
+        this.createEntryContext(dataWithGuid);
+
+        if (this.getFormType() === FormTypes.SMART) {
+            await content.addSmartSections();
+            objectPageInstance.getObjectPageLayout().setModel(this.getODataModel());
+            objectPageInstance.getObjectPageLayout().setBindingContext(this.getEntryContext());
+        } else {
+            await content.addSimpleSections();
+            objectPageInstance.getObjectPageLayout().setModel(this.getODataModel(), this.getModelName());
+            objectPageInstance.getObjectPageLayout().setBindingContext(this.getEntryContext(), this.getModelName());
+        }
+
+        if (this.getCustomContents().length) {
+            objectPageInstance.addEmptySection(this.getCustomContentSectionTitle());
+
+            this.getCustomContents().forEach((customContent) => {
+                objectPageInstance.addContentToSection(customContent);
+            });
+        }
+
+        await this.createTypedView();
+        this.displayTypedView();
     }
 
     private async generateGuid(data?: EntityT): Promise<EntityT | undefined> {
@@ -178,5 +226,14 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
         }
 
         return dataWithGuid;
+    }
+
+    public registerManualSubmit(submitter: (entry: EntryCreateCL<EntityT>) => void, listener?: object) {
+        this.manualSubmitter = submitter;
+        this.manualSubmitListener = listener;
+    }
+
+    public submitManually() {
+        this.completeSubmit();
     }
 }
