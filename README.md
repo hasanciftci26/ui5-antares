@@ -117,6 +117,10 @@ ui5 -v
       - [Validation with Operator](#validation-with-operator)
       - [Validation with Validator Function](#validation-with-validator-function)
       - [ValidationOperator Enum](#validationoperator-enum)
+    - [Object Page](#object-page)
+      - [Sections](#sections)
+      - [Header Title](#header-title)
+      - [Header Label](#header-label)
     - [Custom Control](#custom-control)
       - [Constructor](#constructor-3)
       - [Validation](#validation)
@@ -3675,6 +3679,82 @@ sap.ui.define([
 | ValidationOperator.StartsWith    | Starts with. It can only be used with `string` type     |
 
 ### Object Page
+
+By default, the [createNewEntry()](#create-new-entry) method generates a [sap.m.Dialog](https://sapui5.hana.ondemand.com/#/api/sap.m.Dialog) [Simple Form](https://sapui5.hana.ondemand.com/#/api/sap.ui.layout.form.SimpleForm) or [Smart Form](https://sapui5.hana.ondemand.com/#/api/sap.ui.comp.smartform.SmartForm) content, with the configurations done using the public methods. However, there may be a need for a larger screen for some of the reasons listed below.
+
+- The `EntitySet` may have many properties that are not user friendly when displayed in a dialog.
+- The custom content may not fit in the dialog.
+
+In such cases, UI5 Antares has the capability to generate an [sap.uxap.ObjectPageLayout](https://sapui5.hana.ondemand.com/sdk/#/api/sap.uxap.ObjectPageLayout) instead of a [sap.m.Dialog](https://sapui5.hana.ondemand.com/#/api/sap.m.Dialog).
+
+> **Hint:** All features of a dialog generation process are also available for the object page generation process.
+
+By default, Entry classes generates an object page with a single section including all the properties of an `EntitySet`. The default title for this section is derived from the [Form Title](#form-title). To change the title of this section, please use the [setFormTitle()](#form-title) or **setDefaultGroupTitle()** method.
+
+> **Important:** Please be aware that any custom content added using the [addCustomContent()](#custom-content) or [addContentFromFragment()](#custom-content-from-fragment) methods will be added to a separate section with a default title. The default title for the custom content is **Custom Contents**, but this can be modified using the **setCustomContentSectionTitle()** method.
+
+To generate an object page for the `EntitySet`, the **setDisplayObjectPage()** method can be utilized. The second parameter of this method is the **target name** of the current view. This information is required by the library to return the end user back to the view where the object page was called. The target information can be obtained from the application's **manifest.json** file. To find the target name of the current page, please look into the **"sap.ui5"."routing"."targets"** section in the **manifest.json** file.
+
+> **IMPORTANT:** The object page generation is only available when the SAPUI5 application has a [router](https://sapui5.hana.ondemand.com/sdk/#/topic/e5200ee755f344c8aef8efcbab3308fb) initialized in the UI Component (Component.js). UI5 Antares, uses the router of the application and does not initialize a new router instance.
+
+The target name is **MyTarget** in the sample of the **manifest.json** file provided below.
+
+```json
+{
+  "sap.app": {
+    ...
+  },
+  "sap.ui": {
+    ...
+  },
+  "sap.ui5": {
+    ...
+    "routing": {
+      "config": {
+        ...
+      },
+      "routes": [
+        ...
+      ],
+      "targets": {
+        "MyTarget": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": "true",
+          "viewId": "MyViewId",
+          "viewName": "MyViewName"
+        },
+        ...
+      }
+    }
+  }
+}
+```
+
+---
+
+**Setter (setDisplayObjectPage)**
+
+| Parameter  | Type    | Mandatory | Description                                                                                                              | 
+| :--------- | :------ | :-------- | :----------------------------------------------------------------------------------------------------------------------- |
+| display    | boolean | Yes       | If set to **true**, the library will generate an object page instead of a dialog                                         |
+| fromTarget | string  | Yes       | The target name of the view to where the end user should return after finishing the process on the generated object page |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getDisplayObjectPage)**
+
+| Returns | Description                                                                                            |
+| :------ | :----------------------------------------------------------------------------------------------------- |
+| boolean | Returns all the value that was set using **setDisplayObjectPage()** method. Default value is **false** |
+
+#### Sections
+
+#### Header Title
+
+#### Header Label
 
 ### Custom Control
 
