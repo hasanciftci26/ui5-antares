@@ -688,6 +688,10 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
                                     this.submitFailed.call(this.submitFailedListener, errorResponse);
                                 }
                             } else {
+                                if (this.displayObjectPage) {
+                                    this.getODataModel().refresh(true);
+                                }
+
                                 if (this.submitCompleted) {
                                     let responseData: EntityT | undefined;
 

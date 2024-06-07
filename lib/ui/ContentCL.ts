@@ -607,7 +607,11 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                 objectPageInstance.addSection(simpleForm, group.title === "UI5AntaresDefaultGroup" ? this.entry.getUnknownGroupTitle() : group.title);
             }
         } else {
+            this.simpleFormElements = [];
             await this.addProperties();
+            this.simpleFormElements.forEach((element) => {
+                simpleFormForKeys.addContent(element);
+            });
         }
     }
 

@@ -33,7 +33,13 @@ Please refer to the [Planned Features](#planned-features) section to learn about
 
 ## Features GIF
 
+### Auto Generated Dialog
+
 ![UI5 Antares Gif](https://github.com/hasanciftci26/ui5-antares/blob/media/antares.gif?raw=true)
+
+### Auto Generated Object Page
+
+![UI5 Antares Object Page Gif](https://github.com/hasanciftci26/ui5-antares/blob/media/antares_object_page.gif?raw=true)
 
 ## Prerequisites
 
@@ -66,6 +72,8 @@ ui5 -v
 - [UI5 Antares](#ui5-antares)
   - [BEFORE YOU CONTINUE](#before-you-continue)
   - [Features GIF](#features-gif)
+    - [Auto Generated Dialog](#auto-generated-dialog)
+    - [Auto Generated Object Page](#auto-generated-object-page)
   - [Prerequisites](#prerequisites)
   - [Table of Contents](#table-of-contents)
   - [Versioning](#versioning)
@@ -121,6 +129,8 @@ ui5 -v
       - [Sections](#sections)
       - [Header Title](#header-title)
       - [Header Label](#header-label)
+      - [Header Avatar](#header-avatar)
+      - [Custom Content Section Title](#custom-content-section-title)
     - [Custom Control](#custom-control)
       - [Constructor](#constructor-3)
       - [Validation](#validation)
@@ -3689,13 +3699,15 @@ In such cases, UI5 Antares has the capability to generate an [sap.uxap.ObjectPag
 
 > **Hint:** All features of a dialog generation process are also available for the object page generation process.
 
-By default, Entry classes generates an object page with a single section including all the properties of an `EntitySet`. The default title for this section is derived from the [Form Title](#form-title). To change the title of this section, please use the [setFormTitle()](#form-title) or **setDefaultGroupTitle()** method.
+By default, Entry classes generates an object page with a single section including all the properties of an `EntitySet`. The default title for this section is derived from the [Form Title](#form-title). To change the title of this section, please use the **setDefaultGroupTitle()** method.
 
 > **Important:** Please be aware that any custom content added using the [addCustomContent()](#custom-content) or [addContentFromFragment()](#custom-content-from-fragment) methods will be added to a separate section with a default title. The default title for the custom content is **Custom Contents**, but this can be modified using the **setCustomContentSectionTitle()** method.
 
 To generate an object page for the `EntitySet`, the **setDisplayObjectPage()** method can be utilized. The second parameter of this method is the **target name** of the current view. This information is required by the library to return the end user back to the view where the object page was called. The target information can be obtained from the application's **manifest.json** file. To find the target name of the current page, please look into the **"sap.ui5"."routing"."targets"** section in the **manifest.json** file.
 
 > **IMPORTANT:** The object page generation is only available when the SAPUI5 application has a [router](https://sapui5.hana.ondemand.com/sdk/#/topic/e5200ee755f344c8aef8efcbab3308fb) initialized in the UI Component (Component.js). UI5 Antares, uses the router of the application and does not initialize a new router instance.
+
+> **Important:** UI5 Antares does not change the hash when displaying the generated object page. Instead, a new target named **UI5AntaresObjectPageTarget** is added using the application's router. Then, the created target is displayed on the fly.
 
 The target name is **MyTarget** in the sample of the **manifest.json** file provided below.
 
@@ -3750,11 +3762,355 @@ The target name is **MyTarget** in the sample of the **manifest.json** file prov
 | :------ | :----------------------------------------------------------------------------------------------------- |
 | boolean | Returns all the value that was set using **setDisplayObjectPage()** method. Default value is **false** |
 
+**Sample**
+
+Let us consider an `EntitySet` named **Products** and we wish to have an object page instead of a dialog for the creation process.
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public onCreateProduct() {
+    // initialize
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // set the default section title
+    entry.setDefaultGroupTitle("My Default Section");
+
+    // activate the object page with the target
+    entry.setDisplayObjectPage(true, "MyCurrentViewTarget");
+
+    // call the object page
+    entry.createNewEntry();
+  }
+  
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // initialize
+          const entry = new EntryCreateCL(this, "Products");
+
+          // set the default section title
+          entry.setDefaultGroupTitle("My Default Section");          
+
+          // activate the object page with the target
+          entry.setDisplayObjectPage(true, "MyCurrentViewTarget");
+
+          // call the object page
+          entry.createNewEntry(); 
+        }
+
+      });
+
+    });
+```
+
+The generated object page with the default values will look more or less like the following.
+
+![Object Page](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/object_page_1.png?raw=true)
+
 #### Sections
+
+To add sections to the generated object page, [Form Grouping](#form-grouping) feature can be utilized.
 
 #### Header Title
 
+The title in the generated object page is derived from the [Form Title](#form-title) feature.
+
 #### Header Label
+
+The label which is displayed on the right side of the [sap.m.Avatar](https://sapui5.hana.ondemand.com/#/api/sap.m.Avatar) can be modified using the **setObjectPageHeaderLabel()** method. The default values for the header label are listed below.
+
+**Default Values**
+
+| Class                         | Default Value                                         |
+| :---------------------------- | :---------------------------------------------------- |
+| [Entry Create](#entry-create) | You can create a new ${this.entityName} on this page. |
+| [Entry Update](#entry-update) | You can update ${this.entityName} on this page.       |
+| [Entry Delete](#entry-delete) | You can delete ${this.entityName} on this page.       |
+| [Entry Read](#entry-read)     | You can display ${this.entityName} on this page.      |
+
+**Setter (setObjectPageHeaderLabel)**
+
+| Parameter | Type   | Mandatory | Description                                                                                                               | 
+| :-------- | :----- | :-------- | :------------------------------------------------------------------------------------------------------------------------ |
+| label     | string | Yes       | The label which is displayed on the right side of the [sap.m.Avatar](https://sapui5.hana.ondemand.com/#/api/sap.m.Avatar) |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getObjectPageHeaderLabel)**
+
+| Returns | Description                                                                                                                    |
+| :------ | :----------------------------------------------------------------------------------------------------------------------------- |
+| boolean | Returns all the value that was set using **setObjectPageHeaderLabel()** method. Default value differs based on the Entry class |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public onCreateProduct() {
+    // initialize
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // set the header title
+    entry.setFormTitle("My Header Title");
+
+    // set the default section title
+    entry.setDefaultGroupTitle("My Default Section");
+
+    // set the header label
+    entry.setObjectPageHeaderLabel("My Header Label");
+
+    // activate the object page with the target
+    entry.setDisplayObjectPage(true, "MyCurrentViewTarget");
+
+    // call the object page
+    entry.createNewEntry();
+  }
+  
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // initialize
+          const entry = new EntryCreateCL(this, "Products");
+
+          // set the header title
+          entry.setFormTitle("My Header Title");
+
+          // set the default section title
+          entry.setDefaultGroupTitle("My Default Section");
+
+          // set the header label
+          entry.setObjectPageHeaderLabel("My Header Label");
+
+          // activate the object page with the target
+          entry.setDisplayObjectPage(true, "MyCurrentViewTarget");
+
+          // call the object page
+          entry.createNewEntry();
+        }
+
+      });
+
+    });
+```
+
+![Object Page](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/object_page_2.png?raw=true)
+
+#### Header Avatar
+
+To change the **src** of the [sap.m.Avatar](https://sapui5.hana.ondemand.com/#/api/sap.m.Avatar) displayed in the object page, the **setObjectPageAvatarSrc()** method can be utilized. The default values for the avatar are listed below.
+
+**Default Values**
+
+| Class                         | Default Value      |
+| :---------------------------- | :----------------- |
+| [Entry Create](#entry-create) | sap-icon://add     |
+| [Entry Update](#entry-update) | sap-icon://edit    |
+| [Entry Delete](#entry-delete) | sap-icon://delete  |
+| [Entry Read](#entry-read)     | sap-icon://display |
+
+**Setter (setObjectPageAvatarSrc)**
+
+| Parameter | Type   | Mandatory | Description                                                                                  | 
+| :-------- | :----- | :-------- | :------------------------------------------------------------------------------------------- |
+| src       | string | Yes       | The src attribute of the [sap.m.Avatar](https://sapui5.hana.ondemand.com/#/api/sap.m.Avatar) |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getObjectPageAvatarSrc)**
+
+| Returns | Description                                                                                                                  |
+| :------ | :--------------------------------------------------------------------------------------------------------------------------- |
+| string  | Returns all the value that was set using **setObjectPageAvatarSrc()** method. Default value differs based on the Entry class |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public onCreateProduct() {
+    // initialize
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // set the avatar src
+    entry.setObjectPageAvatarSrc("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png");
+
+    // call the object page
+    entry.createNewEntry();
+  }
+  
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // initialize
+          const entry = new EntryCreateCL(this, "Products");
+
+          // set the avatar src
+          entry.setObjectPageAvatarSrc("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png");
+
+          // call the object page
+          entry.createNewEntry();
+        }
+
+      });
+
+    });
+```
+
+![Object Page](https://github.com/hasanciftci26/ui5-antares/blob/media/create_entry/object_page_3.png?raw=true)
+
+#### Custom Content Section Title
+
+To change the default title for the custom contents in the generated object page, the **setCustomContentSectionTitle()** method can be utilized.
+
+**Setter (setCustomContentSectionTitle)**
+
+| Parameter | Type   | Mandatory | Description                                                        | 
+| :-------- | :----- | :-------- | :----------------------------------------------------------------- |
+| title     | string | Yes       | The title of the section that is generated for the custom contents |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getCustomContentSectionTitle)**
+
+| Returns | Description                                                                                                              |
+| :------ | :----------------------------------------------------------------------------------------------------------------------- |
+| string  | Returns all the value that was set using **setCustomContentSectionTitle()** method. Default value is **Custom Contents** |
 
 ### Custom Control
 
@@ -4976,6 +5332,7 @@ Entry Update (EntryUpdateCL) is a class that manages the UPDATE (PATCH/MERGE/PUT
 
 **Features:**
 - sap.m.Dialog generation with a SmartForm, SimpleForm or Custom content
+- sap.uxap.ObjectPageLayout generation with a SmartForm, SimpleForm or Custom Content
 - User input validation via ValidationLogicCL class
 - Value Help Dialog generation via ValueHelpCL class
 - Property sorting, readonly properties
@@ -5748,6 +6105,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
   </thead>
   <tbody>
     <tr>
+      <td><a href="#manual-submit">Manual Submit</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
       <td><a href="#label-generation">Label Generation</a></td>
       <td align="center">&#x2714;</td>
       <td></td>
@@ -5775,6 +6138,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td><a href="#form-title">Form Title</a></td>
       <td align="center">&#x2714;</td>
       <td>Update <code>${entityPath}</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#form-grouping">Form Grouping</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
       <td></td>
     </tr>
     <tr>
@@ -5862,6 +6231,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td></td>
     </tr>    
     <tr>
+      <td><a href="#object-page">Object Page</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
       <td><a href="#custom-control">Custom Control</a></td>
       <td align="center">&#x2714;</td>
       <td></td>
@@ -5888,6 +6263,7 @@ Entry Delete (EntryDeleteCL) is a class that manages the DELETE operation throug
 
 **Features:**
 - sap.m.Dialog generation with a SmartForm, SimpleForm or Custom content
+- sap.uxap.ObjectPageLayout generation with a SmartForm, SimpleForm or Custom Content
 - Property sorting
 - Label generation for the SmartForm, SimpleForm elements
 - delete() handling based on the user interaction
@@ -7168,6 +7544,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
   </thead>
   <tbody>
     <tr>
+      <td><a href="#manual-submit">Manual Submit</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>  
+    <tr>
       <td><a href="#label-generation">Label Generation</a></td>
       <td align="center">&#x2714;</td>
       <td></td>
@@ -7197,6 +7579,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td>Delete <code>${entityPath}</code></td>
       <td></td>
     </tr>
+    <tr>
+      <td><a href="#form-grouping">Form Grouping</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>    
     <tr>
       <td><a href="#begin-button-text">Begin Button Text</a></td>
       <td align="center">&#x2714;</td>
@@ -7294,6 +7682,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td></td>
     </tr>    
     <tr>
+      <td><a href="#object-page">Object Page</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    <tr>
       <td><a href="#custom-control">Custom Control</a></td>
       <td align="center">&#x2714;</td>
       <td></td>
@@ -7320,6 +7714,7 @@ Entry Read (EntryReadCL) is a class that manages the READ operation through the 
 
 **Features:**
 - sap.m.Dialog generation with a SmartForm, SimpleForm or Custom content
+- sap.uxap.ObjectPageLayout generation with a SmartForm, SimpleForm or Custom Content
 - Property sorting, excluding
 - Label generation for the SmartForm, SimpleForm elements
 - Call a fragment and bind the context in case you do not want to use the auto-generated dialog
@@ -8071,6 +8466,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
   </thead>
   <tbody>
     <tr>
+      <td><a href="#manual-submit">Manual Submit</a></td>
+      <td align="center">&#x2717;</td>
+      <td></td>
+      <td></td>
+    </tr>  
+    <tr>
       <td><a href="#label-generation">Label Generation</a></td>
       <td align="center">&#x2714;</td>
       <td></td>
@@ -8100,6 +8501,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td>Delete <code>${entityPath}</code></td>
       <td></td>
     </tr>
+    <tr>
+      <td><a href="#form-grouping">Form Grouping</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>    
     <tr>
       <td><a href="#begin-button-text">Begin Button Text</a></td>
       <td align="center">&#x2717;</td>
@@ -8184,6 +8591,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td></td>
       <td></td>
     </tr>    
+    <tr>
+      <td><a href="#object-page">Object Page</a></td>
+      <td align="center">&#x2714;</td>
+      <td></td>
+      <td></td>
+    </tr>      
     <tr>
       <td><a href="#custom-control">Custom Control</a></td>
       <td align="center">&#x2714;</td>
@@ -11881,12 +12294,6 @@ Here is a list of features that are in the pipeline for the next releases.
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td>Form Grouping</td>
-      <td>*</td>
-      <td width="150"><a href="#entry-create">Entry Create</a><br><a href="#entry-update">Entry Update</a><br><a href="#entry-delete">Entry Delete</a><br><a href="#entry-read">Entry Read</a></td>
-      <td>The capability of creating the SimpleForm or SmartForm with the grouping of properties as shown in the sample: <a href="https://sapui5.hana.ondemand.com/#/entity/sap.ui.layout.form.SimpleForm/sample/sap.ui.layout.sample.SimpleForm480_Trial">Simple Form Fullscreen – three groups (horizontal)</a></td>
-    </tr>
     <tr>
       <td>Deep Create</td>
       <td>*</td>
