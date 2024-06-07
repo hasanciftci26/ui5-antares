@@ -19,6 +19,9 @@ import CustomControlCL from "ui5/antares/ui/CustomControlCL";
 import CustomData from "sap/ui/core/CustomData";
 import { ODataMethods } from "ui5/antares/types/odata/enums";
 import { PropertyBindingInfo } from "sap/ui/base/ManagedObject";
+import { IFormGroups } from "ui5/antares/types/entry/common";
+import Title from "sap/ui/core/Title";
+import ColumnLayout from "sap/ui/comp/smartform/ColumnLayout";
 
 /**
  * @namespace ui5.antares.ui
@@ -39,14 +42,22 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
     }
 
     public async getSmartForm(): Promise<SmartForm> {
-        const smartFormGroup = await this.getSmartFormGroup();
+        const smartFormGroups = await this.getSmartFormGroups();
 
         const smartForm = new SmartForm({
             editTogglable: false,
             editable: true,
             title: this.entry.getFormTitle(),
-            groups: [smartFormGroup]
+            groups: smartFormGroups
         });
+
+        if (this.entry.getFormGroups().length) {
+            smartForm.setLayout(new ColumnLayout({
+                columnsXL: 3,
+                columnsL: 3,
+                columnsM: 2
+            }));
+        }
 
         return smartForm;
     }
@@ -56,25 +67,102 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
 
         const simpleForm = new SimpleForm({
             editable: true,
+            layout: "ResponsiveGridLayout",
+            columnsXL: 3,
+            columnsL: 3,
+            columnsM: 2,
             title: this.entry.getFormTitle(),
             content: simpleFormContent
         });
 
+        if (this.entry.getFormGroups().length) {
+            simpleForm.setLayout("ColumnLayout");
+        }
+
         return simpleForm;
     }
 
-    private async getSmartFormGroup(): Promise<Group> {
-        this.smartGroup = new Group();
+    private async getSmartFormGroups(): Promise<Group[]> {
+        const formGroups = this.entry.getFormGroups();
+        const smartGroups: Group[] = [];
+
+        this.smartGroup = new Group({
+            title: this.entry.getDefaultGroupTitle()
+        });
+
+        smartGroups.push(this.smartGroup);
+        // Key properties are always in the default group
         await this.addKeyProperties();
-        await this.addProperties();
-        return this.smartGroup;
+
+        if (formGroups.length) {
+            if (this.entry.getIncludeAllProperties()) {
+                await this.addDefaultGroupElements(formGroups);
+            }
+
+            for (const group of formGroups) {
+                this.smartGroup = new Group({
+                    title: group.title === "UI5AntaresDefaultGroup" ? this.entry.getUnknownGroupTitle() : group.title
+                });
+
+                smartGroups.push(this.smartGroup);
+                await this.addProperties(group);
+            }
+        } else {
+            await this.addProperties();
+        }
+
+        return smartGroups;
     }
 
     private async getSimpleFormContent(): Promise<UI5Element[]> {
+        const formGroups = this.entry.getFormGroups();
         this.simpleFormElements = [];
+
+        if (this.entry.getDefaultGroupTitle()) {
+            this.simpleFormElements.push(new Title({ text: this.entry.getDefaultGroupTitle() }));
+        }
+
+        // Key properties are always in the default group
         await this.addKeyProperties();
-        await this.addProperties();
+
+        if (formGroups.length) {
+            if (this.entry.getIncludeAllProperties()) {
+                await this.addDefaultGroupElements(formGroups);
+            }
+
+            for (const group of formGroups) {
+                this.simpleFormElements.push(new Title({ text: group.title === "UI5AntaresDefaultGroup" ? this.entry.getUnknownGroupTitle() : group.title }));
+                await this.addProperties(group);
+            }
+        } else {
+            await this.addProperties();
+        }
+
         return this.simpleFormElements;
+    }
+
+    private async addDefaultGroupElements(groups: IFormGroups[]) {
+        const groupProperties = groups.reduce((props, group) => props = [...props, ...group.properties], [] as string[]);
+        const entityTypeKeys = await this.getEntityTypeKeys();
+        const entityTypeProperties = await this.getEntityTypeProperties();
+        const defaultProperties: string[] = [];
+
+        for (const property of entityTypeProperties) {
+            if (entityTypeKeys.some(key => key.propertyName === property.propertyName) ||
+                this.entry.getExcludedProperties().includes(property.propertyName) ||
+                groupProperties.includes(property.propertyName)) {
+                continue;
+            }
+
+            defaultProperties.push(property.propertyName);
+        }
+
+        if (defaultProperties.length) {
+            groups.push({
+                title: "UI5AntaresDefaultGroup",
+                properties: defaultProperties
+            });
+        }
     }
 
     private async addKeyProperties() {
@@ -102,13 +190,19 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         });
     }
 
-    private async addProperties() {
+    private async addProperties(group?: IFormGroups) {
         const entityTypeKeys = await this.getEntityTypeKeys();
         const entityTypeProperties = await this.getEntityTypeProperties();
 
         for (const property of this.entry.getPropertyOrder()) {
             if (entityTypeKeys.some(key => key.propertyName === property) || !entityTypeProperties.some(prop => prop.propertyName === property)) {
                 continue;
+            }
+
+            if (group) {
+                if (!group.properties.includes(property)) {
+                    continue;
+                }
             }
 
             let entityTypeProperty = entityTypeProperties.find(prop => prop.propertyName === property) as IEntityType;
@@ -138,6 +232,12 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
                     this.entry.getPropertyOrder().includes(property.propertyName) ||
                     this.entry.getExcludedProperties().includes(property.propertyName)) {
                     continue;
+                }
+
+                if (group) {
+                    if (!group.properties.includes(property.propertyName)) {
+                        continue;
+                    }
                 }
 
                 if (this.entry.getFormType() === FormTypes.SMART) {
@@ -200,17 +300,17 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
 
         switch (this.entry.getDisplayGuidProperties()) {
             case GuidStrategies.NONE:
-                if (property.propertyType === "Edm.Guid") {
+                if (property.propertyType === "Edm.Guid" && !this.entry.getFormGroups().length) {
                     smartField.setVisible(false);
                 }
                 break;
             case GuidStrategies.ONLY_KEY:
-                if (property.propertyType === "Edm.Guid" && !keyField) {
+                if (property.propertyType === "Edm.Guid" && !keyField && !this.entry.getFormGroups().length) {
                     smartField.setVisible(false);
                 }
                 break;
             case GuidStrategies.ONLY_NON_KEY:
-                if (property.propertyType === "Edm.Guid" && keyField) {
+                if (property.propertyType === "Edm.Guid" && keyField && !this.entry.getFormGroups().length) {
                     smartField.setVisible(false);
                 }
                 break;
@@ -402,17 +502,17 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
 
         switch (this.entry.getDisplayGuidProperties()) {
             case GuidStrategies.NONE:
-                if (property.propertyType === "Edm.Guid") {
+                if (property.propertyType === "Edm.Guid" && !this.entry.getFormGroups().length) {
                     input.setVisible(false);
                 }
                 break;
             case GuidStrategies.ONLY_KEY:
-                if (property.propertyType === "Edm.Guid" && !keyField) {
+                if (property.propertyType === "Edm.Guid" && !keyField && !this.entry.getFormGroups().length) {
                     input.setVisible(false);
                 }
                 break;
             case GuidStrategies.ONLY_NON_KEY:
-                if (property.propertyType === "Edm.Guid" && keyField) {
+                if (property.propertyType === "Edm.Guid" && keyField && !this.entry.getFormGroups().length) {
                     input.setVisible(false);
                 }
                 break;
@@ -453,5 +553,101 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             this.simpleFormElements.push(new Label({ text: this.getEntityTypePropLabel(property.propertyName) }));
         }
         this.simpleFormElements.push(control.getControl());
+    }
+
+    public async addSmartSections() {
+        const objectPageInstance = this.entry.getObjectPageInstance();
+        const formGroups = this.entry.getFormGroups();
+        const smartFormForKeys = this.createSmartForm();
+
+        await this.addKeyProperties();
+        objectPageInstance.addSection(smartFormForKeys, this.entry.getDefaultGroupTitle() || this.entry.getFormTitle());
+
+        if (formGroups.length) {
+            if (this.entry.getIncludeAllProperties()) {
+                await this.addDefaultGroupElements(formGroups);
+            }
+
+            for (const group of formGroups) {
+                const smartForm = this.createSmartForm();
+                await this.addProperties(group);
+                objectPageInstance.addSection(smartForm, group.title === "UI5AntaresDefaultGroup" ? this.entry.getUnknownGroupTitle() : group.title);
+            }
+        } else {
+            await this.addProperties();
+        }
+    }
+
+    public async addSimpleSections() {
+        const objectPageInstance = this.entry.getObjectPageInstance();
+        const formGroups = this.entry.getFormGroups();
+        const simpleFormForKeys = this.createSimpleForm();
+
+        await this.addKeyProperties();
+
+        this.simpleFormElements.forEach((element) => {
+            simpleFormForKeys.addContent(element);
+        });
+
+        objectPageInstance.addSection(simpleFormForKeys, this.entry.getDefaultGroupTitle() || this.entry.getFormTitle());
+
+        if (formGroups.length) {
+            if (this.entry.getIncludeAllProperties()) {
+                await this.addDefaultGroupElements(formGroups);
+            }
+
+            for (const group of formGroups) {
+                const simpleForm = this.createSimpleForm();
+                await this.addProperties(group);
+
+                this.simpleFormElements.forEach((element) => {
+                    simpleForm.addContent(element);
+                });
+
+                objectPageInstance.addSection(simpleForm, group.title === "UI5AntaresDefaultGroup" ? this.entry.getUnknownGroupTitle() : group.title);
+            }
+        } else {
+            this.simpleFormElements = [];
+            await this.addProperties();
+            this.simpleFormElements.forEach((element) => {
+                simpleFormForKeys.addContent(element);
+            });
+        }
+    }
+
+    private createSmartForm(): SmartForm {
+        this.smartGroup = new Group();
+
+        const smartForm = new SmartForm({
+            editTogglable: false,
+            editable: true,
+            groups: this.smartGroup,
+            layout: new ColumnLayout({
+                columnsXL: 1,
+                columnsL: 1,
+                columnsM: 1,
+                emptyCellsLarge: 5
+            })
+        });
+
+        return smartForm;
+    }
+
+    private createSimpleForm(): SimpleForm {
+        this.simpleFormElements = [];
+
+        const simpleForm = new SimpleForm({
+            editable: true,
+            layout: "ColumnLayout",
+            emptySpanXL: 5,
+            emptySpanL: 5,
+            emptySpanM: 5,
+            emptySpanS: 5,
+            columnsXL: 1,
+            columnsL: 1,
+            columnsM: 1
+        });
+
+        return simpleForm;
     }
 }

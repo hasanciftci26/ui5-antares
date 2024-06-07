@@ -3,11 +3,13 @@ import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL";
 import EntryUpdateCL from "ui5/antares/entry/v2/EntryUpdateCL";
 import EntryDeleteCL from "ui5/antares/entry/v2/EntryDeleteCL";
 import { IProducts } from "../types/create";
-import { FormTypes } from "ui5/antares/types/entry/enums";
+import { FormTypes, GuidStrategies } from "ui5/antares/types/entry/enums";
 import ValueHelpCL from "ui5/antares/ui/ValueHelpCL";
 import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
 import { ValidationOperator } from "ui5/antares/types/ui/enums";
 import EntryReadCL from "ui5/antares/entry/v2/EntryReadCL";
+import Button from "sap/m/Button";
+import MessageToast from "sap/m/MessageToast";
 
 /**
  * @namespace test.ui5.antares.controller
@@ -28,20 +30,37 @@ export default class Homepage extends BaseController {
 
     public async onCreateProduct(): Promise<void> {
         const entry = new EntryCreateCL<IProducts>(this, "Products");
-        entry.setFormType(FormTypes.SIMPLE);
-        entry.addValueHelp(new ValueHelpCL(this, {
-            propertyName: "CategoryID",
-            valueHelpEntity: "Categories",
-            valueHelpProperty: "ID",
-            readonlyProperties: ["Name"]
+        entry.setFormGroups([{
+            title: "Name Group",
+            properties: ["Name"]
+        }, {
+            title: "Money",
+            properties: ["Price", "Currency"]
+        }]);
+
+        entry.setMandatoryProperties(["Price", "CategoryID"]);
+        // entry.setDisplayObjectPage(true, "TargetHomepage");
+        entry.setDefaultGroupTitle("First Section");
+        // entry.setFormType(FormTypes.SIMPLE);
+        entry.addValidationLogic(new ValidationLogicCL({
+            propertyName: "Price",
+            operator: ValidationOperator.GT,
+            value1: 1500,
+            message: "Price must be greater than 1500"
         }));
-        entry.addValueHelp(new ValueHelpCL(this, {
-            propertyName: "SupplierID",
-            valueHelpEntity: "Suppliers",
-            valueHelpProperty: "ID",
-            readonlyProperties: ["CompanyName", "ContactName", "Country"]
-        }));
+
+        entry.registerManualSubmit(this.onManualCreateSubmit, this);
+        entry.addCustomContent(new Button({ text: "Custom Button" }));
         entry.createNewEntry();
+    }
+
+    public onManualCreateSubmit(entry: EntryCreateCL<IProducts>) {
+        entry.submitManually();
+    }
+
+    public onManualUpdateSubmit(entry: EntryUpdateCL<IProducts>) {
+        MessageToast.show("Manual update")
+        entry.submitManually();
     }
 
     public async onUpdateProduct(): Promise<void> {
@@ -50,6 +69,18 @@ export default class Homepage extends BaseController {
             initializer: "stProducts"
         });
 
+        // entry.setDisplayGuidProperties(GuidStrategies.ALL);
+
+        entry.setFormGroups([{
+            title: "Name Group",
+            properties: ["Name"]
+        }, {
+            title: "Money",
+            properties: ["Price", "Currency"]
+        }]);
+
+        // entry.setDisplayObjectPage(true, "TargetHomepage");
+        entry.registerManualSubmit(this.onManualUpdateSubmit, this);
         entry.updateEntry();
     }
 
@@ -59,6 +90,8 @@ export default class Homepage extends BaseController {
             initializer: "stProducts"
         });
 
+        entry.setDisplayObjectPage(true, "TargetHomepage");
+        entry.attachDeleteCompleted(this.onDeleteCompleted, this);
         entry.deleteEntry();
     }
 
@@ -68,6 +101,11 @@ export default class Homepage extends BaseController {
             initializer: "stProducts"
         });
 
+        entry.setFormGroups([{
+            title: "Super",
+            properties: ["Price", "Currency"]
+        }]);
+        entry.setDisplayObjectPage(true, "TargetHomepage");
         entry.readEntry();
     }
 
@@ -85,4 +123,8 @@ export default class Homepage extends BaseController {
     /* ======================================================================================================================= */
     /* Internal methods                                                                                                        */
     /* ======================================================================================================================= */
+
+    public onDeleteCompleted() {
+        MessageToast.show("Successfully deleted.");
+    }
 }

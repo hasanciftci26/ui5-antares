@@ -1,4 +1,3 @@
-import { Button$PressEvent } from "sap/m/Button";
 import Dialog from "sap/m/Dialog";
 import MessageBox from "sap/m/MessageBox";
 import UIComponent from "sap/ui/core/UIComponent";
@@ -17,6 +16,8 @@ import FragmentCL from "ui5/antares/ui/FragmentCL";
  */
 export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT extends object = object> extends EntryCL<EntityT, EntityKeysT> {
     private settings: IUpdateSettings<EntityKeysT>;
+    private manualSubmitter?: (entry: EntryUpdateCL<EntityT>) => void;
+    private manualSubmitListener?: object;
 
     constructor(controller: Controller | UIComponent, settings: IUpdateSettings<EntityKeysT>, modelName?: string) {
         super(controller, settings.entityPath, ODataMethods.UPDATE, modelName);
@@ -31,10 +32,14 @@ export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT 
         this.getODataModel().setDefaultBindingMode("TwoWay");
         this.getODataModel().setUseBatch(true);
 
-        if (this.getDialogStrategy() === DialogStrategies.LOAD) {
-            await this.loadDialog();
+        if (this.getDisplayObjectPage()) {
+            await this.createObjectPage();
         } else {
-            await this.createDialog();
+            if (this.getDialogStrategy() === DialogStrategies.LOAD) {
+                await this.loadDialog();
+            } else {
+                await this.createDialog();
+            }
         }
     }
 
@@ -73,7 +78,15 @@ export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT 
         entryDialog.getDialog().open();
     }
 
-    private onUpdateTriggered(event: Button$PressEvent) {
+    private onUpdateTriggered() {
+        if (this.manualSubmitter) {
+            this.manualSubmitter.call(this.manualSubmitListener || this.getSourceController(), this);
+        } else {
+            this.completeSubmit();
+        }
+    }
+
+    private completeSubmit() {
         const validation = this.valueValidation();
 
         if (!validation.validated) {
@@ -82,9 +95,9 @@ export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT 
         }
 
         this.submit();
-    }    
+    }
 
-    private onEntryCanceled(event: Button$PressEvent) {
+    private onEntryCanceled() {
         this.reset();
         this.closeEntryDialog();
         this.destroyEntryDialog();
@@ -118,6 +131,47 @@ export default class EntryUpdateCL<EntityT extends object = object, EntityKeysT 
         } else {
             fragment.destroyFragmentContent();
             throw new Error("Provided fragment must contain a sap.m.Dialog control. Put all the controls into a sap.m.Dialog");
-        }        
+        }
+    }
+
+    private async createObjectPage() {
+        await this.initializeContext(this.settings.initializer);
+        const content = new ContentCL<EntryUpdateCL<EntityT>, EntityT>(this.getSourceController(), this, ODataMethods.UPDATE, this.getModelName());
+
+        // Create Object Page
+        this.createObjectPageLayout();
+        const objectPageInstance = this.getObjectPageInstance();
+        objectPageInstance.addCompleteButton(this.getBeginButtonText(), this.getBeginButtonType());
+        objectPageInstance.addCancelButton(this.getEndButtonText(), this.getEndButtonType());
+
+        if (this.getFormType() === FormTypes.SMART) {
+            await content.addSmartSections();
+            objectPageInstance.getObjectPageLayout().setModel(this.getODataModel());
+            objectPageInstance.getObjectPageLayout().setBindingContext(this.getEntryContext());
+        } else {
+            await content.addSimpleSections();
+            objectPageInstance.getObjectPageLayout().setModel(this.getODataModel(), this.getModelName());
+            objectPageInstance.getObjectPageLayout().setBindingContext(this.getEntryContext(), this.getModelName());
+        }
+
+        if (this.getCustomContents().length) {
+            objectPageInstance.addEmptySection(this.getCustomContentSectionTitle());
+
+            this.getCustomContents().forEach((customContent) => {
+                objectPageInstance.addContentToSection(customContent);
+            });
+        }
+
+        await this.createTypedView();
+        this.displayTypedView();
+    }
+
+    public registerManualSubmit(submitter: (entry: EntryUpdateCL<EntityT>) => void, listener?: object) {
+        this.manualSubmitter = submitter;
+        this.manualSubmitListener = listener;
+    }
+
+    public submitManually() {
+        this.completeSubmit();
     }
 }
