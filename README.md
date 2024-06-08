@@ -227,6 +227,8 @@ UI5 Antares and SAPUI5 versions are directly related. The SAPUI5 version used ca
 
 > You should install the version that corresponds to the version of your SAPUI5/Fiori Elements application.
 
+> **IMPORTANT:** When the **patch** part of the SAPUI5 version is **0**, the UI5 Antares patch part begins with **999** because the NPM does not permit leading zeros in the version parts. For instance, if the SAPUI5 version is **1.124.0**, the UI5 Antares version will be **1.124.999001**. The last three digits will increase with each bug fix or new feature.
+
 You can see examples of versioning below.
 
 > **Note:** The versions shown in the example below may not exist.
@@ -236,7 +238,7 @@ You can see examples of versioning below.
 | 1.123.1002          | 1.123.1        | Latest Version for 1.123.1                |
 | 1.123.1001          | 1.123.1        | One before the latest version for 1.123.1 |
 | 1.96.32001          | 1.96.32        | Latest Version for 1.96.32                |
-| 1.84.001            | 1.84           | Latest Version for 1.84                   |
+| 1.84.999001         | 1.84.0         | Latest Version for 1.84.0                 |
 
 ### Supported SAPUI5 Versions
 
@@ -244,7 +246,7 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 
 | UI5 Antares Version | SAPUI5 Version | Status    |
 | :------------------ | :------------- | :-------- |
-| 1.124.0001          | 1.124.0        | Available |
+| 1.124.999001        | 1.124.0        | Available |
 | 1.123.1002          | 1.123.1        | Available |
 | 1.123.1001          | 1.123.1        | Available |
 | 1.120.1002          | 1.120.1        | Available |
