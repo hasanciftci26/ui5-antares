@@ -243,8 +243,12 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 
 | UI5 Antares Version | SAPUI5 Version | Status    |
 | :------------------ | :------------- | :-------- |
+| 1.123.1002          | 1.123.1        | Available |
 | 1.123.1001          | 1.123.1        | Available |
+| 1.120.1002          | 1.120.1        | Available |
 | 1.120.1001          | 1.120.1        | Available |
+| 1.108.23001         | 1.108.23       | Available |
+| 1.96.25002          | 1.96.25        | Available |
 | 1.96.25001          | 1.96.25        | Available |
 | 1.120.*             | 1.120.*        | Planned   |
 | 1.108.*             | 1.108.*        | Planned   |

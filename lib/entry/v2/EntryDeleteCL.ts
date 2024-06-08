@@ -1,4 +1,3 @@
-import { Button$PressEvent } from "sap/m/Button";
 import Dialog from "sap/m/Dialog";
 import MessageBox from "sap/m/MessageBox";
 import { ButtonType } from "sap/m/library";
@@ -120,13 +119,13 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
         entryDialog.getDialog().open();
     }
 
-    private onDeleteTriggered(event: Button$PressEvent) {
+    private onDeleteTriggered() {
         this.deleteEntryContext();
         this.closeEntryDialog();
         this.destroyEntryDialog();
     }
 
-    private onEntryCanceled(event: Button$PressEvent) {
+    private onEntryCanceled() {
         this.reset();
         this.closeEntryDialog();
         this.destroyEntryDialog();

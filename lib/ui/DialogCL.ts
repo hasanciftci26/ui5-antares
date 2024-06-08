@@ -1,4 +1,4 @@
-import Button, { Button$PressEvent } from "sap/m/Button";
+import Button from "sap/m/Button";
 import Dialog from "sap/m/Dialog";
 import { ButtonType } from "sap/m/library";
 import BaseObject from "sap/ui/base/Object";
@@ -15,15 +15,14 @@ export default class DialogCL extends BaseObject {
         super();
         this.dialogId = dialogId;
 
-        this.dialog = new Dialog({
-            id: this.dialogId,
+        this.dialog = new Dialog(this.dialogId, {
             showHeader: false,
             resizable: true,
             draggable: true
         });
     }
 
-    public addBeginButton(buttonText: string, buttonType: ButtonType, pressEventHandler: (event: Button$PressEvent) => void, listener: object) {
+    public addBeginButton(buttonText: string, buttonType: ButtonType, pressEventHandler: () => void, listener: object) {
         this.dialog.setBeginButton(new Button({
             text: buttonText,
             type: buttonType,
@@ -31,7 +30,7 @@ export default class DialogCL extends BaseObject {
         }));
     }
 
-    public addEndButton(buttonText: string, buttonType: ButtonType, pressEventHandler: (event: Button$PressEvent) => void, listener: object) {
+    public addEndButton(buttonText: string, buttonType: ButtonType, pressEventHandler: () => void, listener: object) {
         this.dialog.setEndButton(new Button({
             text: buttonText,
             type: buttonType,

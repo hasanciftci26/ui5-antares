@@ -27,8 +27,7 @@ export default class ObjectPageLayoutCL extends BaseObject {
         const label = new Label({ text: headerLabel });
         label.addStyleClass("sapUiTinyMarginBegin");
 
-        this.objectPageLayout = new ObjectPageLayout({
-            id: "UI5AntaresObjectPageViewID--UI5AntaresObjectPageLayout",
+        this.objectPageLayout = new ObjectPageLayout("UI5AntaresObjectPageViewID--UI5AntaresObjectPageLayout", {
             upperCaseAnchorBar: false,
             headerTitle: new ObjectPageDynamicHeaderTitle({
                 expandedHeading: new Title({ text: headerText, wrapping: true }),
@@ -55,8 +54,7 @@ export default class ObjectPageLayoutCL extends BaseObject {
 
     public addCompleteButton(buttonText: string, buttonType: ButtonType) {
         const headerTitle = this.objectPageLayout.getHeaderTitle() as ObjectPageDynamicHeaderTitle;
-        headerTitle.addAction(new Button({
-            id: "UI5AntaresObjectPageViewID--UI5AntaresObjectPageCompleteButton",
+        headerTitle.addAction(new Button("UI5AntaresObjectPageViewID--UI5AntaresObjectPageCompleteButton", {
             text: buttonText,
             type: buttonType
         }));
@@ -64,8 +62,7 @@ export default class ObjectPageLayoutCL extends BaseObject {
 
     public addCancelButton(buttonText: string, buttonType: ButtonType) {
         const headerTitle = this.objectPageLayout.getHeaderTitle() as ObjectPageDynamicHeaderTitle;
-        headerTitle.addAction(new Button({
-            id: "UI5AntaresObjectPageViewID--UI5AntaresObjectPageCancelButton",
+        headerTitle.addAction(new Button("UI5AntaresObjectPageViewID--UI5AntaresObjectPageCancelButton", {
             text: buttonText,
             type: buttonType
         }));

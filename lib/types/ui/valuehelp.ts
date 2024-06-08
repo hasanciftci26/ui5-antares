@@ -12,4 +12,12 @@ export interface IValueHelpSettings {
     resourceBundlePrefix?: string;
     useMetadataLabels?: boolean;
     filterModelName?: string;
-};
+}
+
+export interface IValueHelpDialogOKEvent {
+    getParameter: (parameter: "tokens") => ITokens[] | undefined;
+}
+
+export interface ITokens {
+    getKey: () => string;
+}

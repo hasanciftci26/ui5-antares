@@ -3,20 +3,20 @@ import Text from "sap/m/Text";
 import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";
 import ModelCL from "ui5/antares/base/v2/ModelCL";
-import { IValueHelpSettings } from "ui5/antares/types/ui/valuehelp";
+import { IValueHelpDialogOKEvent, IValueHelpSettings } from "ui5/antares/types/ui/valuehelp";
 import { NamingStrategies } from "ui5/antares/types/entry/enums";
 import EntityCL from "ui5/antares/entity/v2/EntityCL";
 import ColumnListItem from "sap/m/ColumnListItem";
-import Input, { Input$ValueHelpRequestEvent } from "sap/m/Input";
+import Input from "sap/m/Input";
 import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import ListBinding from "sap/ui/model/ListBinding";
-import ValueHelpDialog, { ValueHelpDialog$OkEvent } from "sap/ui/comp/valuehelpdialog/ValueHelpDialog";
+import ValueHelpDialog from "sap/ui/comp/valuehelpdialog/ValueHelpDialog";
 import UITable from "sap/ui/table/Table";
 import Table from "sap/m/Table";
 import UIColumn from "sap/ui/table/Column";
 import Label from "sap/m/Label";
-import FilterBar, { FilterBar$SearchEvent } from "sap/ui/comp/filterbar/FilterBar";
+import FilterBar from "sap/ui/comp/filterbar/FilterBar";
 import FilterGroupItem from "sap/ui/comp/filterbar/FilterGroupItem";
 import Control from "sap/ui/core/Control";
 import SearchField from "sap/m/SearchField";
@@ -26,6 +26,7 @@ import DateTimePicker from "sap/m/DateTimePicker";
 import CheckBox from "sap/m/CheckBox";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import { PropertyBindingInfo } from "sap/ui/base/ManagedObject";
+import Event from "sap/ui/base/Event";
 
 /**
  * @namespace ui5.antares.ui
@@ -69,11 +70,11 @@ export default class ValueHelpCL extends ModelCL {
         this.filterModelName = settings.filterModelName || "UI5AntaresVHFilterModel";
     }
 
-    public openValueHelpDialog(event: Input$ValueHelpRequestEvent) {
+    public openValueHelpDialog(event: Event) {
         this.getValueHelpDialog().then((dialog) => {
             dialog.open();
         });
-        this.sourceControl = event.getSource();
+        this.sourceControl = event.getSource() as Input;
     }
 
     public getPropertyName(): string {
@@ -110,7 +111,7 @@ export default class ValueHelpCL extends ModelCL {
         return this.valueHelpDialog;
     }
 
-    private onConfirm(event: ValueHelpDialog$OkEvent) {
+    private onConfirm(event: IValueHelpDialogOKEvent) {
         const selectedTokens = event.getParameter("tokens");
 
         if (selectedTokens) {
@@ -408,7 +409,7 @@ export default class ValueHelpCL extends ModelCL {
         }
     }
 
-    private async onFilterBarSearch(event: FilterBar$SearchEvent) {
+    private async onFilterBarSearch() {
         const filterData = this.filterModel.getData() as object;
         const filterProperties = Object.keys(filterData).filter(key => key !== "VHSearchFieldValue");
         const filters: Filter[] = [];
@@ -455,7 +456,7 @@ export default class ValueHelpCL extends ModelCL {
             if (filters.length) {
                 binding.filter(new Filter({ filters: filters, and: true }));
             } else {
-                binding.filter();
+                binding.filter([]);
             }
         }
 
@@ -465,7 +466,7 @@ export default class ValueHelpCL extends ModelCL {
             if (filters.length) {
                 binding.filter(new Filter({ filters: filters, and: true }));
             } else {
-                binding.filter();
+                binding.filter([]);
             }
         }
     }

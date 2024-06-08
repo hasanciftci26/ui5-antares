@@ -1,6 +1,6 @@
-import Lib from "sap/ui/core/Lib";
+import ObjectPath from "sap/base/util/ObjectPath";
 
-const library = Lib.init({
+sap.ui.getCore().initLibrary({
     name: "ui5.antares",
     dependencies: [
         "sap.m",
@@ -34,7 +34,9 @@ const library = Lib.init({
         "ui5.antares.util.Util"
     ],
     noLibraryCSS: true,
-    version: "1.123.1002"
+    version: "1.108.23001"
 });
+
+const library: { [key: string]: unknown } = ObjectPath.get("ui5.antares") as { [key: string]: unknown };
 
 export default library
