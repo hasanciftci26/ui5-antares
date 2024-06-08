@@ -5,7 +5,7 @@
         "type": "library",
         "title": "UI5 Antares",
         "applicationVersion": {
-            "version": "1.124.0001"
+            "version": "1.124.999001"
         }
     },
     "sap.ui5": {
