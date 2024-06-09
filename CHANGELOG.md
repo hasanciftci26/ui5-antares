@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.120.13001] - 2024-06-09
+
+### Added
+
+- Initial productive release.
+
 ## [1.120.12001] - 2024-06-09
 
 ### Added
@@ -180,6 +186,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.120.13001]: https://github.com/hasanciftci26/ui5-antares/tree/1.120.13001
 [1.120.12001]: https://github.com/hasanciftci26/ui5-antares/tree/1.120.12001
 [1.120.11001]: https://github.com/hasanciftci26/ui5-antares/tree/1.120.11001
 [1.96.33001]: https://github.com/hasanciftci26/ui5-antares/tree/1.96.33001

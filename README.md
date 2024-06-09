@@ -249,6 +249,7 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 | 1.124.999001        | 1.124.0        | Available |
 | 1.123.1002          | 1.123.1        | Available |
 | 1.123.1001          | 1.123.1        | Available |
+| 1.120.13001         | 1.120.13       | Available |
 | 1.120.12001         | 1.120.12       | Available |
 | 1.120.11001         | 1.120.11       | Available |
 | 1.120.1002          | 1.120.1        | Available |
