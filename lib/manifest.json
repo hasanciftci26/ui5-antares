@@ -5,12 +5,12 @@
         "type": "library",
         "title": "UI5 Antares",
         "applicationVersion": {
-            "version": "1.96.25002"
+            "version": "1.96.30001"
         }
     },
     "sap.ui5": {
         "dependencies": {
-            "minUI5Version": "1.96.25",
+            "minUI5Version": "1.96.30",
             "libs": {
                 "sap.m": {},
                 "sap.ui.core": {},
