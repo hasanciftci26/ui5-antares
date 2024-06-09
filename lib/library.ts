@@ -34,7 +34,7 @@ const library = Lib.init({
         "ui5.antares.util.Util"
     ],
     noLibraryCSS: true,
-    version: "1.120.13001"
+    version: "1.120.14001"
 });
 
 export default library
