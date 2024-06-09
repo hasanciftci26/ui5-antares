@@ -78,6 +78,7 @@ ui5 -v
   - [Table of Contents](#table-of-contents)
   - [Versioning](#versioning)
     - [Supported SAPUI5 Versions](#supported-sapui5-versions)
+    - [NPM Package Tags](#npm-package-tags)
   - [Installation](#installation)
     - [TypeScript](#typescript)
     - [Approuter](#approuter)
@@ -226,6 +227,8 @@ UI5 Antares and SAPUI5 versions are directly related. The SAPUI5 version used ca
 
 > You should install the version that corresponds to the version of your SAPUI5/Fiori Elements application.
 
+> **IMPORTANT:** When the **patch** part of the SAPUI5 version is **0**, the UI5 Antares patch part begins with **999** because the NPM does not permit leading zeros in the version parts. For instance, if the SAPUI5 version is **1.124.0**, the UI5 Antares version will be **1.124.999001**. The last three digits will increase with each bug fix or new feature.
+
 You can see examples of versioning below.
 
 > **Note:** The versions shown in the example below may not exist.
@@ -235,7 +238,7 @@ You can see examples of versioning below.
 | 1.123.1002          | 1.123.1        | Latest Version for 1.123.1                |
 | 1.123.1001          | 1.123.1        | One before the latest version for 1.123.1 |
 | 1.96.32001          | 1.96.32        | Latest Version for 1.96.32                |
-| 1.84.001            | 1.84           | Latest Version for 1.84                   |
+| 1.84.999001         | 1.84.0         | Latest Version for 1.84.0                 |
 
 ### Supported SAPUI5 Versions
 
@@ -243,10 +246,12 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 
 | UI5 Antares Version | SAPUI5 Version | Status    |
 | :------------------ | :------------- | :-------- |
+| 1.124.999001        | 1.124.0        | Available |
 | 1.123.1002          | 1.123.1        | Available |
 | 1.123.1001          | 1.123.1        | Available |
 | 1.120.1002          | 1.120.1        | Available |
 | 1.120.1001          | 1.120.1        | Available |
+| 1.108.31001         | 1.108.31       | Available |
 | 1.108.30001         | 1.108.30       | Available |
 | 1.108.23001         | 1.108.23       | Available |
 | 1.96.25002          | 1.96.25        | Available |
@@ -254,6 +259,24 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 | 1.120.*             | 1.120.*        | Planned   |
 | 1.108.*             | 1.108.*        | Planned   |
 | 1.96.*              | > 1.96.25      | Planned   |
+
+### NPM Package Tags
+
+If the versioning is confusing, you can use a special tag when installing the package. The most recent version of UI5 Antares that corresponds to a specific SAPUI5 version will always include a tag as follows.
+
+**Tag Naming Convention:** `ui5-${1}-${2}-${3}-latest`
+
+- **\$\{1\}** = Major part of the SAPUI5 version
+- **\$\{2\}** = Minor part of the SAPUI5 version
+- **\$\{3\}** = Patch part of the SAPUI5 version
+
+As an example, if your SAPUI5 application is version **1.124.0**, you can utilize the following command.
+
+```sh
+npm install --save-exact ui5-antares@ui5-1-124-0-latest
+```
+
+> **Hint:** The `--save-exact` argument prevents the addition of a caret or tilda in front of the version in the package.json file.
 
 ## Installation
 
