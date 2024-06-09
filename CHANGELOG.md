@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.96.33001] - 2024-06-09
+
+### Added
+
+- Initial productive release.
+
+### Changed
+
+- The sap.ui.model.odata.v2.Context class does not have the **delete()** method in the 1.96.33 SAPUI5 version. It is replaced with the **remove()** method of the sap.ui.model.odata.v2.ODataModel class. The **EntryDeleteCL** class still works the same. It is only a technical change.
+
+### Removed
+
+- sap.m.ColorPalettePopover is not supported by the FragmentCL class in this version.
+
 ## [1.96.32001] - 2024-06-09
 
 ### Added
@@ -154,6 +168,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.96.33001]: https://github.com/hasanciftci26/ui5-antares/tree/1.96.33001
 [1.96.32001]: https://github.com/hasanciftci26/ui5-antares/tree/1.96.32001
 [1.96.31001]: https://github.com/hasanciftci26/ui5-antares/tree/1.96.31001
 [1.96.30001]: https://github.com/hasanciftci26/ui5-antares/tree/1.96.30001
