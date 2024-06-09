@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.108.32001] - 2024-06-09
+
+### Added
+
+- Initial productive release.
+
+### Removed
+
+- sap.m.ColorPalettePopover is not supported by the FragmentCL class in this version.
+
 ## [1.108.31001] - 2024-06-09
 
 ### Added
@@ -102,6 +112,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.108.32001]: https://github.com/hasanciftci26/ui5-antares/tree/1.108.32001
 [1.108.31001]: https://github.com/hasanciftci26/ui5-antares/tree/1.108.31001
 [1.124.999001]: https://github.com/hasanciftci26/ui5-antares/tree/1.124.999001
 [1.108.30001]: https://github.com/hasanciftci26/ui5-antares/tree/1.108.30001
