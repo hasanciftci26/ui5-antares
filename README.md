@@ -246,16 +246,27 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 
 | UI5 Antares Version | SAPUI5 Version | Status    |
 | :------------------ | :------------- | :-------- |
+| 1.124.1001          | 1.124.1        | Available |
 | 1.124.999001        | 1.124.0        | Available |
+| 1.123.2001          | 1.123.2        | Available |
 | 1.123.1002          | 1.123.1        | Available |
 | 1.123.1001          | 1.123.1        | Available |
+| 1.120.15001         | 1.120.15       | Available |
+| 1.120.14001         | 1.120.14       | Available |
+| 1.120.13001         | 1.120.13       | Available |
+| 1.120.12001         | 1.120.12       | Available |
+| 1.120.11001         | 1.120.11       | Available |
 | 1.120.1002          | 1.120.1        | Available |
 | 1.120.1001          | 1.120.1        | Available |
-| 1.108.31001         | 1.108.31       | Available |
-| 1.108.30001         | 1.108.30       | Available |
-| 1.108.23001         | 1.108.23       | Available |
-| 1.96.25002          | 1.96.25        | Available |
-| 1.96.25001          | 1.96.25        | Available |
+| 1.108.32001         | 1.108.32       | Available |
+| 1.108.31002         | 1.108.31       | Available |
+| 1.108.30002         | 1.108.30       | Available |
+| 1.108.23002         | 1.108.23       | Available |
+| 1.96.33002          | 1.96.33        | Available |
+| 1.96.32002          | 1.96.32        | Available |
+| 1.96.31002          | 1.96.31        | Available |
+| 1.96.30002          | 1.96.30        | Available |
+| 1.96.25003          | 1.96.25        | Available |
 | 1.120.*             | 1.120.*        | Planned   |
 | 1.108.*             | 1.108.*        | Planned   |
 | 1.96.*              | > 1.96.25      | Planned   |
@@ -3065,6 +3076,13 @@ You must initialize an object from **ValueHelpCL** in order to use it.
       <td>No</td>
       <td>UI5AntaresVHFilterModel</td>
       <td>The JSONModel name of the filterbar which is needed by the ValueHelpCL</td>
+    </tr>
+    <tr>
+      <td>&emsp;filterCaseSensitive?</td>
+      <td>boolean</td>
+      <td>No</td>
+      <td>false</td>
+      <td>Set to <strong>true</strong> for case sensitive search in the filterbar</td>
     </tr>
     <tr>
       <td>modelName?</td>

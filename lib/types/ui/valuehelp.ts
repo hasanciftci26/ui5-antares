@@ -12,6 +12,7 @@ export interface IValueHelpSettings {
     resourceBundlePrefix?: string;
     useMetadataLabels?: boolean;
     filterModelName?: string;
+    filterCaseSensitive?: boolean;
 }
 
 export interface IValueHelpDialogOKEvent {
