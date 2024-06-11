@@ -52,6 +52,7 @@ export default class ValueHelpCL extends ModelCL {
     ];
     private filterModelName: string;
     private filterModel: JSONModel;
+    private caseSensitive: boolean;
 
     constructor(controller: Controller | UIComponent, settings: IValueHelpSettings, modelName?: string) {
         super(controller, modelName);
@@ -67,6 +68,7 @@ export default class ValueHelpCL extends ModelCL {
         this.resourceBundlePrefix = settings.resourceBundlePrefix || "antaresVH";
         this.useMetadataLabels = settings.useMetadataLabels === undefined ? false : settings.useMetadataLabels;
         this.filterModelName = settings.filterModelName || "UI5AntaresVHFilterModel";
+        this.caseSensitive = settings.filterCaseSensitive ?? false;
     }
 
     public openValueHelpDialog(event: Input$ValueHelpRequestEvent) {
@@ -426,7 +428,7 @@ export default class ValueHelpCL extends ModelCL {
                 filters.push(new Filter({
                     path: property,
                     operator: FilterOperator.Contains,
-                    caseSensitive: false,
+                    caseSensitive: this.caseSensitive,
                     value1: filterValue
                 }));
             } else {
@@ -499,7 +501,7 @@ export default class ValueHelpCL extends ModelCL {
                 path: this.valueHelpProperty,
                 operator: FilterOperator.Contains,
                 value1: searchFieldValue,
-                caseSensitive: false
+                caseSensitive: this.caseSensitive
             }));
         }
 
@@ -515,7 +517,7 @@ export default class ValueHelpCL extends ModelCL {
                     path: property,
                     operator: FilterOperator.Contains,
                     value1: searchFieldValue,
-                    caseSensitive: false
+                    caseSensitive: this.caseSensitive
                 }));
             }
 
