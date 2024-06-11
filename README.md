@@ -246,17 +246,16 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 
 | UI5 Antares Version | SAPUI5 Version | Status    |
 | :------------------ | :------------- | :-------- |
-| 1.124.1001          | 1.124.1        | Available |
-| 1.124.999001        | 1.124.0        | Available |
-| 1.123.2001          | 1.123.2        | Available |
-| 1.123.1002          | 1.123.1        | Available |
-| 1.123.1001          | 1.123.1        | Available |
-| 1.120.15001         | 1.120.15       | Available |
-| 1.120.14001         | 1.120.14       | Available |
-| 1.120.13001         | 1.120.13       | Available |
-| 1.120.12001         | 1.120.12       | Available |
-| 1.120.11001         | 1.120.11       | Available |
-| 1.120.1003          | 1.120.1        | Available |
+| 1.124.1002          | 1.124.1        | Available |
+| 1.124.999002        | 1.124.0        | Available |
+| 1.123.2002          | 1.123.2        | Available |
+| 1.123.1003          | 1.123.1        | Available |
+| 1.120.15002         | 1.120.15       | Available |
+| 1.120.14002         | 1.120.14       | Available |
+| 1.120.13002         | 1.120.13       | Available |
+| 1.120.12002         | 1.120.12       | Available |
+| 1.120.11002         | 1.120.11       | Available |
+| 1.120.1004          | 1.120.1        | Available |
 | 1.108.32002         | 1.108.32       | Available |
 | 1.108.31002         | 1.108.31       | Available |
 | 1.108.30002         | 1.108.30       | Available |
@@ -11658,6 +11657,8 @@ To open a dialog or a popover from a fragment file, there are two distinct metho
 
 Please note that both methods only support the following dialog and popover classes:
 
+> **Hint:** Both methods include an optional parameter named `viewDependent: boolean`. If you wish to add the dialog or popover as a dependent to your view, please set this parameter to **true**.
+
 1) [sap.m.Dialog](https://sapui5.hana.ondemand.com/#/api/sap.m.Dialog)
 2) [sap.m.Popover](https://sapui5.hana.ondemand.com/#/api/sap.m.Popover)
 3) [sap.m.MessagePopover](https://sapui5.hana.ondemand.com/#/api/sap.m.MessagePopover)
@@ -12068,9 +12069,9 @@ sap.ui.define([
 
 ### Close Dialog or Popover
 
-To close the dialog or the popover opened by one of the following approaches, please use the **close()** method.
+To close the dialog or the popover opened by one of the following approaches, please use the **close()** or **closeAndDestroy()** method.
 
-> **Important:** Please be advised that it is your responsibility to destroy the content after using the **close()** method. This can be achieved by using the [destroyFragmentContent()](#destroy-fragment-content) method.
+> **Important:** Please be advised that it is your responsibility to destroy the content after using the **close()** method. This can be achieved by using the [destroyFragmentContent()](#destroy-fragment-content) method. If you use the **closeAndDestroy()** method, the content will be destroyed automatically.
 
 1) [load()](#load-content) and [open()](#open-sync)
 2) [openAsync()](#open-async)
