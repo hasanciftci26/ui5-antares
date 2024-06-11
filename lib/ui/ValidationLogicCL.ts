@@ -98,11 +98,11 @@ export default class ValidationLogicCL extends BaseObject {
     }
 
     private valueControl(value: ValidatorValue) {
-        if ((this.operator === ValidationOperator.BT || this.operator === ValidationOperator.NB) && (!this.value1 || !this.value2)) {
+        if ((this.operator === ValidationOperator.BT || this.operator === ValidationOperator.NB) && (this.value1 == null || this.value2 == null)) {
             throw new Error("value1 and value2 must be set with ValidationOperator.BT and ValidationOperator.NB");
         }
 
-        if (!this.value1) {
+        if (this.value1 == null) {
             throw new Error("value1 must be set.");
         }
 
