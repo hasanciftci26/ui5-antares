@@ -19,6 +19,7 @@ export default class FragmentCL extends BaseObject {
     private sourceView?: View;
     private openByControl?: Control;
     private fragment?: Control | Control[];
+    private autoDestroyOnESC: boolean = false;
 
     constructor(controller: Controller | UIComponent, fragmentPath: string, openByControl?: Control) {
         super();
@@ -152,7 +153,20 @@ export default class FragmentCL extends BaseObject {
             controller: this.sourceController
         }) as Promise<Control | Control[]>);
 
+        if (fragment instanceof Dialog && this.autoDestroyOnESC) {
+            fragment.setEscapeHandler(this.onESCTriggered.bind(this));
+        }
+
         this.fragment = fragment;
         return fragment;
+    }
+
+    public setAutoDestroyOnESC(destroy: boolean) {
+        this.autoDestroyOnESC = destroy;
+    }
+
+    private onESCTriggered(event: { resolve: Function; reject: Function; }) {
+        event.resolve();
+        this.destroyFragmentContent();
     }
 }

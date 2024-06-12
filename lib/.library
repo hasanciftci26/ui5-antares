@@ -2,7 +2,7 @@
 <library xmlns="http://www.sap.com/sap.ui.library.xsd">
   <name>ui5.antares</name>
   <vendor>Hasan Çiftçi</vendor>
-  <version>1.120.1004</version>
+  <version>1.120.1005</version>
   <documentation>UI5 Antares is a set of some useful classes and methods to speed up the development time for OData operations in SAPUI5 applications.</documentation>
   <dependencies>
     <dependency>

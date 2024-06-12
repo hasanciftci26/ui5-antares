@@ -12207,6 +12207,8 @@ To retrieve the content loaded from a fragment file using the [load()](#load-con
 
 To destroy the content loaded from a fragment using the [load()](#load-content) or [openAsync()](#open-async) methods, the **destroyFragmentContent()** method can be utilized.
 
+> **Hint:** If you wish to destroy the content of the dialog when the user presses ESC button, please use **setAutoDestroyOnESC(destroy: boolean)** method and set the parameter of the method to **true**. Otherwise, you are responsible from destroying the content when the user presses ESC button. If the content is not destroyed in each ESC event, the dialog cannot be loaded again.
+
 **Sample**
 
 Let us assume that we have created a file with the extension **.fragment.xml** and the following content. We would now like to open the **dialog** in the controller. When the user presses the **Close** button, we will close the dialog and destroy it.

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.120.1005] - 2024-06-12
+
+### Added
+
+- **setAutoDestroyOnESC()** method has been added to the **FragmentCL** class. If this method is executed with **true** parameter, the dialog content will be destroyed automatically by the class.
+
 ## [1.120.1004] - 2024-06-11
 
 ### Added
@@ -407,6 +413,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.120.1005]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1004...1.120.1005?diff=split
 [1.120.1004]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1003...1.120.1004?diff=split
 [1.124.1002]: https://github.com/hasanciftci26/ui5-antares/compare/1.124.1001...1.124.1002?diff=split
 [1.124.999002]: https://github.com/hasanciftci26/ui5-antares/compare/1.124.999001...1.124.999002?diff=split
