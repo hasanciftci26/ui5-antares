@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.120.1006] - 2024-06-14
+
+### Added
+
+- It is now possible to disable auto close after the submit is done in EntryCreateCL and EntryUpdateCL classes. To close and destroy the dialog manually, the **closeAndDestroyEntryDialog()** method can be utilized.
+
+### Fixed
+
+- The issue with label generation from the metadata for custom controls in the SMART form has been resolved. 
+
 ## [1.120.1005] - 2024-06-12
 
 ### Added
@@ -413,6 +423,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.120.1006]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1005...1.120.1006?diff=split
 [1.120.1005]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1004...1.120.1005?diff=split
 [1.120.1004]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1003...1.120.1004?diff=split
 [1.124.1002]: https://github.com/hasanciftci26/ui5-antares/compare/1.124.1001...1.124.1002?diff=split

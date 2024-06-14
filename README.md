@@ -91,6 +91,7 @@ ui5 -v
       - [Method Parameters](#method-parameters)
       - [Default Values](#default-values)
     - [Manual Submit](#manual-submit)
+    - [Disable Auto Dialog Close](#disable-auto-dialog-close)
     - [Label Generation](#label-generation)
       - [Resource Model](#resource-model-i18n)
       - [Label Generation From The Technical Names](#label-generation-from-the-technical-names)
@@ -925,6 +926,133 @@ sap.ui.define([
       
           // do not forget to complete the submit process
           entry.submitManually();    
+        }
+
+      });
+
+    });
+```
+
+### Disable Auto Dialog Close
+
+By default, the generated dialog is closed and destroyed after the submission is completed in the Entry Create and Entry Update classes. However, this auto-close feature can be disabled if you still need to access the dialog content after the submission. This feature is particularly useful when there are custom contents that will be managed after the submission is completed.
+
+> **IMPORTANT:** To close and destroy the dialog afterwards, the **closeAndDestroyEntryDialog()** method can be utilized through the object instantiated from the [Entry Create](#entry-create) or [Entry Update](#entry-update) class.
+
+To disable the auto close feature, the **setDisableAutoClose()** method can be utilized.
+
+**Setter (setDisableAutoClose)**
+
+| Parameter | Type    | Mandatory | Description                                                   | 
+| :-------- | :------ | :-------- | :------------------------------------------------------------ |
+| disable   | boolean | Yes       | If it is set to **true**, auto close feature will be disabled |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getDisableAutoClose)**
+
+| Returns | Description                                                                                       |
+| :------ | :------------------------------------------------------------------------------------------------ |
+| boolean | Returns the value that was set using **setDisableAutoClose()** method. Default value is **false** |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import ResponseCL from "ui5/antares/entry/v2/ResponseCL"; // Import the response class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  private productEntry: EntryCreateCL<IProducts>;
+
+  public onInit() {
+
+  }
+
+  public onCreateProduct() {
+    // initialize and set to the class property
+    this.productEntry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // disable auto close
+    this.productEntry.setDisableAutoClose(true);
+
+    // attach submit completed
+    this.productEntry.attachSubmitCompleted(this.onCreateCompleted, this);
+
+    // call the dialog
+    this.productEntry.createNewEntry();
+  }
+
+  private onCreateCompleted(response: ResponseCL<IProducts>) {
+    // do your logic here 
+
+    // do not forget to close and destroy
+    this.productEntry.closeAndDestroyEntryDialog();
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // initialize and set to the class property
+          this.productEntry = new EntryCreateCL<IProducts>(this, "Products");
+
+          // disable auto close
+          this.productEntry.setDisableAutoClose(true);
+
+          // attach submit completed
+          this.productEntry.attachSubmitCompleted(this._onCreateCompleted, this);
+
+          // call the dialog
+          this.productEntry.createNewEntry();
+        },
+
+        _onCreateCompleted: function (response) {
+          // do your logic here 
+
+          // do not forget to close and destroy
+          this.productEntry.closeAndDestroyEntryDialog();
         }
 
       });
@@ -6155,6 +6283,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td></td>
     </tr>
     <tr>
+      <td><a href="#disable-auto-dialog-close">Disable Auto Dialog Close</a></td>
+      <td align="center">&#x2714;</td>
+      <td>false</td>
+      <td></td>
+    </tr>
+    <tr>
       <td><a href="#label-generation">Label Generation</a></td>
       <td align="center">&#x2714;</td>
       <td></td>
@@ -7592,7 +7726,13 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td align="center">&#x2717;</td>
       <td></td>
       <td></td>
-    </tr>  
+    </tr>
+    <tr>
+      <td><a href="#disable-auto-dialog-close">Disable Auto Dialog Close</a></td>
+      <td align="center">&#x2717;</td>
+      <td>false</td>
+      <td></td>
+    </tr>    
     <tr>
       <td><a href="#label-generation">Label Generation</a></td>
       <td align="center">&#x2714;</td>
@@ -8515,6 +8655,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td></td>
       <td></td>
     </tr>  
+    <tr>
+      <td><a href="#disable-auto-dialog-close">Disable Auto Dialog Close</a></td>
+      <td align="center">&#x2717;</td>
+      <td>false</td>
+      <td></td>
+    </tr>    
     <tr>
       <td><a href="#label-generation">Label Generation</a></td>
       <td align="center">&#x2714;</td>

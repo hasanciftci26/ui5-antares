@@ -535,7 +535,9 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             elements: [control.getControl()]
         });
 
-        if (!this.entry.getUseMetadataLabels()) {
+        if (this.entry.getUseMetadataLabels()) {
+            groupElement.setLabel(property.annotationLabel || this.getEntityTypePropLabel(property.propertyName));
+        } else {
             groupElement.setLabel(this.getEntityTypePropLabel(property.propertyName));
         }
 

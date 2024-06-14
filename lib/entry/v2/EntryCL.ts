@@ -94,6 +94,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     private fromTarget: string;
     private createdTarget: Target;
     private customContentSectionTitle: string = "Custom Contents";
+    private disableAutoClose: boolean = false;
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
@@ -429,6 +430,14 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         return this.entryMethod;
     }
 
+    public setDisableAutoClose(disable: boolean) {
+        this.disableAutoClose = disable;
+    }
+
+    public getDisableAutoClose(): boolean {
+        return this.disableAutoClose;
+    }
+
     public async addControlFromFragment(fragment: FragmentCL) {
         await fragment.load();
         const content = fragment.getFragmentContent();
@@ -558,6 +567,11 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         } else {
             this.entryDialog.destroyFragmentContent();
         }
+    }
+
+    public closeAndDestroyEntryDialog() {
+        this.closeEntryDialog();
+        this.destroyEntryDialog();
     }
 
     public valueValidation(): IValueValidation {
@@ -733,7 +747,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
 
         this.setOldBindingMode();
 
-        if (!this.displayObjectPage) {
+        if (!this.displayObjectPage && !this.disableAutoClose) {
             this.closeEntryDialog();
             this.destroyEntryDialog();
         }
