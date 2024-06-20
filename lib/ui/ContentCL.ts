@@ -320,6 +320,18 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             smartField.setEditable(false);
         }
 
+        const customData = this.entry.getFieldCustomData().find(data => data.propertyName === property.propertyName);
+
+        if (customData) {
+            smartField.addCustomData(customData.customData);
+        }
+
+        const editMode = this.entry.getTextInEditModeSource().find(mode => mode.propertyName === property.propertyName);
+
+        if (editMode) {
+            smartField.setTextInEditModeSource(editMode.textInEditModeSource);
+        }
+
         const groupElement = new GroupElement({
             elements: [smartField]
         });
@@ -374,6 +386,12 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             checkbox.setEditable(false);
         }
 
+        const customData = this.entry.getFieldCustomData().find(data => data.propertyName === property.propertyName);
+
+        if (customData) {
+            checkbox.addCustomData(customData.customData);
+        }
+
         this.simpleFormElements.push(checkbox);
     }
 
@@ -406,6 +424,12 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
             datePicker.setEditable(false);
         }
 
+        const customData = this.entry.getFieldCustomData().find(data => data.propertyName === property.propertyName);
+
+        if (customData) {
+            datePicker.addCustomData(customData.customData);
+        }
+
         this.simpleFormElements.push(datePicker);
     }
 
@@ -432,6 +456,12 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
 
         if (this.entry.getReadonlyProperties().includes(property.propertyName)) {
             dateTimePicker.setEditable(false);
+        }
+
+        const customData = this.entry.getFieldCustomData().find(data => data.propertyName === property.propertyName);
+
+        if (customData) {
+            dateTimePicker.addCustomData(customData.customData);
         }
 
         this.simpleFormElements.push(dateTimePicker);
@@ -525,6 +555,12 @@ export default class ContentCL<EntryT extends EntryCL<EntityT>, EntityT extends 
         if (valueHelp) {
             input.setShowValueHelp(true);
             input.attachValueHelpRequest({}, valueHelp.openValueHelpDialog, valueHelp);
+        }
+
+        const customData = this.entry.getFieldCustomData().find(data => data.propertyName === property.propertyName);
+
+        if (customData) {
+            input.addCustomData(customData.customData);
         }
 
         this.simpleFormElements.push(input);

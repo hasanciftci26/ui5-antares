@@ -28,7 +28,7 @@ import AnalyticalTable from "sap/ui/table/AnalyticalTable";
 import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
 import SmartValidatorCL from "ui5/antares/entry/v2/SmartValidatorCL";
 import SimpleValidatorCL from "ui5/antares/entry/v2/SimpleValidatorCL";
-import { IFormGroups } from "ui5/antares/types/entry/common";
+import { IFieldCustomData, IFormGroups, ITextInEditModeSource } from "ui5/antares/types/entry/common";
 import Group from "sap/ui/comp/smartform/Group";
 import ObjectPageLayoutCL from "ui5/antares/ui/ObjectPageLayoutCL";
 import Target from "sap/ui/core/routing/Target";
@@ -95,6 +95,8 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     private createdTarget: Target;
     private customContentSectionTitle: string = "Custom Contents";
     private disableAutoClose: boolean = false;
+    private fieldCustomData: IFieldCustomData[] = [];
+    private textInEditModeSource: ITextInEditModeSource[] = [];
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
@@ -436,6 +438,22 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
 
     public getDisableAutoClose(): boolean {
         return this.disableAutoClose;
+    }
+
+    public setFieldCustomData(customData: IFieldCustomData[]) {
+        this.fieldCustomData = customData;
+    }
+
+    public getFieldCustomData(): IFieldCustomData[] {
+        return this.fieldCustomData;
+    }
+
+    public setTextInEditModeSource(textInEditModeSource: ITextInEditModeSource[]) {
+        this.textInEditModeSource = textInEditModeSource;
+    }
+
+    public getTextInEditModeSource(): ITextInEditModeSource[] {
+        return this.textInEditModeSource;
     }
 
     public async addControlFromFragment(fragment: FragmentCL) {

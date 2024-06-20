@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.120.1007] - 2024-06-20
+
+### Added
+
+- It is now possible to set custom data for the auto-generated form elements using the **setFieldCustomData()** method of the Entry classes.
+- It is now possible to set the `setTextInEditModeSource` property of the smartfield using the **setTextInEditModeSource()** method of the Entry classes.
+
 ## [1.120.1006] - 2024-06-14
 
 ### Added
@@ -423,6 +430,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.120.1007]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1006...1.120.1007?diff=split
 [1.120.1006]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1005...1.120.1006?diff=split
 [1.120.1005]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1004...1.120.1005?diff=split
 [1.120.1004]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1003...1.120.1004?diff=split

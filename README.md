@@ -104,6 +104,10 @@ ui5 -v
     - [Form Title](#form-title)
     - [Form Grouping](#form-grouping)
       - [IFormGroups Type Definition](#iformgroups-type-definition)
+    - [Custom Data](#custom-data)
+      - [IFieldCustomData Type Definition](#ifieldcustomdata-type-definition)
+    - [Text In Edit Mode Source](#text-in-edit-mode-source)
+      - [ITextInEditModeSource Type Definition](#itextineditmodesource-type-definition)
     - [Begin Button Text](#begin-button-text)
     - [Begin Button Type](#begin-button-type)
     - [End Button Text](#end-button-text)
@@ -1865,6 +1869,248 @@ sap.ui.define([
 | IFormGroups       | `object`   |                                                     |
 | &emsp; title      | `string`   | The title of the form group or object page section  |
 | &emsp; properties | `string[]` | The properties that will be included into the group |
+
+### Custom Data
+
+[10001]: https://sapui5.hana.ondemand.com/sdk/#/api/sap.ui.core.CustomData
+
+UI5 Antares enables users to add [Custom Data](https://sapui5.hana.ondemand.com/sdk/#/api/sap.ui.core.CustomData) to the auto-generated SIMPLE/SMART form elements. To add custom data, the **setFieldCustomData()** method can be utilized.
+
+**Setter (setFieldCustomData)**
+
+| Parameter  | Type                                                      | Mandatory | Description                                                            | 
+| :--------- | :-------------------------------------------------------- | :-------- | :--------------------------------------------------------------------- |
+| customData | [IFieldCustomData\[\]](#ifieldcustomdata-type-definition) | Yes       | The custom data that will be added to the auto-generated form elements |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getFieldCustomData)**
+
+| Returns                                                    | Description                                                                                   |
+| :--------------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
+| [IFieldCustomData\[\]](#ifieldcustomdata-type-definition)  | Returns the value that was set using **setFieldCustomData()** method. Default value is **[]** |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import CustomData from "sap/ui/core/CustomData"; // Import the custom data
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public onCreateProduct() {
+    // initialize
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // set the custom data
+    entry.setFieldCustomData([{
+      propertyName: "name",
+      customData: new CustomData({key: "MyKey1", value:"MyValue1"})
+    },{
+      propertyName: "description",
+      customData: new CustomData({key: "MyKey2", value:"MyValue2"})
+    }]);
+
+    // call the dialog
+    entry.createNewEntry();
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "sap/ui/core/CustomData" // Import the custom data
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, CustomData) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // initialize
+          const entry = new EntryCreateCL(this, "Products");
+
+          // set the custom data
+          entry.setFieldCustomData([{
+            propertyName: "name",
+            customData: new CustomData({key: "MyKey1", value:"MyValue1"})
+          },{
+            propertyName: "description",
+            customData: new CustomData({key: "MyKey2", value:"MyValue2"})
+          }]);
+
+          // call the dialog
+          entry.createNewEntry(); 
+        }
+
+      });
+
+    });
+```
+
+#### IFieldCustomData Type Definition
+
+| Property            | Type                 | Description                                             |
+| :------------------ | :------------------- | :------------------------------------------------------ |
+| IFieldCustomData    | `object`             |                                                         |
+| &emsp; propertyName | `string`             | The name of the property that will have the custom data |
+| &emsp; customData   | [Custom Data][10001] | The custom data                                         |
+
+### Text In Edit Mode Source
+
+[10002]: https://sapui5.hana.ondemand.com/#/api/sap.ui.comp.smartfield.TextInEditModeSource
+
+UI5 Antares enables users to set the `textInEditModeSource` property of the SmartField when the smartform is generated. To set the `textInEditModeSource` property, the **setTextInEditModeSource()** method can be utilized.
+
+**Setter (setTextInEditModeSource)**
+
+| Parameter            | Type                                                                | Mandatory | Description                                           | 
+| :------------------- | :------------------------------------------------------------------ | :-------- | :---------------------------------------------------- |
+| textInEditModeSource | [ITextInEditModeSource\[\]](#itextineditmodesource-type-definition) | Yes       | The `textInEditModeSource` configs for the properties |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getTextInEditModeSource)**
+
+| Returns                                                             | Description                                                                                        |
+| :------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------- |
+| [ITextInEditModeSource\[\]](#itextineditmodesource-type-definition) | Returns the value that was set using **setTextInEditModeSource()** method. Default value is **[]** |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import { smartfield } from "sap/ui/comp/library"; // Import the smartfield library
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public onCreateProduct() {
+    // initialize
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // set the textInEditModeSource
+    entry.setTextInEditModeSource([{
+      propertyName: "name",
+      textInEditModeSource: smartfield.TextInEditModeSource.NavigationProperty
+    },{
+      propertyName: "description",
+      customData: smartfield.TextInEditModeSource.ValueList
+    }]);
+
+    // call the dialog
+    entry.createNewEntry();
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "sap/ui/comp/library" // Import the comp library
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, UIComp) {
+      "use strict";
+
+      const { TextInEditModeSource } = UIComp["smartfield"]; // Destructure to get the enum
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // initialize
+          const entry = new EntryCreateCL(this, "Products");
+
+          // set the textInEditModeSource
+          entry.setTextInEditModeSource([{
+            propertyName: "name",
+            textInEditModeSource: TextInEditModeSource.NavigationProperty
+          },{
+            propertyName: "description",
+            customData: TextInEditModeSource.ValueList
+          }]);
+
+          // call the dialog
+          entry.createNewEntry(); 
+        }
+
+      });
+
+    });
+```
+
+#### ITextInEditModeSource Type Definition
+
+| Property                    | Type                          | Description                                                                |
+| :-------------------------- | :---------------------------- | :------------------------------------------------------------------------- |
+| ITextInEditModeSource       | `object`                      |                                                                            |
+| &emsp; propertyName         | `string`                      | The name of the property whose `textInEditModeSource` property will be set |
+| &emsp; textInEditModeSource | [TextInEditModeSource][10002] | The `textInEditModeSource` property of the smartfield                      |
 
 ### Begin Button Text
 
@@ -6325,6 +6571,18 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td></td>
     </tr>
     <tr>
+      <td><a href="#custom-data">Custom Data</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#text-in-edit-mode-source">Text In Edit Mode Source</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>
+    <tr>
       <td><a href="#begin-button-text">Begin Button Text</a></td>
       <td align="center">&#x2714;</td>
       <td>Update</td>
@@ -7768,7 +8026,19 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td align="center">&#x2714;</td>
       <td>[]</td>
       <td></td>
-    </tr>    
+    </tr>
+    <tr>
+      <td><a href="#custom-data">Custom Data</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#text-in-edit-mode-source">Text In Edit Mode Source</a></td>
+      <td align="center">&#x2717;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>       
     <tr>
       <td><a href="#begin-button-text">Begin Button Text</a></td>
       <td align="center">&#x2714;</td>
@@ -8696,7 +8966,19 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td align="center">&#x2714;</td>
       <td>[]</td>
       <td></td>
-    </tr>    
+    </tr> 
+    <tr>
+      <td><a href="#custom-data">Custom Data</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#text-in-edit-mode-source">Text In Edit Mode Source</a></td>
+      <td align="center">&#x2717;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>       
     <tr>
       <td><a href="#begin-button-text">Begin Button Text</a></td>
       <td align="center">&#x2717;</td>
