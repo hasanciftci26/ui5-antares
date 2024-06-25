@@ -126,6 +126,7 @@ ui5 -v
       - [Constructor](#constructor-1)
       - [Label Generation](#label-generation-1)
       - [Standalone Usage](#standalone-usage)
+        - [Attach After Select](#attach-after-select)
     - [Validation Logic](#validation-logic)
       - [Constructor](#constructor-2)
       - [Validation with Operator](#validation-with-operator)
@@ -260,7 +261,7 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 | 1.120.13002         | 1.120.13       | Available |
 | 1.120.12002         | 1.120.12       | Available |
 | 1.120.11002         | 1.120.11       | Available |
-| 1.120.1004          | 1.120.1        | Available |
+| 1.120.1009          | 1.120.1        | Available |
 | 1.108.32002         | 1.108.32       | Available |
 | 1.108.31002         | 1.108.31       | Available |
 | 1.108.30002         | 1.108.30       | Available |
@@ -3716,6 +3717,123 @@ sap.ui.define([
 
           // Pass the event to the public openValueHelpDialog method.
           supplierVH.openValueHelpDialog(event);
+        }
+      });
+
+    });
+```
+
+#### Attach After Select
+
+When the ValueHelpCL class is utilized as a standalone component, it is possible to attach a function that will be executed after the user selects a row in the ValueHelpDialog table. 
+
+If the ValueHelpCL class is able to retrieve the object from the selected row, it will be passed as a parameter to the attached function. Otherwise, only the value of the `valueHelpProperty` will be passed as a parameter.
+
+To attach a function, the **attachAfterSelect()** method can be utilized.
+
+**Setter (attachAfterSelect)**
+
+| Parameter   | Type                             | Mandatory | Description                                                                   | 
+| :---------- | :------------------------------- | :-------- | :---------------------------------------------------------------------------- |
+| afterSelect | (data: string \| object) => void | Yes       | The function that will be executed after the selection                        |
+| listener    | object                           | No        | The default listener is the **controller** from [constructor](#constructor-1) |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ValueHelpCL from "ui5/antares/ui/ValueHelpCL"; // Import the Value Help class
+import { Input$ValueHelpRequestEvent } from "sap/m/Input"; // Import the Value Help Request event type
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  // The parameter type should be Input$ValueHelpRequestEvent
+  public async onValueHelpRequest(event: Input$ValueHelpRequestEvent) {
+
+    // Create an object from the ValueHelpCL class
+    const supplierVH = new ValueHelpCL(this, {
+        propertyName: "STANDALONE", // Since this is a mandatory param and not relevant for the standalone usage, you can set anything
+        valueHelpEntity: "Suppliers", // This is the entity set that brings data
+        valueHelpProperty: "ID", // This is the property of the entity set whose value will be set to the input
+        readonlyProperties: [ // These properties will be the columns of the table on the Value Help Dialog
+          "companyName",
+          "contactName",
+          "contactTitle",
+          "country",
+          "city",
+          "paymentTerms"  
+        ],
+        excludedFilterProperties: ["contactName"] // These properties will be excluded from the filterbar
+    });
+
+    // attach the function
+    supplierVH.attachAfterSelect(this.afterVHSelect, this);
+
+    // Pass the Input$ValueHelpRequestEvent to the public openValueHelpDialog method.
+    supplierVH.openValueHelpDialog(event);
+  }
+
+  private afterVHSelect(data: string | object) {
+    // here do the logic after the vh selection
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/ValueHelpCL" // Import the Value Help class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ValueHelpCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onValueHelpRequest: async function (event) {
+          // Create an object from the ValueHelpCL class
+          const supplierVH = new ValueHelpCL(this, {
+              propertyName: "STANDALONE", // Since this is a mandatory param and not relevant for the standalone usage, you can set anything
+              valueHelpEntity: "Suppliers", // This is the entity set that brings data
+              valueHelpProperty: "ID", // This is the property of the entity set whose value will be set to the input
+              readonlyProperties: [ // These properties will be the columns of the table on the Value Help Dialog
+                "companyName",
+                "contactName",
+                "contactTitle",
+                "country",
+                "city",
+                "paymentTerms"  
+              ],
+              excludedFilterProperties: ["contactName"] // These properties will be excluded from the filterbar
+          });    
+
+          // attach the function
+          supplierVH.attachAfterSelect(this._afterVHSelect, this);
+
+          // Pass the event to the public openValueHelpDialog method.
+          supplierVH.openValueHelpDialog(event);
+        },
+
+        _afterVHSelect: function (data) {
+          // here do the logic after the vh selection
         }
       });
 

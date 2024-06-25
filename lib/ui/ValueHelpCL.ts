@@ -53,6 +53,8 @@ export default class ValueHelpCL extends ModelCL {
     private filterModelName: string;
     private filterModel: JSONModel;
     private caseSensitive: boolean;
+    private afterSelect?: (data: string | object) => void;
+    private afterSelectListener?: object;
 
     constructor(controller: Controller | UIComponent, settings: IValueHelpSettings, modelName?: string) {
         super(controller, modelName);
@@ -117,6 +119,16 @@ export default class ValueHelpCL extends ModelCL {
 
         if (selectedTokens) {
             this.sourceControl.setValue(selectedTokens[0].getKey());
+
+            if (this.afterSelect) {
+                const selectedRow = selectedTokens[0].getCustomData().find(data => data.getKey() === "row");
+
+                if (selectedRow) {
+                    this.afterSelect.call(this.afterSelectListener || this.getSourceController(), selectedRow.getValue());
+                } else {
+                    this.afterSelect.call(this.afterSelectListener || this.getSourceController(), selectedTokens[0].getKey());
+                }
+            }
         }
 
         this.valueHelpDialog.close();
@@ -530,5 +542,10 @@ export default class ValueHelpCL extends ModelCL {
         const filterModel = new JSONModel();
         filterModel.setDefaultBindingMode("TwoWay");
         this.filterModel = filterModel;
+    }
+
+    public attachAfterSelect(afterSelect: (data: string | object) => void, listener?: object) {
+        this.afterSelect = afterSelect;
+        this.afterSelectListener = listener;
     }
 }

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.120.1009] - 2024-06-25
+
+### Added
+
+- It is now possible to attach a function that will be executed after the user selects a row from the ValueHelpDialog when the ValueHelpCL class is used as a standalone component.
+
 ## [1.120.1008] - 2024-06-21
 
 ### Fixed
@@ -436,6 +442,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.120.1009]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1008...1.120.1009?diff=split
 [1.120.1008]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1007...1.120.1008?diff=split
 [1.120.1007]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1006...1.120.1007?diff=split
 [1.120.1006]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1005...1.120.1006?diff=split
