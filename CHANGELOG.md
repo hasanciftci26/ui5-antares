@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.120.1010] - 2024-07-03
+
+### Fixed
+
+- The view dependent dialog bug fix for dialog loading in Entry classes.
+
 ## [1.120.1009] - 2024-06-25
 
 ### Added
@@ -442,6 +448,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.120.1010]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1009...1.120.1010?diff=split
 [1.120.1009]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1008...1.120.1009?diff=split
 [1.120.1008]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1007...1.120.1008?diff=split
 [1.120.1007]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1006...1.120.1007?diff=split

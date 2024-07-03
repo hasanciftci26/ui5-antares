@@ -132,7 +132,7 @@ export default class EntryCreateCL<EntityT extends object = object> extends Entr
                 content.setBindingContext(this.getEntryContext(), this.getModelName());
             }
 
-            fragment.open();
+            fragment.open(true);
         } else {
             fragment.destroyFragmentContent();
             throw new Error("Provided fragment must contain a sap.m.Dialog control. Put all the controls into a sap.m.Dialog");
