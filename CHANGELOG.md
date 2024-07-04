@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.120.1011] - 2024-07-04
+
+### Fixed
+
+- The missing parameters of the resetChanges in Entry class have been added. 
+
 ## [1.120.1010] - 2024-07-03
 
 ### Fixed
@@ -448,6 +454,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.120.1011]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1010...1.120.1011?diff=split
 [1.120.1010]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1009...1.120.1010?diff=split
 [1.120.1009]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1008...1.120.1009?diff=split
 [1.120.1008]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1007...1.120.1008?diff=split

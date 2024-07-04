@@ -665,7 +665,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     public reset(resetAll: boolean = false) {
         if (this.getODataModel().hasPendingChanges()) {
             if (resetAll) {
-                this.getODataModel().resetChanges();
+                this.getODataModel().resetChanges(undefined, true, true);
             } else {
                 this.getODataModel().resetChanges([this.entryContext.getPath()]);
             }
