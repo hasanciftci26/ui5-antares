@@ -91,6 +91,7 @@ ui5 -v
       - [Method Parameters](#method-parameters)
       - [Default Values](#default-values)
     - [Manual Submit](#manual-submit)
+    - [Disable Auto Dialog Close](#disable-auto-dialog-close)
     - [Label Generation](#label-generation)
       - [Resource Model](#resource-model-i18n)
       - [Label Generation From The Technical Names](#label-generation-from-the-technical-names)
@@ -103,6 +104,10 @@ ui5 -v
     - [Form Title](#form-title)
     - [Form Grouping](#form-grouping)
       - [IFormGroups Type Definition](#iformgroups-type-definition)
+    - [Custom Data](#custom-data)
+      - [IFieldCustomData Type Definition](#ifieldcustomdata-type-definition)
+    - [Text In Edit Mode Source](#text-in-edit-mode-source)
+      - [ITextInEditModeSource Type Definition](#itextineditmodesource-type-definition)
     - [Begin Button Text](#begin-button-text)
     - [Begin Button Type](#begin-button-type)
     - [End Button Text](#end-button-text)
@@ -121,6 +126,7 @@ ui5 -v
       - [Constructor](#constructor-1)
       - [Label Generation](#label-generation-1)
       - [Standalone Usage](#standalone-usage)
+        - [Attach After Select](#attach-after-select)
     - [Validation Logic](#validation-logic)
       - [Constructor](#constructor-2)
       - [Validation with Operator](#validation-with-operator)
@@ -246,8 +252,8 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 
 | UI5 Antares Version | SAPUI5 Version | Status    |
 | :------------------ | :------------- | :-------- |
-| 1.124.1001          | 1.124.1        | Available |
-| 1.124.999002        | 1.124.0        | Available |
+| 1.124.1002          | 1.124.1        | Available |
+| 1.124.999003        | 1.124.0        | Available |
 | 1.123.2002          | 1.123.2        | Available |
 | 1.123.1003          | 1.123.1        | Available |
 | 1.120.15002         | 1.120.15       | Available |
@@ -255,7 +261,7 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 | 1.120.13002         | 1.120.13       | Available |
 | 1.120.12002         | 1.120.12       | Available |
 | 1.120.11002         | 1.120.11       | Available |
-| 1.120.1003          | 1.120.1        | Available |
+| 1.120.1011          | 1.120.1        | Available |
 | 1.108.32002         | 1.108.32       | Available |
 | 1.108.31002         | 1.108.31       | Available |
 | 1.108.30002         | 1.108.30       | Available |
@@ -925,6 +931,133 @@ sap.ui.define([
       
           // do not forget to complete the submit process
           entry.submitManually();    
+        }
+
+      });
+
+    });
+```
+
+### Disable Auto Dialog Close
+
+By default, the generated dialog is closed and destroyed after the submission is completed in the Entry Create and Entry Update classes. However, this auto-close feature can be disabled if you still need to access the dialog content after the submission. This feature is particularly useful when there are custom contents that will be managed after the submission is completed.
+
+> **IMPORTANT:** To close and destroy the dialog afterwards, the **closeAndDestroyEntryDialog()** method can be utilized through the object instantiated from the [Entry Create](#entry-create) or [Entry Update](#entry-update) class.
+
+To disable the auto close feature, the **setDisableAutoClose()** method can be utilized.
+
+**Setter (setDisableAutoClose)**
+
+| Parameter | Type    | Mandatory | Description                                                   | 
+| :-------- | :------ | :-------- | :------------------------------------------------------------ |
+| disable   | boolean | Yes       | If it is set to **true**, auto close feature will be disabled |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getDisableAutoClose)**
+
+| Returns | Description                                                                                       |
+| :------ | :------------------------------------------------------------------------------------------------ |
+| boolean | Returns the value that was set using **setDisableAutoClose()** method. Default value is **false** |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import ResponseCL from "ui5/antares/entry/v2/ResponseCL"; // Import the response class
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  private productEntry: EntryCreateCL<IProducts>;
+
+  public onInit() {
+
+  }
+
+  public onCreateProduct() {
+    // initialize and set to the class property
+    this.productEntry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // disable auto close
+    this.productEntry.setDisableAutoClose(true);
+
+    // attach submit completed
+    this.productEntry.attachSubmitCompleted(this.onCreateCompleted, this);
+
+    // call the dialog
+    this.productEntry.createNewEntry();
+  }
+
+  private onCreateCompleted(response: ResponseCL<IProducts>) {
+    // do your logic here 
+
+    // do not forget to close and destroy
+    this.productEntry.closeAndDestroyEntryDialog();
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+
+interface IProductKeys {
+  ID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL" // Import the class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // initialize and set to the class property
+          this.productEntry = new EntryCreateCL<IProducts>(this, "Products");
+
+          // disable auto close
+          this.productEntry.setDisableAutoClose(true);
+
+          // attach submit completed
+          this.productEntry.attachSubmitCompleted(this._onCreateCompleted, this);
+
+          // call the dialog
+          this.productEntry.createNewEntry();
+        },
+
+        _onCreateCompleted: function (response) {
+          // do your logic here 
+
+          // do not forget to close and destroy
+          this.productEntry.closeAndDestroyEntryDialog();
         }
 
       });
@@ -1737,6 +1870,248 @@ sap.ui.define([
 | IFormGroups       | `object`   |                                                     |
 | &emsp; title      | `string`   | The title of the form group or object page section  |
 | &emsp; properties | `string[]` | The properties that will be included into the group |
+
+### Custom Data
+
+[10001]: https://sapui5.hana.ondemand.com/sdk/#/api/sap.ui.core.CustomData
+
+UI5 Antares enables users to add [Custom Data](https://sapui5.hana.ondemand.com/sdk/#/api/sap.ui.core.CustomData) to the auto-generated SIMPLE/SMART form elements. To add custom data, the **setFieldCustomData()** method can be utilized.
+
+**Setter (setFieldCustomData)**
+
+| Parameter  | Type                                                      | Mandatory | Description                                                            | 
+| :--------- | :-------------------------------------------------------- | :-------- | :--------------------------------------------------------------------- |
+| customData | [IFieldCustomData\[\]](#ifieldcustomdata-type-definition) | Yes       | The custom data that will be added to the auto-generated form elements |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getFieldCustomData)**
+
+| Returns                                                    | Description                                                                                   |
+| :--------------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
+| [IFieldCustomData\[\]](#ifieldcustomdata-type-definition)  | Returns the value that was set using **setFieldCustomData()** method. Default value is **[]** |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import CustomData from "sap/ui/core/CustomData"; // Import the custom data
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public onCreateProduct() {
+    // initialize
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // set the custom data
+    entry.setFieldCustomData([{
+      propertyName: "name",
+      customData: new CustomData({key: "MyKey1", value:"MyValue1"})
+    },{
+      propertyName: "description",
+      customData: new CustomData({key: "MyKey2", value:"MyValue2"})
+    }]);
+
+    // call the dialog
+    entry.createNewEntry();
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "sap/ui/core/CustomData" // Import the custom data
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, CustomData) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // initialize
+          const entry = new EntryCreateCL(this, "Products");
+
+          // set the custom data
+          entry.setFieldCustomData([{
+            propertyName: "name",
+            customData: new CustomData({key: "MyKey1", value:"MyValue1"})
+          },{
+            propertyName: "description",
+            customData: new CustomData({key: "MyKey2", value:"MyValue2"})
+          }]);
+
+          // call the dialog
+          entry.createNewEntry(); 
+        }
+
+      });
+
+    });
+```
+
+#### IFieldCustomData Type Definition
+
+| Property            | Type                 | Description                                             |
+| :------------------ | :------------------- | :------------------------------------------------------ |
+| IFieldCustomData    | `object`             |                                                         |
+| &emsp; propertyName | `string`             | The name of the property that will have the custom data |
+| &emsp; customData   | [Custom Data][10001] | The custom data                                         |
+
+### Text In Edit Mode Source
+
+[10002]: https://sapui5.hana.ondemand.com/#/api/sap.ui.comp.smartfield.TextInEditModeSource
+
+UI5 Antares enables users to set the `textInEditModeSource` property of the SmartField when the smartform is generated. To set the `textInEditModeSource` property, the **setTextInEditModeSource()** method can be utilized.
+
+**Setter (setTextInEditModeSource)**
+
+| Parameter            | Type                                                                | Mandatory | Description                                           | 
+| :------------------- | :------------------------------------------------------------------ | :-------- | :---------------------------------------------------- |
+| textInEditModeSource | [ITextInEditModeSource\[\]](#itextineditmodesource-type-definition) | Yes       | The `textInEditModeSource` configs for the properties |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**Getter (getTextInEditModeSource)**
+
+| Returns                                                             | Description                                                                                        |
+| :------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------- |
+| [ITextInEditModeSource\[\]](#itextineditmodesource-type-definition) | Returns the value that was set using **setTextInEditModeSource()** method. Default value is **[]** |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL"; // Import the class
+import { smartfield } from "sap/ui/comp/library"; // Import the smartfield library
+
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  public onCreateProduct() {
+    // initialize
+    const entry = new EntryCreateCL<IProducts>(this, "Products");
+
+    // set the textInEditModeSource
+    entry.setTextInEditModeSource([{
+      propertyName: "name",
+      textInEditModeSource: smartfield.TextInEditModeSource.NavigationProperty
+    },{
+      propertyName: "description",
+      customData: smartfield.TextInEditModeSource.ValueList
+    }]);
+
+    // call the dialog
+    entry.createNewEntry();
+  }
+
+}
+
+interface IProducts {
+  ID: string;
+  name: string;
+  description: string;
+  brand: string;
+  price: number;
+  currency: string;
+  quantityInStock: number;
+  categoryID: string;
+  supplierID: string;
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/entry/v2/EntryCreateCL", // Import the class
+    "sap/ui/comp/library" // Import the comp library
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, EntryCreateCL, UIComp) {
+      "use strict";
+
+      const { TextInEditModeSource } = UIComp["smartfield"]; // Destructure to get the enum
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onCreateProduct: async function () {
+          // initialize
+          const entry = new EntryCreateCL(this, "Products");
+
+          // set the textInEditModeSource
+          entry.setTextInEditModeSource([{
+            propertyName: "name",
+            textInEditModeSource: TextInEditModeSource.NavigationProperty
+          },{
+            propertyName: "description",
+            customData: TextInEditModeSource.ValueList
+          }]);
+
+          // call the dialog
+          entry.createNewEntry(); 
+        }
+
+      });
+
+    });
+```
+
+#### ITextInEditModeSource Type Definition
+
+| Property                    | Type                          | Description                                                                |
+| :-------------------------- | :---------------------------- | :------------------------------------------------------------------------- |
+| ITextInEditModeSource       | `object`                      |                                                                            |
+| &emsp; propertyName         | `string`                      | The name of the property whose `textInEditModeSource` property will be set |
+| &emsp; textInEditModeSource | [TextInEditModeSource][10002] | The `textInEditModeSource` property of the smartfield                      |
 
 ### Begin Button Text
 
@@ -3342,6 +3717,123 @@ sap.ui.define([
 
           // Pass the event to the public openValueHelpDialog method.
           supplierVH.openValueHelpDialog(event);
+        }
+      });
+
+    });
+```
+
+#### Attach After Select
+
+When the ValueHelpCL class is utilized as a standalone component, it is possible to attach a function that will be executed after the user selects a row in the ValueHelpDialog table. 
+
+If the ValueHelpCL class is able to retrieve the object from the selected row, it will be passed as a parameter to the attached function. Otherwise, only the value of the `valueHelpProperty` will be passed as a parameter.
+
+To attach a function, the **attachAfterSelect()** method can be utilized.
+
+**Setter (attachAfterSelect)**
+
+| Parameter   | Type                             | Mandatory | Description                                                                   | 
+| :---------- | :------------------------------- | :-------- | :---------------------------------------------------------------------------- |
+| afterSelect | (data: string \| object) => void | Yes       | The function that will be executed after the selection                        |
+| listener    | object                           | No        | The default listener is the **controller** from [constructor](#constructor-1) |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ValueHelpCL from "ui5/antares/ui/ValueHelpCL"; // Import the Value Help class
+import { Input$ValueHelpRequestEvent } from "sap/m/Input"; // Import the Value Help Request event type
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  // The parameter type should be Input$ValueHelpRequestEvent
+  public async onValueHelpRequest(event: Input$ValueHelpRequestEvent) {
+
+    // Create an object from the ValueHelpCL class
+    const supplierVH = new ValueHelpCL(this, {
+        propertyName: "STANDALONE", // Since this is a mandatory param and not relevant for the standalone usage, you can set anything
+        valueHelpEntity: "Suppliers", // This is the entity set that brings data
+        valueHelpProperty: "ID", // This is the property of the entity set whose value will be set to the input
+        readonlyProperties: [ // These properties will be the columns of the table on the Value Help Dialog
+          "companyName",
+          "contactName",
+          "contactTitle",
+          "country",
+          "city",
+          "paymentTerms"  
+        ],
+        excludedFilterProperties: ["contactName"] // These properties will be excluded from the filterbar
+    });
+
+    // attach the function
+    supplierVH.attachAfterSelect(this.afterVHSelect, this);
+
+    // Pass the Input$ValueHelpRequestEvent to the public openValueHelpDialog method.
+    supplierVH.openValueHelpDialog(event);
+  }
+
+  private afterVHSelect(data: string | object) {
+    // here do the logic after the vh selection
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/ValueHelpCL" // Import the Value Help class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ValueHelpCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onValueHelpRequest: async function (event) {
+          // Create an object from the ValueHelpCL class
+          const supplierVH = new ValueHelpCL(this, {
+              propertyName: "STANDALONE", // Since this is a mandatory param and not relevant for the standalone usage, you can set anything
+              valueHelpEntity: "Suppliers", // This is the entity set that brings data
+              valueHelpProperty: "ID", // This is the property of the entity set whose value will be set to the input
+              readonlyProperties: [ // These properties will be the columns of the table on the Value Help Dialog
+                "companyName",
+                "contactName",
+                "contactTitle",
+                "country",
+                "city",
+                "paymentTerms"  
+              ],
+              excludedFilterProperties: ["contactName"] // These properties will be excluded from the filterbar
+          });    
+
+          // attach the function
+          supplierVH.attachAfterSelect(this._afterVHSelect, this);
+
+          // Pass the event to the public openValueHelpDialog method.
+          supplierVH.openValueHelpDialog(event);
+        },
+
+        _afterVHSelect: function (data) {
+          // here do the logic after the vh selection
         }
       });
 
@@ -6155,6 +6647,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td></td>
     </tr>
     <tr>
+      <td><a href="#disable-auto-dialog-close">Disable Auto Dialog Close</a></td>
+      <td align="center">&#x2714;</td>
+      <td>false</td>
+      <td></td>
+    </tr>
+    <tr>
       <td><a href="#label-generation">Label Generation</a></td>
       <td align="center">&#x2714;</td>
       <td></td>
@@ -6186,6 +6684,18 @@ The features listed below are identical to those available in [EntryCreateCL](#e
     </tr>
     <tr>
       <td><a href="#form-grouping">Form Grouping</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#custom-data">Custom Data</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#text-in-edit-mode-source">Text In Edit Mode Source</a></td>
       <td align="center">&#x2714;</td>
       <td>[]</td>
       <td></td>
@@ -7592,7 +8102,13 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td align="center">&#x2717;</td>
       <td></td>
       <td></td>
-    </tr>  
+    </tr>
+    <tr>
+      <td><a href="#disable-auto-dialog-close">Disable Auto Dialog Close</a></td>
+      <td align="center">&#x2717;</td>
+      <td>false</td>
+      <td></td>
+    </tr>    
     <tr>
       <td><a href="#label-generation">Label Generation</a></td>
       <td align="center">&#x2714;</td>
@@ -7628,7 +8144,19 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td align="center">&#x2714;</td>
       <td>[]</td>
       <td></td>
-    </tr>    
+    </tr>
+    <tr>
+      <td><a href="#custom-data">Custom Data</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#text-in-edit-mode-source">Text In Edit Mode Source</a></td>
+      <td align="center">&#x2717;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>       
     <tr>
       <td><a href="#begin-button-text">Begin Button Text</a></td>
       <td align="center">&#x2714;</td>
@@ -8516,6 +9044,12 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td></td>
     </tr>  
     <tr>
+      <td><a href="#disable-auto-dialog-close">Disable Auto Dialog Close</a></td>
+      <td align="center">&#x2717;</td>
+      <td>false</td>
+      <td></td>
+    </tr>    
+    <tr>
       <td><a href="#label-generation">Label Generation</a></td>
       <td align="center">&#x2714;</td>
       <td></td>
@@ -8550,7 +9084,19 @@ The features listed below are identical to those available in [EntryCreateCL](#e
       <td align="center">&#x2714;</td>
       <td>[]</td>
       <td></td>
-    </tr>    
+    </tr> 
+    <tr>
+      <td><a href="#custom-data">Custom Data</a></td>
+      <td align="center">&#x2714;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="#text-in-edit-mode-source">Text In Edit Mode Source</a></td>
+      <td align="center">&#x2717;</td>
+      <td>[]</td>
+      <td></td>
+    </tr>       
     <tr>
       <td><a href="#begin-button-text">Begin Button Text</a></td>
       <td align="center">&#x2717;</td>
@@ -11657,6 +12203,8 @@ To open a dialog or a popover from a fragment file, there are two distinct metho
 
 Please note that both methods only support the following dialog and popover classes:
 
+> **Hint:** Both methods include an optional parameter named `viewDependent: boolean`. If you wish to add the dialog or popover as a dependent to your view, please set this parameter to **true**.
+
 1) [sap.m.Dialog](https://sapui5.hana.ondemand.com/#/api/sap.m.Dialog)
 2) [sap.m.Popover](https://sapui5.hana.ondemand.com/#/api/sap.m.Popover)
 3) [sap.m.MessagePopover](https://sapui5.hana.ondemand.com/#/api/sap.m.MessagePopover)
@@ -12067,9 +12615,9 @@ sap.ui.define([
 
 ### Close Dialog or Popover
 
-To close the dialog or the popover opened by one of the following approaches, please use the **close()** method.
+To close the dialog or the popover opened by one of the following approaches, please use the **close()** or **closeAndDestroy()** method.
 
-> **Important:** Please be advised that it is your responsibility to destroy the content after using the **close()** method. This can be achieved by using the [destroyFragmentContent()](#destroy-fragment-content) method.
+> **Important:** Please be advised that it is your responsibility to destroy the content after using the **close()** method. This can be achieved by using the [destroyFragmentContent()](#destroy-fragment-content) method. If you use the **closeAndDestroy()** method, the content will be destroyed automatically.
 
 1) [load()](#load-content) and [open()](#open-sync)
 2) [openAsync()](#open-async)
@@ -12204,6 +12752,8 @@ To retrieve the content loaded from a fragment file using the [load()](#load-con
 ### Destroy Fragment Content
 
 To destroy the content loaded from a fragment using the [load()](#load-content) or [openAsync()](#open-async) methods, the **destroyFragmentContent()** method can be utilized.
+
+> **Hint:** If you wish to destroy the content of the dialog when the user presses ESC button, please use **setAutoDestroyOnESC(destroy: boolean)** method and set the parameter of the method to **true**. Otherwise, you are responsible from destroying the content when the user presses ESC button. If the content is not destroyed in each ESC event, the dialog cannot be loaded again.
 
 **Sample**
 

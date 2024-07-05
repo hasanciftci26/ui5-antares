@@ -4,6 +4,89 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.124.999003] - 2024-07-05
+
+### Added
+
+- `viewDependent` parameter has been added to the **openAsync()** and **open()** methods of the **FragmentCL** class. If this parameter is set to true, dialog or popover is added as a dependent to the source view using the **addDependent()** method of the MVC View class.
+- **closeAndDestroy()** method has been added to the **FragmentCL** class. With this method, it is no longer necessary to call **close()** and then **destroyFragmentContent()**. This method does both.
+- **setAutoDestroyOnESC()** method has been added to the **FragmentCL** class. If this method is executed with **true** parameter, the dialog content will be destroyed automatically by the class.
+- It is now possible to disable auto close after the submit is done in EntryCreateCL and EntryUpdateCL classes. To close and destroy the dialog manually, the **closeAndDestroyEntryDialog()** method can be utilized.
+- It is now possible to set custom data for the auto-generated form elements using the **setFieldCustomData()** method of the Entry classes.
+- It is now possible to set the `setTextInEditModeSource` property of the smartfield using the **setTextInEditModeSource()** method of the Entry classes.
+- It is now possible to attach a function that will be executed after the user selects a row from the ValueHelpDialog when the ValueHelpCL class is used as a standalone component.
+
+### Fixed
+
+- The issue with label generation from the metadata for custom controls in the SMART form has been resolved. 
+- The missing dialog types ViewSettingsDialog, TableSelectDialog, SelectDialog, BusyDialog, ValueHelpDialog have been added to the FragmentCL class.
+- The view dependent dialog bug fix for dialog loading in Entry classes.
+- The missing parameters of the resetChanges in Entry class have been added. 
+
+## [1.120.1011] - 2024-07-04
+
+### Fixed
+
+- The missing parameters of the resetChanges in Entry class have been added. 
+
+## [1.120.1010] - 2024-07-03
+
+### Fixed
+
+- The view dependent dialog bug fix for dialog loading in Entry classes.
+
+## [1.120.1009] - 2024-06-25
+
+### Added
+
+- It is now possible to attach a function that will be executed after the user selects a row from the ValueHelpDialog when the ValueHelpCL class is used as a standalone component.
+
+## [1.120.1008] - 2024-06-21
+
+### Fixed
+
+- The missing dialog types ViewSettingsDialog, TableSelectDialog, SelectDialog, BusyDialog, ValueHelpDialog have been added to the FragmentCL class.
+
+## [1.120.1007] - 2024-06-20
+
+### Added
+
+- It is now possible to set custom data for the auto-generated form elements using the **setFieldCustomData()** method of the Entry classes.
+- It is now possible to set the `setTextInEditModeSource` property of the smartfield using the **setTextInEditModeSource()** method of the Entry classes.
+
+## [1.120.1006] - 2024-06-14
+
+### Added
+
+- It is now possible to disable auto close after the submit is done in EntryCreateCL and EntryUpdateCL classes. To close and destroy the dialog manually, the **closeAndDestroyEntryDialog()** method can be utilized.
+
+### Fixed
+
+- The issue with label generation from the metadata for custom controls in the SMART form has been resolved. 
+
+## [1.120.1005] - 2024-06-12
+
+### Added
+
+- **setAutoDestroyOnESC()** method has been added to the **FragmentCL** class. If this method is executed with **true** parameter, the dialog content will be destroyed automatically by the class.
+
+## [1.120.1004] - 2024-06-11
+
+### Added
+
+- `viewDependent` parameter has been added to the **openAsync()** and **open()** methods of the **FragmentCL** class. If this parameter is set to true, dialog or popover is added as a dependent to the source view using the **addDependent()** method of the MVC View class.
+- **closeAndDestroy()** method has been added to the **FragmentCL** class. With this method, it is no longer necessary to call **close()** and then **destroyFragmentContent()**. This method does both.
+
+## [1.124.1002] - 2024-06-11
+
+### Added
+
+- `filterCaseSensitive?` parameter added to the constructor of the ValueHelpCL to change the default value of case-sensitive search in the filterbar.
+
+### Fixed
+
+- ValidationLogicCL bug fix for falsy values such as false, 0, "" in the `value1` and `value2` properties. 
+
 ## [1.124.999002] - 2024-06-11
 
 ### Added
@@ -390,6 +473,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.124.999003]: https://github.com/hasanciftci26/ui5-antares/compare/1.124.999002...1.124.999003?diff=split
+[1.120.1011]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1010...1.120.1011?diff=split
+[1.120.1010]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1009...1.120.1010?diff=split
+[1.120.1009]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1008...1.120.1009?diff=split
+[1.120.1008]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1007...1.120.1008?diff=split
+[1.120.1007]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1006...1.120.1007?diff=split
+[1.120.1006]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1005...1.120.1006?diff=split
+[1.120.1005]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1004...1.120.1005?diff=split
+[1.120.1004]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1003...1.120.1004?diff=split
+[1.124.1002]: https://github.com/hasanciftci26/ui5-antares/compare/1.124.1001...1.124.1002?diff=split
 [1.124.999002]: https://github.com/hasanciftci26/ui5-antares/compare/1.124.999001...1.124.999002?diff=split
 [1.123.2002]: https://github.com/hasanciftci26/ui5-antares/compare/1.123.2001...1.123.2002?diff=split
 [1.123.1003]: https://github.com/hasanciftci26/ui5-antares/compare/1.123.1002...1.123.1003?diff=split
