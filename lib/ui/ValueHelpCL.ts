@@ -56,6 +56,8 @@ export default class ValueHelpCL extends ModelCL {
     private afterSelect?: (data: string | object) => void;
     private afterSelectListener?: object;
     private initialFilters?: IValueHelpInitialFilter[];
+    private afterDialogOpened?: (dialog: ValueHelpDialog) => void;
+    private afterOpenedListener?: object;
 
     constructor(controller: Controller | UIComponent, settings: IValueHelpSettings, modelName?: string) {
         super(controller, modelName);
@@ -80,6 +82,10 @@ export default class ValueHelpCL extends ModelCL {
 
             if (this.initialFilters) {
                 this.applyInitialFilters();
+            }
+
+            if (this.afterDialogOpened) {
+                this.afterDialogOpened.call(this.afterOpenedListener || this.getSourceController(), this.valueHelpDialog);
             }
         });
         this.sourceControl = event.getSource();
@@ -563,12 +569,17 @@ export default class ValueHelpCL extends ModelCL {
             if (this.excludedFilterProperties.includes(filter.propertyName)) {
                 continue;
             }
-            
+
             if (filter.propertyName === this.valueHelpProperty || this.readonlyProperties.includes(filter.propertyName)) {
                 this.filterModel.setProperty(`/${filter.propertyName}`, filter.value);
             }
         }
 
         this.filterBar.search();
+    }
+
+    public attachAfterDialogOpened(afterDialogOpened: (dialog: ValueHelpDialog) => void, listener?: object) {
+        this.afterDialogOpened = afterDialogOpened;
+        this.afterOpenedListener = listener;
     }
 }

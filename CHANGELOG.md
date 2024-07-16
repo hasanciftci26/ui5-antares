@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.120.1013] - 2024-07-16
+
+### Added
+
+- It is now possible to attach a function that will be executed when the ValueHelpDialog is opened by ValueHelpCL class.
+
+## [1.124.999005] - 2024-07-16
+
+### Added
+
+- It is now possible to attach a function that will be executed when the ValueHelpDialog is opened by ValueHelpCL class.
+
+## [1.124.999004] - 2024-07-16
+
+### Added
+
+- It is now possible to set initial filter values for standalone ValueHelpCL usages.
+
 ## [1.120.1012] - 2024-07-16
 
 ### Added
@@ -479,6 +497,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial productive release.
 
+[1.120.1013]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1012...1.120.1013?diff=split
+[1.124.999005]: https://github.com/hasanciftci26/ui5-antares/compare/1.124.999004...1.124.999005?diff=split
+[1.124.999004]: https://github.com/hasanciftci26/ui5-antares/compare/1.124.999003...1.124.999004?diff=split
 [1.120.1012]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1011...1.120.1012?diff=split
 [1.124.999003]: https://github.com/hasanciftci26/ui5-antares/compare/1.124.999002...1.124.999003?diff=split
 [1.120.1011]: https://github.com/hasanciftci26/ui5-antares/compare/1.120.1010...1.120.1011?diff=split
