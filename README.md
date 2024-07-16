@@ -127,6 +127,8 @@ ui5 -v
       - [Label Generation](#label-generation-1)
       - [Standalone Usage](#standalone-usage)
         - [Attach After Select](#attach-after-select)
+        - [Initial Filter Values](#initial-filter-values)
+          - [IValueHelpInitialFilter Type Definition](#ivaluehelpinitialfilter-type-definition)
     - [Validation Logic](#validation-logic)
       - [Constructor](#constructor-2)
       - [Validation with Operator](#validation-with-operator)
@@ -253,7 +255,7 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 | UI5 Antares Version | SAPUI5 Version | Status    |
 | :------------------ | :------------- | :-------- |
 | 1.124.1002          | 1.124.1        | Available |
-| 1.124.999002        | 1.124.0        | Available |
+| 1.124.999003        | 1.124.0        | Available |
 | 1.123.2002          | 1.123.2        | Available |
 | 1.123.1003          | 1.123.1        | Available |
 | 1.120.15002         | 1.120.15       | Available |
@@ -261,7 +263,7 @@ The table below shows the currently supported and planned SAPUI5 versions. UI5 A
 | 1.120.13002         | 1.120.13       | Available |
 | 1.120.12002         | 1.120.12       | Available |
 | 1.120.11002         | 1.120.11       | Available |
-| 1.120.1011          | 1.120.1        | Available |
+| 1.120.1012          | 1.120.1        | Available |
 | 1.108.32002         | 1.108.32       | Available |
 | 1.108.31002         | 1.108.31       | Available |
 | 1.108.30002         | 1.108.30       | Available |
@@ -3839,6 +3841,134 @@ sap.ui.define([
 
     });
 ```
+
+#### Initial Filter Values
+
+It is possible to set initial filter values that will be applied to the Value Help EntitySet when the Value Help Dialog is opened.
+
+> **Note:** The properties included in the initial filter must either be equal to the `valueHelpProperty` or included in the `readonlyProperties` array. Properties included in the `excludedFilterProperties` array will be ignored in the initial filter.
+
+To set the initial filter values, the **setInitialFilters()** method can be utilized.
+
+**Setter (setInitialFilters)**
+
+| Parameter   | Type                                                                   | Mandatory | Description               | 
+| :---------- | :--------------------------------------------------------------------- | :-------- | :------------------------ |
+| filters     | [IValueHelpInitialFilter\[\]](#ivaluehelpinitialfilter-type-definition)| Yes       | The initial filter values |
+
+| Returns | Description |
+| :------ | :---------- |
+| void    |             |
+
+**TypeScript**
+
+```ts
+import Controller from "sap/ui/core/mvc/Controller";
+import ValueHelpCL from "ui5/antares/ui/ValueHelpCL"; // Import the Value Help class
+import { Input$ValueHelpRequestEvent } from "sap/m/Input"; // Import the Value Help Request event type
+/**
+ * @namespace your.apps.namespace
+ */
+export default class YourController extends Controller {
+  public onInit() {
+
+  }
+
+  // The parameter type should be Input$ValueHelpRequestEvent
+  public async onValueHelpRequest(event: Input$ValueHelpRequestEvent) {
+
+    // Create an object from the ValueHelpCL class
+    const supplierVH = new ValueHelpCL(this, {
+        propertyName: "STANDALONE", // Since this is a mandatory param and not relevant for the standalone usage, you can set anything
+        valueHelpEntity: "Suppliers", // This is the entity set that brings data
+        valueHelpProperty: "ID", // This is the property of the entity set whose value will be set to the input
+        readonlyProperties: [ // These properties will be the columns of the table on the Value Help Dialog
+          "companyName",
+          "contactName",
+          "contactTitle",
+          "country",
+          "city",
+          "paymentTerms"  
+        ],
+        excludedFilterProperties: ["contactName"] // These properties will be excluded from the filterbar
+    });
+
+    // set the initial filters
+    supplierVH.setInitialFilters([{
+      propertyName: "companyName",
+      value: "ABC"
+    }, {
+      propertyName: "country",
+      value: "TR"
+    }]);
+
+    // Pass the Input$ValueHelpRequestEvent to the public openValueHelpDialog method.
+    supplierVH.openValueHelpDialog(event);
+  }
+}
+```
+
+---
+
+**JavaScript**
+
+```js
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "ui5/antares/ui/ValueHelpCL" // Import the Value Help class
+], 
+    /**
+     * @param {typeof sap.ui.core.mvc.Controller} Controller
+     */
+    function (Controller, ValueHelpCL) {
+      "use strict";
+
+      return Controller.extend("your.apps.namespace.YourController", {
+        onInit: function () {
+
+        },
+
+        onValueHelpRequest: async function (event) {
+          // Create an object from the ValueHelpCL class
+          const supplierVH = new ValueHelpCL(this, {
+              propertyName: "STANDALONE", // Since this is a mandatory param and not relevant for the standalone usage, you can set anything
+              valueHelpEntity: "Suppliers", // This is the entity set that brings data
+              valueHelpProperty: "ID", // This is the property of the entity set whose value will be set to the input
+              readonlyProperties: [ // These properties will be the columns of the table on the Value Help Dialog
+                "companyName",
+                "contactName",
+                "contactTitle",
+                "country",
+                "city",
+                "paymentTerms"  
+              ],
+              excludedFilterProperties: ["contactName"] // These properties will be excluded from the filterbar
+          });    
+
+          // set the initial filters
+          supplierVH.setInitialFilters([{
+            propertyName: "companyName",
+            value: "ABC"
+          }, {
+            propertyName: "country",
+            value: "TR"
+          }]);
+
+          // Pass the event to the public openValueHelpDialog method.
+          supplierVH.openValueHelpDialog(event);
+        }
+      });
+
+    });
+```
+
+#### IValueHelpInitialFilter Type Definition
+
+| Property                | Type                                        | Description                      |
+| :---------------------- | :------------------------------------------ | :------------------------------- |
+| IValueHelpInitialFilter | `object`                                    |                                  |
+| &emsp; propertyName     | `string`                                    | The property name                |
+| &emsp; value            | `string` \| `number` \| `boolean` \| `Date` | The filter value of the property |
 
 ### Validation Logic
 
