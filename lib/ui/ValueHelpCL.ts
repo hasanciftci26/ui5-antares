@@ -3,7 +3,7 @@ import Text from "sap/m/Text";
 import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";
 import ModelCL from "ui5/antares/base/v2/ModelCL";
-import { IValueHelpSettings } from "ui5/antares/types/ui/valuehelp";
+import { IValueHelpInitialFilter, IValueHelpSettings } from "ui5/antares/types/ui/valuehelp";
 import { NamingStrategies } from "ui5/antares/types/entry/enums";
 import EntityCL from "ui5/antares/entity/v2/EntityCL";
 import ColumnListItem from "sap/m/ColumnListItem";
@@ -55,6 +55,7 @@ export default class ValueHelpCL extends ModelCL {
     private caseSensitive: boolean;
     private afterSelect?: (data: string | object) => void;
     private afterSelectListener?: object;
+    private initialFilters?: IValueHelpInitialFilter[];
 
     constructor(controller: Controller | UIComponent, settings: IValueHelpSettings, modelName?: string) {
         super(controller, modelName);
@@ -76,6 +77,10 @@ export default class ValueHelpCL extends ModelCL {
     public openValueHelpDialog(event: Input$ValueHelpRequestEvent) {
         this.getValueHelpDialog().then((dialog) => {
             dialog.open();
+
+            if (this.initialFilters) {
+                this.applyInitialFilters();
+            }
         });
         this.sourceControl = event.getSource();
     }
@@ -547,5 +552,23 @@ export default class ValueHelpCL extends ModelCL {
     public attachAfterSelect(afterSelect: (data: string | object) => void, listener?: object) {
         this.afterSelect = afterSelect;
         this.afterSelectListener = listener;
+    }
+
+    public setInitialFilters(filters: IValueHelpInitialFilter[]) {
+        this.initialFilters = filters;
+    }
+
+    private applyInitialFilters() {
+        for (const filter of this.initialFilters as IValueHelpInitialFilter[]) {
+            if (this.excludedFilterProperties.includes(filter.propertyName)) {
+                continue;
+            }
+            
+            if (filter.propertyName === this.valueHelpProperty || this.readonlyProperties.includes(filter.propertyName)) {
+                this.filterModel.setProperty(`/${filter.propertyName}`, filter.value);
+            }
+        }
+
+        this.filterBar.search();
     }
 }
