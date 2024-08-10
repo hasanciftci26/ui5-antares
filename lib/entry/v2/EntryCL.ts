@@ -28,7 +28,7 @@ import AnalyticalTable from "sap/ui/table/AnalyticalTable";
 import ValidationLogicCL from "ui5/antares/ui/ValidationLogicCL";
 import SmartValidatorCL from "ui5/antares/entry/v2/SmartValidatorCL";
 import SimpleValidatorCL from "ui5/antares/entry/v2/SimpleValidatorCL";
-import { IFormGroups } from "ui5/antares/types/entry/common";
+import { IFieldCustomData, IFormGroups, ITextInEditModeSource } from "ui5/antares/types/entry/common";
 import Group from "sap/ui/comp/smartform/Group";
 import ObjectPageLayoutCL from "ui5/antares/ui/ObjectPageLayoutCL";
 import Target from "sap/ui/core/routing/Target";
@@ -94,6 +94,9 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     private fromTarget: string;
     private createdTarget: Target;
     private customContentSectionTitle: string = "Custom Contents";
+    private disableAutoClose: boolean = false;
+    private fieldCustomData: IFieldCustomData[] = [];
+    private textInEditModeSource: ITextInEditModeSource[] = [];
 
     constructor(controller: Controller | UIComponent, entityPath: string, method: ODataMethods, modelName?: string) {
         super(controller, modelName);
@@ -429,6 +432,30 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         return this.entryMethod;
     }
 
+    public setDisableAutoClose(disable: boolean) {
+        this.disableAutoClose = disable;
+    }
+
+    public getDisableAutoClose(): boolean {
+        return this.disableAutoClose;
+    }
+
+    public setFieldCustomData(customData: IFieldCustomData[]) {
+        this.fieldCustomData = customData;
+    }
+
+    public getFieldCustomData(): IFieldCustomData[] {
+        return this.fieldCustomData;
+    }
+
+    public setTextInEditModeSource(textInEditModeSource: ITextInEditModeSource[]) {
+        this.textInEditModeSource = textInEditModeSource;
+    }
+
+    public getTextInEditModeSource(): ITextInEditModeSource[] {
+        return this.textInEditModeSource;
+    }
+
     public async addControlFromFragment(fragment: FragmentCL) {
         await fragment.load();
         const content = fragment.getFragmentContent();
@@ -560,6 +587,11 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
         }
     }
 
+    public closeAndDestroyEntryDialog() {
+        this.closeEntryDialog();
+        this.destroyEntryDialog();
+    }
+
     public valueValidation(): IValueValidation {
         if (this.formType === FormTypes.SMART) {
             return this.validateSmartValues();
@@ -633,7 +665,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
     public reset(resetAll: boolean = false) {
         if (this.getODataModel().hasPendingChanges()) {
             if (resetAll) {
-                this.getODataModel().resetChanges();
+                this.getODataModel().resetChanges(undefined, true, true);
             } else {
                 this.getODataModel().resetChanges([this.entryContext.getPath()]);
             }
@@ -733,7 +765,7 @@ export default abstract class EntryCL<EntityT extends object = object, EntityKey
 
         this.setOldBindingMode();
 
-        if (!this.displayObjectPage) {
+        if (!this.displayObjectPage && !this.disableAutoClose) {
             this.closeEntryDialog();
             this.destroyEntryDialog();
         }
