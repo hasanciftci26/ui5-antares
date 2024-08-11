@@ -152,7 +152,7 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
                 content.setBindingContext(this.getEntryContext(), this.getModelName());
             }
 
-            fragment.open();
+            fragment.open(true);
         } else {
             fragment.destroyFragmentContent();
             throw new Error("Provided fragment must contain a sap.m.Dialog control. Put all the controls into a sap.m.Dialog");
@@ -171,22 +171,22 @@ export default class EntryDeleteCL<EntityT extends object = object, EntityKeysT 
                 if (event === "YES") {
                     this.getODataModel().remove(context.getPath(), {
                         success: () => {
-                            if (this.deleteCompleted) {
-                                this.deleteCompleted.call(this.completedListener, data);
-                            }
+                        if (this.deleteCompleted) {
+                            this.deleteCompleted.call(this.completedListener, data);
+                        }
 
-                            if (this.getDisplayObjectPage()) {
-                                (this.getUIRouter().getTargets() as Targets).display(this.getFromTarget());
-                            }                            
+                        if (this.getDisplayObjectPage()) {
+                            (this.getUIRouter().getTargets() as Targets).display(this.getFromTarget());
+                        }
                         },
                         error: (error: IDeleteFailed) => {
-                            if (this.deleteFailed) {
-                                const response = new ResponseCL<IDeleteFailed>(error, error.statusCode);
-                                this.deleteFailed.call(this.failedListener, response);
-                            }
+                        if (this.deleteFailed) {
+                            const response = new ResponseCL<IDeleteFailed>(error, error.statusCode);
+                            this.deleteFailed.call(this.failedListener, response);
+                        }
 
-                            if (this.getDisplayObjectPage()) {
-                                (this.getUIRouter().getTargets() as Targets).display(this.getFromTarget());
+                        if (this.getDisplayObjectPage()) {
+                            (this.getUIRouter().getTargets() as Targets).display(this.getFromTarget());
                             }                            
                         }
                     });
