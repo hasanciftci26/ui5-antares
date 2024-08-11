@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-publish:
-    if: github.event.pull_request.merged == true  # Ensure it only runs if the PR is merged
+    if: github.event.pull_request.merged == true && startsWith(github.ref, 'refs/heads/') && endsWith(github.ref, '-latest')  # Ensure it only runs if the PR is merged
     runs-on: ubuntu-latest
 
     steps:
