@@ -1,3 +1,4 @@
+import CustomData from "sap/ui/core/CustomData";
 import { NamingStrategies } from "ui5/antares/types/entry/enums";
 
 export interface IValueHelpSettings {
@@ -21,4 +22,10 @@ export interface IValueHelpDialogOKEvent {
 
 export interface ITokens {
     getKey: () => string;
+    getCustomData: () => CustomData[];
+}
+
+export interface IValueHelpInitialFilter {
+    propertyName: string;
+    value: string | number | boolean | Date;
 }

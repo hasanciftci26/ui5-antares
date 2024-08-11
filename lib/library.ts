@@ -34,7 +34,7 @@ sap.ui.getCore().initLibrary({
         "ui5.antares.util.Util"
     ],
     noLibraryCSS: true,
-    version: "1.96.33002"
+    version: "1.96.33003"
 });
 
 const library: { [key: string]: unknown } = ObjectPath.get("ui5.antares") as { [key: string]: unknown };
