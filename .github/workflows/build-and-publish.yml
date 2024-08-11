@@ -37,3 +37,22 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}  # Use the npm token from secrets
       run: npm publish --tag ${{ env.TAG_NAME }}
+
+    - name: Deprecate previous version
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}  # Use the npm token from secrets
+      run: |
+        # Get the current version
+        CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+        
+        # Extract major, minor, and patch numbers
+        MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
+        MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
+        PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
+        
+        # Calculate the previous patch version
+        PREVIOUS_PATCH=$((PATCH-1))
+        PREVIOUS_VERSION="${MAJOR}.${MINOR}.${PREVIOUS_PATCH}"
+        
+        # Deprecate the previous version
+        npm deprecate "ui5-antares@${PREVIOUS_VERSION}" "This version has some bugs and missing features. Please install the latest version with the following command: npm install --save-exact ui5-antares@${TAG_NAME}"      
