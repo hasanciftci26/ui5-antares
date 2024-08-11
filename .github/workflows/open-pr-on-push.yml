@@ -96,6 +96,7 @@ jobs:
         fi
 
     - name: Create Pull Request
+      if: ${{ env.TARGET_BRANCH != '' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
