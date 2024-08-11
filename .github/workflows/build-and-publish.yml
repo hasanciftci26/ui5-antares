@@ -1,0 +1,38 @@
+name: Build and Publish
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  build-and-publish:
+    if: github.event.pull_request.merged == true && startsWith(github.ref, 'refs/heads/') && endsWith(github.ref, '-latest')  # Ensure it only runs if the PR is merged
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'  # Specify the Node.js version you need
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build the project
+      run: npm run build  # Adjust according to your build script
+
+    - name: Determine Tag
+      id: determine-tag
+      run: |
+        BRANCH_NAME=$(echo $GITHUB_REF | sed 's|refs/heads/||')
+        TAG_NAME="ui5-${BRANCH_NAME//./-}"
+        echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+
+    - name: Publish to npm
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}  # Use the npm token from secrets
+      run: npm publish --tag ${{ env.TAG_NAME }}
