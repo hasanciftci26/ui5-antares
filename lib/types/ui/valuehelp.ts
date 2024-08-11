@@ -14,3 +14,8 @@ export interface IValueHelpSettings {
     filterModelName?: string;
     filterCaseSensitive?: boolean;
 };
+
+export interface IValueHelpInitialFilter {
+    propertyName: string;
+    value: string | number | boolean | Date;
+}
