@@ -46,6 +46,12 @@ jobs:
       run: |
         BRANCH_NAME=$(echo $GITHUB_REF | sed 's|refs/heads/||')
         echo "SOURCE_BRANCH=$BRANCH_NAME" >> $GITHUB_ENV
+
+        if [[ "$BRANCH_NAME" == *-latest ]]; then
+          echo "Branch already ends with '-latest'. Exiting."
+          exit 0
+        fi
+
         if [[ "$BRANCH_NAME" == 1.124.1* ]]; then
           echo "TARGET_BRANCH=1.124.1-latest" >> $GITHUB_ENV
         elif [[ "$BRANCH_NAME" == 1.124.999* ]]; then
