@@ -3,7 +3,7 @@ import Text from "sap/m/Text";
 import UIComponent from "sap/ui/core/UIComponent";
 import Controller from "sap/ui/core/mvc/Controller";
 import ModelCL from "ui5/antares/base/v2/ModelCL";
-import { IValueHelpDialogOKEvent, IValueHelpSettings } from "ui5/antares/types/ui/valuehelp";
+import { IValueHelpDialogOKEvent, IValueHelpInitialFilter, IValueHelpSettings } from "ui5/antares/types/ui/valuehelp";
 import { NamingStrategies } from "ui5/antares/types/entry/enums";
 import EntityCL from "ui5/antares/entity/v2/EntityCL";
 import ColumnListItem from "sap/m/ColumnListItem";
@@ -54,6 +54,11 @@ export default class ValueHelpCL extends ModelCL {
     private filterModelName: string;
     private filterModel: JSONModel;
     private caseSensitive: boolean;
+    private afterSelect?: (data: string | object) => void;
+    private afterSelectListener?: object;
+    private initialFilters?: IValueHelpInitialFilter[];
+    private afterDialogOpened?: (dialog: ValueHelpDialog) => void;
+    private afterOpenedListener?: object;
 
     constructor(controller: Controller | UIComponent, settings: IValueHelpSettings, modelName?: string) {
         super(controller, modelName);
@@ -75,6 +80,14 @@ export default class ValueHelpCL extends ModelCL {
     public openValueHelpDialog(event: Event) {
         this.getValueHelpDialog().then((dialog) => {
             dialog.open();
+
+            if (this.initialFilters) {
+                this.applyInitialFilters();
+            }
+
+            if (this.afterDialogOpened) {
+                this.afterDialogOpened.call(this.afterOpenedListener || this.getSourceController(), this.valueHelpDialog);
+            }
         });
         this.sourceControl = event.getSource() as Input;
     }
@@ -118,6 +131,16 @@ export default class ValueHelpCL extends ModelCL {
 
         if (selectedTokens) {
             this.sourceControl.setValue(selectedTokens[0].getKey());
+
+            if (this.afterSelect) {
+                const selectedRow = selectedTokens[0].getCustomData().find(data => data.getKey() === "row");
+
+                if (selectedRow) {
+                    this.afterSelect.call(this.afterSelectListener || this.getSourceController(), selectedRow.getValue());
+                } else {
+                    this.afterSelect.call(this.afterSelectListener || this.getSourceController(), selectedTokens[0].getKey());
+                }
+            }
         }
 
         this.valueHelpDialog.close();
@@ -531,5 +554,33 @@ export default class ValueHelpCL extends ModelCL {
         const filterModel = new JSONModel();
         filterModel.setDefaultBindingMode("TwoWay");
         this.filterModel = filterModel;
+    }
+
+    public attachAfterSelect(afterSelect: (data: string | object) => void, listener?: object) {
+        this.afterSelect = afterSelect;
+        this.afterSelectListener = listener;
+    }
+
+    public setInitialFilters(filters: IValueHelpInitialFilter[]) {
+        this.initialFilters = filters;
+    }
+
+    private applyInitialFilters() {
+        for (const filter of this.initialFilters as IValueHelpInitialFilter[]) {
+            if (this.excludedFilterProperties.includes(filter.propertyName)) {
+                continue;
+            }
+
+            if (filter.propertyName === this.valueHelpProperty || this.readonlyProperties.includes(filter.propertyName)) {
+                this.filterModel.setProperty(`/${filter.propertyName}`, filter.value);
+            }
+        }
+
+        this.filterBar.search();
+    }
+
+    public attachAfterDialogOpened(afterDialogOpened: (dialog: ValueHelpDialog) => void, listener?: object) {
+        this.afterDialogOpened = afterDialogOpened;
+        this.afterOpenedListener = listener;
     }
 }
